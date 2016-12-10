@@ -144,7 +144,6 @@ class MainScene implements sd.SceneController {
 					colour: [1, 1, 0],
 				}
 			});
-			scene.pbrModelMgr.setActiveLights([l1.light!, l2.light!, l3.light!], -1);
 
 			this.setMode(GameMode.Title);
 		});
@@ -209,7 +208,6 @@ class MainScene implements sd.SceneController {
 			};
 
 			this.scene_.lightMgr.prepareLightsForRender(this.scene_.lightMgr.all(), camera, renderPass.viewport()!);
-			this.scene_.pbrModelMgr.updateLightData(this.scene_.lightMgr);
 
 			renderPass.setDepthTest(render.DepthTest.Less);
 			renderPass.setFaceCulling(render.FaceCulling.Back);
