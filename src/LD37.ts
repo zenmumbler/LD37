@@ -72,7 +72,7 @@ class MainScene implements sd.SceneController {
 
 		loadAllAssets(rc, ac, scene.meshMgr, progress).then(assets => {
 			const mat = asset.makeMaterial("floor");
-			mat.roughness = 0.4;
+			mat.roughness = 0.3;
 			console.info("ASSETS", assets);
 			this.assets_ = assets;
 
@@ -110,7 +110,7 @@ class MainScene implements sd.SceneController {
 					meshData: meshdata.gen.generate(new meshdata.gen.Plane({ width: 8, depth: 8, rows: 2, segs: 2 }))
 				},
 				pbrModel: {
-					materials: [mat]
+					materials: [assets.mat.medmetal]
 				}
 			});
 
