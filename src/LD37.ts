@@ -72,16 +72,32 @@ class MainScene implements sd.SceneController {
 
 		loadAllAssets(rc, ac, scene.meshMgr, progress).then(assets => {
 			const mat = asset.makeMaterial("floor");
+			mat.roughness = 0.4;
 			console.info("ASSETS", assets);
 			this.assets_ = assets;
 
 			scene.makeEntity({
+				transform: {
+					position: [1.2, 0, 1.2]
+				},
 				mesh: {
-					name: "floor",
+					name: "cube",
 					meshData: meshdata.gen.generate(new meshdata.gen.Box({ width: 2, depth: 2, height: 2, inward: false }))
 				},
 				pbrModel: {
 					materials: [assets.mat.chipmetal]
+				}
+			});
+			scene.makeEntity({
+				transform: {
+					position: [-1.2, 0, -1.2]
+				},
+				mesh: {
+					name: "sphere",
+					meshData: meshdata.gen.generate(new meshdata.gen.Sphere({ radius: 1, rows: 20, segs: 30 }))
+				},
+				pbrModel: {
+					materials: [assets.mat.medmetal]
 				}
 			});
 			scene.makeEntity({

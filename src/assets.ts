@@ -3,6 +3,7 @@
 
 interface MaterialAssets {
 	chipmetal: asset.Material;
+	medmetal: asset.Material;
 }
 
 interface MeshAssets {
@@ -44,14 +45,15 @@ function loadAllAssets(rc: render.RenderContext, ac: audio.AudioContext, meshMgr
 
 	function loadEnvCubeTex<K extends keyof TextureAssets>(dirPath: string, k: K) {
 		render.loadCubeTexture(rc, render.makeCubeMapPaths(dirPath, ".jpg")).then(texture => {
-			const envTexture = render.prefilteredEnvMap(rc, meshMgr, texture, 128);
+			const envTexture = render.prefilteredEnvMap(rc, meshMgr, texture, 256);
 			a.tex[k] = <any>envTexture;
 		});
 	}
 
 	const stuff = [
 		loadLocalMTL("data/mat/chipmetal/chipmetal.mtl", "chipmetal"),
-		loadEnvCubeTex("data/mat/galaxy/galaxy-", "envCubeSpace")
+		loadLocalMTL("data/mat/medmetal/medmetal.mtl", "medmetal"),
+		loadEnvCubeTex("data/mat/galaxy/galaxy-", "envCubeSpace"),
 	];
 	totalAssets = stuff.length;
 
