@@ -6,11 +6,10 @@ interface MaterialAssets {
 }
 
 interface MeshAssets {
-
 }
 
 interface TextureAssets {
-
+	envCubeSpace: render.Texture;
 }
 
 interface Assets {
@@ -20,7 +19,7 @@ interface Assets {
 	tex: TextureAssets;
 }
 
-function loadAllAssets(rc: render.RenderContext, ac: audio.AudioContext, progress: (ratio: number) => void) {
+function loadAllAssets(rc: render.RenderContext, ac: audio.AudioContext, meshMgr: world.MeshManager, progress: (ratio: number) => void) {
 	const a = { mat: {}, mesh: {}, tex: {} } as Assets;
 
 	var totalAssets = 1, assetsLoaded = 0;
@@ -43,8 +42,16 @@ function loadAllAssets(rc: render.RenderContext, ac: audio.AudioContext, progres
 		});
 	}
 
+	function loadEnvCubeTex<K extends keyof TextureAssets>(dirPath: string, k: K) {
+		render.loadCubeTexture(rc, render.makeCubeMapPaths(dirPath, ".jpg")).then(texture => {
+			const envTexture = render.prefilteredEnvMap(rc, meshMgr, texture, 128);
+			a.tex[k] = <any>envTexture;
+		});
+	}
+
 	const stuff = [
-		loadLocalMTL("data/mat/ChipMetal/chipmetal.mtl", "chipmetal")
+		loadLocalMTL("data/mat/chipmetal/chipmetal.mtl", "chipmetal"),
+		loadEnvCubeTex("data/mat/galaxy/galaxy-", "envCubeSpace")
 	];
 	totalAssets = stuff.length;
 
