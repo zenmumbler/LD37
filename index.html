@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Unknown - a Ludum Dare 37 Entry by @zenmumbler</title>
+	<style>
+		body {
+			margin: 0; background: black;
+			cursor: default;
+			-webkit-user-select: none;
+			-moz-user-select: none;
+			-ms-user-select: none;
+			user-select: none;
+
+			font-family: Tahoma, sans-serif;
+		}
+		.stageholder {
+			width: 1280px;
+			height: 720px;
+			margin: 50px auto 0 auto;
+			position: relative;
+			overflow: hidden;
+		}
+		.stageholder.fullhd {
+			width: 1920px;
+			height: 1080px;
+		}
+
+		#stage {
+			display: none;
+			position: absolute;
+			z-index: 3;
+		}
+
+		.overlay {
+			position: absolute;
+			z-index: 4;
+			width: 100%;
+			height: 100%;
+			display: none;
+			color: white;
+			font-size: 22px;
+		}
+		.titles {
+			padding: 30px 50px;
+		}
+		.right {
+			position: absolute;
+			right: 150px;
+			top: 50px;
+		}
+		.start {
+			margin-top: 50px;
+		}
+
+		.messages p {
+			position: absolute;
+			text-align: center;
+			left: 0;
+			right: 0;
+			bottom: 35%;
+		}
+
+
+		.bar {
+			position: absolute;
+			width: 500px;
+			height: 12px;
+			left: 390px;
+			top: 350px;
+			border: 1px solid white;
+			padding: 1px;
+		}
+		.progress {
+			background-color: rgb(180, 45, 32);
+			height: 100%;
+			width: 0;
+		}
+
+		.butan {
+			display: inline-block;
+			width: 100px;
+			padding: 10px;
+			border: 1px solid white;
+			text-align: center;
+			cursor: pointer;
+		}
+		.butan.pres {
+			color: black;
+			background: white;
+		}
+		.butan.begin {
+			width: 300px;
+			font-size: 36px;
+		}
+
+		.info {
+			font-size: 16px;
+		}
+
+		a, a:visited, a:active {
+			color: rgb(231, 211, 7);
+		}
+	</style>
+</head>
+<body>
+
+<div class="stageholder hdready">
+	<canvas width="1280" height="720" id="stage"></canvas>
+
+	<div class="overlay loading">
+		<div class="bar"><div class="progress"></div></div>
+	</div>
+
+	<div class="overlay titles">
+	</div>
+</div>
+
+<script src="../stardazed-tx/ext/veclib.js"></script>
+<script src="../stardazed-tx/ext/inflate.js"></script>
+<script src="../stardazed-tx/dist/stardazed-tx.js"></script>
+<script src="build/LD37.js"></script>
+
+</body>
+</html>
