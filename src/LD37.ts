@@ -73,8 +73,6 @@ class MainScene implements sd.SceneController {
 		loadAllAssets(rc, ac, scene.meshMgr, progress).then(assets => {
 			const mat = asset.makeMaterial("floor");
 			console.info("ASSETS", assets);
-			assets.mat.chipmetal.roughness = 0.3;
-			assets.mat.chipmetal.metallic = 0.8;
 			this.assets_ = assets;
 
 			scene.makeEntity({
@@ -101,9 +99,7 @@ class MainScene implements sd.SceneController {
 			});
 
 			const l1 = scene.makeEntity({
-				transform: {
-					position: [2, 3, 2]
-				},
+				transform: { position: [2, 3, 2] },
 				light: {
 					name: "point",
 					type: asset.LightType.Point,
@@ -112,7 +108,27 @@ class MainScene implements sd.SceneController {
 					colour: [0, 1, 1],
 				}
 			});
-			scene.pbrModelMgr.setActiveLights([l1.light!], -1);
+			const l2 = scene.makeEntity({
+				transform: { position: [-2, 3, 2] },
+				light: {
+					name: "point",
+					type: asset.LightType.Point,
+					intensity: 2,
+					range: 8,
+					colour: [1, 0, 1],
+				}
+			});
+			const l3 = scene.makeEntity({
+				transform: { position: [2, 3, -2] },
+				light: {
+					name: "point",
+					type: asset.LightType.Point,
+					intensity: 2,
+					range: 8,
+					colour: [1, 1, 0],
+				}
+			});
+			scene.pbrModelMgr.setActiveLights([l1.light!, l2.light!, l3.light!], -1);
 
 			this.setMode(GameMode.Title);
 		});

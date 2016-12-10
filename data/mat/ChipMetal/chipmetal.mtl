@@ -1,6 +1,9 @@
 newmtl chipmetal
 	Ks 0.8 0.8 0.8
 	Ns 6
+	Pr 0.3
+	Pm 0.8
 	map_Kd diffuse.png
+	map_Pr rough.png
 	norm normalheight.png
 	disp normalheight.png
