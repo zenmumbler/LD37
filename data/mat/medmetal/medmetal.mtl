@@ -1,0 +1,5 @@
+newmtl medmetal
+	map_Kd -s 2 2 TexturesCom_Medieval_Metal_albedo_S.png
+	map_Pm TexturesCom_Medieval_Metal_metallic_S.png
+	map_Pr TexturesCom_Medieval_Metal_roughness_S.png
+	norm TexturesCom_Medieval_Metal_normalmap_S.png
