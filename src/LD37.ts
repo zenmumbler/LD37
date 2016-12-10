@@ -1,8 +1,9 @@
 // Unknown, a Ludum Dare 37 Entry
-// (c) 2016 by Arthur Langereis (@zenmumbler) and Brian J. Miller (@mokumgames)
+// (c) 2016 by Arthur Langereis (@zenmumbler)
 
 /// <reference path="../../stardazed-tx/dist/stardazed-tx.d.ts" />
 /// <reference path="flycam.ts" />
+/// <reference path="assets.ts" />
 
 import io = sd.io;
 import math = sd.math;
@@ -64,29 +65,51 @@ class MainScene implements sd.SceneController {
 		const rc = this.rc;
 		const ac = this.ac;
 
-		const mat = asset.makeMaterial("floor");
+		const progress = (ratio: number) => {
+			dom.$1(".progress").style.width = (ratio * 100) + "%";
+		};
 
-		scene.makeEntity({
-			mesh: {
-				name: "floor",
-				meshData: meshdata.gen.generate(new meshdata.gen.Box({ width: 2, depth: 2, height: 2, inward: false }))
-			},
-			stdModel: {
-				materials: [mat]
-			}
-		});
+		loadAllAssets(rc, ac, progress).then(assets => {
+			const mat = asset.makeMaterial("floor");
+			console.info(assets);
 
-		scene.makeEntity({
-			transform: {
-				position: [2, 3, 2]
-			},
-			light: {
-				name: "point",
-				type: asset.LightType.Point,
-				intensity: 1,
-				range: 7,
-				colour: [1, 1, 1],
-			}
+			scene.makeEntity({
+				mesh: {
+					name: "floor",
+					meshData: meshdata.gen.generate(new meshdata.gen.Box({ width: 2, depth: 2, height: 2, inward: false }))
+				},
+				stdModel: {
+					materials: [assets.mat.chipmetal]
+				}
+			});
+			scene.makeEntity({
+				transform: {
+					position: [0, -1, 0],
+					// rotation: quat.fromEuler(0, 0, Math.PI / 2)
+				},
+				mesh: {
+					name: "floor2",
+					meshData: meshdata.gen.generate(new meshdata.gen.Plane({ width: 8, depth: 8, rows: 2, segs: 2 }))
+				},
+				stdModel: {
+					materials: [mat]
+				}
+			});
+
+			scene.makeEntity({
+				transform: {
+					position: [2, 3, 2]
+				},
+				light: {
+					name: "point",
+					type: asset.LightType.Point,
+					intensity: 1,
+					range: 7,
+					colour: [1, 1, 1],
+				}
+			});
+
+			this.setMode(GameMode.Title);
 		});
 	}
 
@@ -106,7 +129,9 @@ class MainScene implements sd.SceneController {
 
 
 	setMode(newMode: GameMode) {
-		dom.hide(".loading");
+		if (newMode != GameMode.Loading) {
+			dom.hide(".loading");
+		}
 		dom.hide(".titles");
 		dom.show("#stage");
 
