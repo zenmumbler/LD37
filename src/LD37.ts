@@ -43,6 +43,7 @@ class MainScene implements sd.SceneController {
 	private assets_: Assets;
 
 	private flyCam_: FlyCamController;
+	private spotLight_: world.LightInstance;
 
 	private mode_ = GameMode.None;
 
@@ -114,36 +115,55 @@ class MainScene implements sd.SceneController {
 				}
 			});
 
-			const l1 = scene.makeEntity({
-				transform: { position: [2, 3, 2] },
+			// const l1 = scene.makeEntity({
+			// 	transform: { position: [2, 3, 2] },
+			// 	light: {
+			// 		name: "point",
+			// 		type: asset.LightType.Point,
+			// 		intensity: 2,
+			// 		range: 8,
+			// 		colour: [0, 1, 1],
+			// 	}
+			// });
+			// const l2 = scene.makeEntity({
+			// 	transform: { position: [-2, 3, 2] },
+			// 	light: {
+			// 		name: "point",
+			// 		type: asset.LightType.Point,
+			// 		intensity: 2,
+			// 		range: 8,
+			// 		colour: [1, 0, 1],
+			// 	}
+			// });
+			// const l3 = scene.makeEntity({
+			// 	transform: { position: [2, 3, -2] },
+			// 	light: {
+			// 		name: "point",
+			// 		type: asset.LightType.Point,
+			// 		intensity: 2,
+			// 		range: 8,
+			// 		colour: [1, 1, 0],
+			// 	}
+			// });
+			const l4 = scene.makeEntity({
+				transform: { position: [3.5, 2.5, 3.5] },
 				light: {
-					name: "point",
-					type: asset.LightType.Point,
-					intensity: 2,
-					range: 8,
-					colour: [0, 1, 1],
+					name: "spot",
+					type: asset.LightType.Spot,
+					intensity: 2.5,
+					range: 12,
+					colour: [1, 1, 1],
+					cutoff: math.deg2rad(35),
+					shadowType: asset.ShadowType.Soft,
+					shadowQuality: asset.ShadowQuality.Auto,
+					shadowStrength: 1,
+					shadowBias: 0.002
 				}
 			});
-			const l2 = scene.makeEntity({
-				transform: { position: [-2, 3, 2] },
-				light: {
-					name: "point",
-					type: asset.LightType.Point,
-					intensity: 2,
-					range: 8,
-					colour: [1, 0, 1],
-				}
-			});
-			const l3 = scene.makeEntity({
-				transform: { position: [2, 3, -2] },
-				light: {
-					name: "point",
-					type: asset.LightType.Point,
-					intensity: 2,
-					range: 8,
-					colour: [1, 1, 0],
-				}
-			});
+
+			this.spotLight_ = l4.light!;
+			ltm.setDirection(this.spotLight_, [-1, -1, -1]);
+			scene.pbrModelMgr.setShadowCaster(this.spotLight_);
 
 			this.setMode(GameMode.Title);
 		});
@@ -180,7 +200,6 @@ class MainScene implements sd.SceneController {
 			return;
 		}
 
-		/*
 		// -- shadow pass
 		let spotShadow: world.ShadowView | null = null;
 
@@ -188,13 +207,14 @@ class MainScene implements sd.SceneController {
 			let rpdShadow = render.makeRenderPassDescriptor();
 			rpdShadow.clearMask = render.ClearMask.Depth;
 
-			spotShadow = this.scene_.lightMgr.shadowViewForLight(this.rc, this.spotLight_.light, .1);
+			spotShadow = this.scene_.lightMgr.shadowViewForLight(this.rc, this.spotLight_, .1);
 
-			render.runRenderPass(this.rc, this.scene_.meshMgr, rpdShadow, spotShadow.shadowFBO, (renderPass) => {
-				this.scene_.stdModelMgr.draw(this.scene_.stdModelMgr.all(), renderPass, spotShadow.lightProjection, null, null, world.RenderMode.Shadow);
-			});
+			if (spotShadow) {
+				render.runRenderPass(this.rc, this.scene_.meshMgr, rpdShadow, spotShadow.shadowFBO, (renderPass) => {
+					this.scene_.pbrModelMgr.drawShadows(this.scene_.pbrModelMgr.all(), renderPass, spotShadow!.lightProjection);
+				});
+			}
 		}
-		*/
 
 		// -- main forward pass
 		let rpdMain = render.makeRenderPassDescriptor();
@@ -212,8 +232,7 @@ class MainScene implements sd.SceneController {
 			renderPass.setDepthTest(render.DepthTest.Less);
 			renderPass.setFaceCulling(render.FaceCulling.Back);
 
-			// this.scene_.stdModelMgr.draw(this.scene_.stdModelMgr.all(), renderPass, camera, null, null, world.RenderMode.Forward);
-			this.scene_.pbrModelMgr.draw(this.scene_.pbrModelMgr.all(), renderPass, camera, world.PBRLightingQuality.CookTorrance, this.assets_.tex.envCubeSpace);
+			this.scene_.pbrModelMgr.draw(this.scene_.pbrModelMgr.all(), renderPass, camera, spotShadow, world.PBRLightingQuality.CookTorrance, this.assets_.tex.envCubeSpace);
 		});
 
 	}
