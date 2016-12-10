@@ -40,6 +40,7 @@ const enum KeyCommand {
 
 class MainScene implements sd.SceneController {
 	private scene_: world.Scene;
+	private assets_: Assets;
 
 	private flyCam_: FlyCamController;
 
@@ -69,16 +70,19 @@ class MainScene implements sd.SceneController {
 			dom.$1(".progress").style.width = (ratio * 100) + "%";
 		};
 
-		loadAllAssets(rc, ac, progress).then(assets => {
+		loadAllAssets(rc, ac, scene.meshMgr, progress).then(assets => {
 			const mat = asset.makeMaterial("floor");
-			console.info(assets);
+			console.info("ASSETS", assets);
+			assets.mat.chipmetal.roughness = 0.3;
+			assets.mat.chipmetal.metallic = 0.8;
+			this.assets_ = assets;
 
 			scene.makeEntity({
 				mesh: {
 					name: "floor",
 					meshData: meshdata.gen.generate(new meshdata.gen.Box({ width: 2, depth: 2, height: 2, inward: false }))
 				},
-				stdModel: {
+				pbrModel: {
 					materials: [assets.mat.chipmetal]
 				}
 			});
@@ -91,23 +95,24 @@ class MainScene implements sd.SceneController {
 					name: "floor2",
 					meshData: meshdata.gen.generate(new meshdata.gen.Plane({ width: 8, depth: 8, rows: 2, segs: 2 }))
 				},
-				stdModel: {
+				pbrModel: {
 					materials: [mat]
 				}
 			});
 
-			scene.makeEntity({
+			const l1 = scene.makeEntity({
 				transform: {
 					position: [2, 3, 2]
 				},
 				light: {
 					name: "point",
 					type: asset.LightType.Point,
-					intensity: 1,
-					range: 7,
-					colour: [1, 1, 1],
+					intensity: 2,
+					range: 8,
+					colour: [0, 1, 1],
 				}
 			});
+			scene.pbrModelMgr.setActiveLights([l1.light!], -1);
 
 			this.setMode(GameMode.Title);
 		});
@@ -140,6 +145,10 @@ class MainScene implements sd.SceneController {
 
 
 	renderFrame(timeStep: number) {
+		if (this.mode_ < GameMode.Title) {
+			return;
+		}
+
 		/*
 		// -- shadow pass
 		let spotShadow: world.ShadowView | null = null;
@@ -168,11 +177,13 @@ class MainScene implements sd.SceneController {
 			};
 
 			this.scene_.lightMgr.prepareLightsForRender(this.scene_.lightMgr.all(), camera, renderPass.viewport()!);
+			this.scene_.pbrModelMgr.updateLightData(this.scene_.lightMgr);
 
 			renderPass.setDepthTest(render.DepthTest.Less);
 			renderPass.setFaceCulling(render.FaceCulling.Back);
 
-			this.scene_.stdModelMgr.draw(this.scene_.stdModelMgr.all(), renderPass, camera, null, null, world.RenderMode.Forward);
+			// this.scene_.stdModelMgr.draw(this.scene_.stdModelMgr.all(), renderPass, camera, null, null, world.RenderMode.Forward);
+			this.scene_.pbrModelMgr.draw(this.scene_.pbrModelMgr.all(), renderPass, camera, world.PBRLightingQuality.CookTorrance, this.assets_.tex.envCubeSpace);
 		});
 
 	}
