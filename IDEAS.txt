@@ -1,0 +1,44 @@
+IDEAS
+-----
+
+Witty text
+
+One _Special_ Room?
+
+SH / RE style puzzles?
+	find the thing(s) that act(s) as a (combined) key
+	obscure text / number puzzles
+
+Room Escape
+	jiggle the bits to find stuff to get to the exit
+
+Cube
+	each room is the same except for some minor differences
+	a maze essentially
+	lends itself well to ProcGen
+
+Groundhog day
+	The room / space is always the same but your actions determine outcome, repeat until you get it right
+	prevent series of bad things from happening
+	make good things happen
+	timed
+	many deaths
+	combine with ridic puzzles
+	frantic or more exploratory?
+		frantic requires much scripting, good interaction
+		exploratory needs some nudges to keep things going
+	hint system, character speaking ala UC
+	needs to be rel. short because of repetition, which is good
+
+Car (crash)?
+	dream thing ala SH1
+	car escape :)
+	bleh
+
+Basically "The Room"
+	it sold plenty so must be good
+	whole room is the puzzle
+	moving parts
+	much planning I see
+	puzzles
+	

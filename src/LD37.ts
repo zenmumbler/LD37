@@ -28,24 +28,12 @@ const enum GameMode {
 	Title,
 	Start,
 	Main,
-	Shift,
 	End
 }
 
 
-const enum KeyboardType {
-	QWERTY,
-	QWERTZ,
-	AZERTY
-}
-
-
 const enum KeyCommand {
-	Forward,
-	Backward,
-	Left,
-	Right,
-	Use
+	DooEet
 }
 
 
@@ -54,16 +42,14 @@ class MainScene implements sd.SceneController {
 
 	private flyCam_: FlyCamController;
 
-	private mousePosRel_ = [0.5, 0.5];
 	private mode_ = GameMode.None;
-	private keyboardType_ = KeyboardType.QWERTY;
 
 
 	constructor(private rc: render.RenderContext, private ac: audio.AudioContext) {
 		this.scene_ = new world.Scene(rc);
 		// this.sfx_ = new Sound(ac);
 
-		this.flyCam_ = new FlyCamController(rc.gl.canvas, [9, 1.3, 17]);
+		this.flyCam_ = new FlyCamController(rc.gl.canvas, [0, 2, 5]);
 
 		this.setMode(GameMode.Loading);
 		this.createScene();
@@ -78,6 +64,30 @@ class MainScene implements sd.SceneController {
 		const rc = this.rc;
 		const ac = this.ac;
 
+		const mat = asset.makeMaterial("floor");
+
+		scene.makeEntity({
+			mesh: {
+				name: "floor",
+				meshData: meshdata.gen.generate(new meshdata.gen.Box({ width: 2, depth: 2, height: 2, inward: false }))
+			},
+			stdModel: {
+				materials: [mat]
+			}
+		});
+
+		scene.makeEntity({
+			transform: {
+				position: [2, 3, 2]
+			},
+			light: {
+				name: "point",
+				type: asset.LightType.Point,
+				intensity: 1,
+				range: 7,
+				colour: [1, 1, 1],
+			}
+		});
 	}
 
 
@@ -98,7 +108,7 @@ class MainScene implements sd.SceneController {
 	setMode(newMode: GameMode) {
 		dom.hide(".loading");
 		dom.hide(".titles");
-
+		dom.show("#stage");
 
 		this.mode_ = newMode;
 	}
@@ -126,10 +136,10 @@ class MainScene implements sd.SceneController {
 		vec4.set(rpdMain.clearColour, 0, 0, 0, 1);
 		rpdMain.clearMask = render.ClearMask.ColourDepth;
 
-		false && render.runRenderPass(this.rc, this.scene_.meshMgr, rpdMain, null, (renderPass) => {
+		render.runRenderPass(this.rc, this.scene_.meshMgr, rpdMain, null, (renderPass) => {
 			let camera: world.ProjectionSetup = {
 				projectionMatrix: mat4.perspective([], math.deg2rad(50), this.rc.gl.drawingBufferWidth / this.rc.gl.drawingBufferHeight, 0.1, 100),
-				viewMatrix: [] // this.playerController_.viewMatrix
+				viewMatrix: this.flyCam_.cam.viewMatrix // this.playerController_.viewMatrix
 			};
 
 			this.scene_.lightMgr.prepareLightsForRender(this.scene_.lightMgr.all(), camera, renderPass.viewport()!);
@@ -137,6 +147,7 @@ class MainScene implements sd.SceneController {
 			renderPass.setDepthTest(render.DepthTest.Less);
 			renderPass.setFaceCulling(render.FaceCulling.Back);
 
+			this.scene_.stdModelMgr.draw(this.scene_.stdModelMgr.all(), renderPass, camera, null, null, world.RenderMode.Forward);
 		});
 
 	}
@@ -144,6 +155,7 @@ class MainScene implements sd.SceneController {
 
 	simulationStep(timeStep: number) {
 		const txm = this.scene_.transformMgr;
+		this.flyCam_.step(timeStep);
 	}
 }
 
@@ -154,7 +166,7 @@ dom.on(window, "load", () => {
 	const rctx = render.makeRenderContext(canvas)!;
 	const actx = audio.makeAudioContext()!;
 
-	var testCtl = new MainScene(rctx, actx);
-	sd.defaultRunLoop.sceneController = testCtl;
+	const mainCtl = new MainScene(rctx, actx);
+	sd.defaultRunLoop.sceneController = mainCtl;
 	sd.defaultRunLoop.start();
 });

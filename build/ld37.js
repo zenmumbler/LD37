@@ -128,11 +128,9 @@ var MainScene = (function () {
     function MainScene(rc, ac) {
         this.rc = rc;
         this.ac = ac;
-        this.mousePosRel_ = [0.5, 0.5];
         this.mode_ = 0;
-        this.keyboardType_ = 0;
         this.scene_ = new world.Scene(rc);
-        this.flyCam_ = new FlyCamController(rc.gl.canvas, [9, 1.3, 17]);
+        this.flyCam_ = new FlyCamController(rc.gl.canvas, [0, 2, 5]);
         this.setMode(1);
         this.createScene();
     }
@@ -143,6 +141,28 @@ var MainScene = (function () {
         var clm = scene.colliderMgr;
         var rc = this.rc;
         var ac = this.ac;
+        var mat = asset.makeMaterial("floor");
+        scene.makeEntity({
+            mesh: {
+                name: "floor",
+                meshData: meshdata.gen.generate(new meshdata.gen.Box({ width: 2, depth: 2, height: 2, inward: false }))
+            },
+            stdModel: {
+                materials: [mat]
+            }
+        });
+        scene.makeEntity({
+            transform: {
+                position: [2, 3, 2]
+            },
+            light: {
+                name: "point",
+                type: 2,
+                intensity: 1,
+                range: 7,
+                colour: [1, 1, 1],
+            }
+        });
     };
     MainScene.prototype.resume = function () {
         if (this.mode_ >= 2) {
@@ -155,6 +175,7 @@ var MainScene = (function () {
     MainScene.prototype.setMode = function (newMode) {
         dom.hide(".loading");
         dom.hide(".titles");
+        dom.show("#stage");
         this.mode_ = newMode;
     };
     MainScene.prototype.renderFrame = function (timeStep) {
@@ -162,18 +183,20 @@ var MainScene = (function () {
         var rpdMain = render.makeRenderPassDescriptor();
         vec4.set(rpdMain.clearColour, 0, 0, 0, 1);
         rpdMain.clearMask = 3;
-        false && render.runRenderPass(this.rc, this.scene_.meshMgr, rpdMain, null, function (renderPass) {
+        render.runRenderPass(this.rc, this.scene_.meshMgr, rpdMain, null, function (renderPass) {
             var camera = {
                 projectionMatrix: mat4.perspective([], math.deg2rad(50), _this.rc.gl.drawingBufferWidth / _this.rc.gl.drawingBufferHeight, 0.1, 100),
-                viewMatrix: []
+                viewMatrix: _this.flyCam_.cam.viewMatrix
             };
             _this.scene_.lightMgr.prepareLightsForRender(_this.scene_.lightMgr.all(), camera, renderPass.viewport());
             renderPass.setDepthTest(3);
             renderPass.setFaceCulling(2);
+            _this.scene_.stdModelMgr.draw(_this.scene_.stdModelMgr.all(), renderPass, camera, null, null, 0);
         });
     };
     MainScene.prototype.simulationStep = function (timeStep) {
         var txm = this.scene_.transformMgr;
+        this.flyCam_.step(timeStep);
     };
     return MainScene;
 }());
@@ -181,7 +204,7 @@ dom.on(window, "load", function () {
     var canvas = document.getElementById("stage");
     var rctx = render.makeRenderContext(canvas);
     var actx = audio.makeAudioContext();
-    var testCtl = new MainScene(rctx, actx);
-    sd.defaultRunLoop.sceneController = testCtl;
+    var mainCtl = new MainScene(rctx, actx);
+    sd.defaultRunLoop.sceneController = mainCtl;
     sd.defaultRunLoop.start();
 });
