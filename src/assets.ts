@@ -1,4 +1,4 @@
-// Unknown, a Ludum Dare 37 Entry
+// Callisto, a Ludum Dare 37 Entry
 // (c) 2016 by Arthur Langereis (@zenmumbler)
 
 interface MaterialAssets {
@@ -36,9 +36,13 @@ function loadAllAssets(rc: render.RenderContext, ac: audio.AudioContext, meshMgr
 		return new URL(path, document.baseURI!);
 	}
 
-	function loadLocalMTL<K extends keyof MaterialAssets>(path: string, k: K) {
+	function loadLocalMTL<K extends keyof MaterialAssets>(path: string, ks: K[]) {
 		return asset.loadMTLFile(localURL(path)).then(ag => {
-			a.mat[k] = <any>ag.materials[0];
+			for (const mat of ag.materials) {
+				if (ks.indexOf(<any>mat.name) > -1) {
+					a.mat[mat.name as K] = <any>mat;
+				}
+			}
 			totalAssets += ag.textures.length;
 			return asset.resolveTextures(rc, ag.textures).then(tex => {
 				assetsLoaded += tex.length;
@@ -58,10 +62,10 @@ function loadAllAssets(rc: render.RenderContext, ac: audio.AudioContext, meshMgr
 	}
 
 	const stuff = [
-		loadLocalMTL("data/mat/chipmetal/chipmetal.mtl", "chipmetal"),
-		loadLocalMTL("data/mat/medmetal/medmetal.mtl", "medmetal"),
-		loadLocalMTL("data/mat/bronzepatina/bronzepatina.mtl", "bronzepatina"),
-		loadLocalMTL("data/mat/whitemarble/whitemarble.mtl", "whitemarble"),
+		loadLocalMTL("data/mat/chipmetal/chipmetal.mtl", ["chipmetal"]),
+		loadLocalMTL("data/mat/medmetal/medmetal.mtl", ["medmetal"]),
+		loadLocalMTL("data/mat/bronzepatina/bronzepatina.mtl", ["bronzepatina"]),
+		loadLocalMTL("data/mat/whitemarble/whitemarble.mtl", ["whitemarble"]),
 		loadEnvCubeTex("data/mat/galaxy/galaxy-", "envCubeSpace")
 	];
 	totalAssets = stuff.length;
