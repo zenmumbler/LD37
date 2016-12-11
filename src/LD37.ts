@@ -43,6 +43,8 @@ class MainScene implements sd.SceneController {
 	private assets_: Assets;
 
 	private flyCam_: FlyCamController;
+
+	private skyBox_: world.Skybox;
 	private spotLight_: world.LightInstance;
 
 	private mode_ = GameMode.None;
@@ -59,11 +61,17 @@ class MainScene implements sd.SceneController {
 	}
 
 
+
+	makeSkybox() {
+		const sb = this.scene_.makeEntity();
+		this.skyBox_ = new world.Skybox(this.rc, this.scene_.transformMgr, this.scene_.meshMgr, this.assets_.tex.envCubeSpace);
+		this.skyBox_.setEntity(sb.entity);
+	}
+
 	createScene() {
 		const scene = this.scene_;
-		const modm = scene.stdModelMgr;
+		const pbrm = scene.pbrModelMgr;
 		const ltm = scene.lightMgr;
-		const clm = scene.colliderMgr;
 		const rc = this.rc;
 		const ac = this.ac;
 
@@ -90,6 +98,9 @@ class MainScene implements sd.SceneController {
 				}
 			});
 			scene.makeEntity({
+
+			this.makeSkybox();
+
 				transform: {
 					position: [-1.2, 0, -1.2]
 				},
@@ -232,7 +243,9 @@ class MainScene implements sd.SceneController {
 			renderPass.setDepthTest(render.DepthTest.Less);
 			renderPass.setFaceCulling(render.FaceCulling.Back);
 
-			this.scene_.pbrModelMgr.draw(this.scene_.pbrModelMgr.all(), renderPass, camera, spotShadow, world.PBRLightingQuality.CookTorrance, this.assets_.tex.envCubeSpace);
+			this.scene_.pbrModelMgr.draw(this.scene_.pbrModelMgr.all(), renderPass, camera, spotShadow, world.PBRLightingQuality.CookTorrance, this.assets_.tex.reflectCubeSpace);
+
+			this.skyBox_.draw(renderPass, camera);
 		});
 
 	}
@@ -241,6 +254,10 @@ class MainScene implements sd.SceneController {
 	simulationStep(timeStep: number) {
 		const txm = this.scene_.transformMgr;
 		this.flyCam_.step(timeStep);
+
+		if (this.skyBox_) {
+			this.skyBox_.setCenter(this.flyCam_.cam.pos);
+		}
 	}
 }
 
