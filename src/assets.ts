@@ -4,6 +4,8 @@
 interface MaterialAssets {
 	chipmetal: asset.Material;
 	medmetal: asset.Material;
+	bronzepatina: asset.Material;
+	whitemarble: asset.Material;
 }
 
 interface MeshAssets {
@@ -53,6 +55,8 @@ function loadAllAssets(rc: render.RenderContext, ac: audio.AudioContext, meshMgr
 	const stuff = [
 		loadLocalMTL("data/mat/chipmetal/chipmetal.mtl", "chipmetal"),
 		loadLocalMTL("data/mat/medmetal/medmetal.mtl", "medmetal"),
+		loadLocalMTL("data/mat/bronzepatina/bronzepatina.mtl", "bronzepatina"),
+		loadLocalMTL("data/mat/whitemarble/whitemarble.mtl", "whitemarble"),
 		loadEnvCubeTex("data/mat/galaxy/galaxy-", "envCubeSpace"),
 	];
 	totalAssets = stuff.length;
