@@ -1,0 +1,5 @@
+newmtl bronzepatina
+	Pm 0
+	map_Kd -s 4 4 TexturesCom_Bronze_Patina_albedo_S.png
+	map_Pr TexturesCom_Bronze_Patina_roughness_S.png
+	norm TexturesCom_Bronze_Patina_normalmap_S.png
