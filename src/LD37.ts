@@ -1,9 +1,10 @@
-// Unknown, a Ludum Dare 37 Entry
+// Callisto, a Ludum Dare 37 Entry
 // (c) 2016 by Arthur Langereis (@zenmumbler)
 
 /// <reference path="../../stardazed-tx/dist/stardazed-tx.d.ts" />
 /// <reference path="flycam.ts" />
 /// <reference path="assets.ts" />
+/// <reference path="levelgen.ts" />
 
 import io = sd.io;
 import math = sd.math;
@@ -37,15 +38,14 @@ const enum KeyCommand {
 	DooEet
 }
 
-
 class MainScene implements sd.SceneController {
 	private scene_: world.Scene;
 	private assets_: Assets;
+	private level_: LevelGen;
 
 	private flyCam_: FlyCamController;
 
 	private skyBox_: world.Skybox;
-	private spotLight_: world.LightInstance;
 	private glowLight_: world.EntityInfo;
 
 	private mode_ = GameMode.None;
@@ -58,150 +58,30 @@ class MainScene implements sd.SceneController {
 		this.flyCam_ = new FlyCamController(rc.gl.canvas, [0, 2, 5]);
 
 		this.setMode(GameMode.Loading);
-		this.createScene();
-	}
 
 
-	makeGlower(position: sd.Float3, radius: number) {
-		this.glowLight_ = this.scene_.makeEntity({
-			transform: {
-				position: position
-			},
-			mesh: {
-				name: "sphere",
-				meshData: meshdata.gen.generate(new meshdata.gen.Sphere({ radius: radius, rows: 20, segs: 30 }))
-			},
-			pbrModel: {
-				materials: [this.assets_.mat.whitemarble]
-			},
-			light: {
-				name: "spherelight1",
-				type: asset.LightType.Point,
-				intensity: 8,
-				range: 2.5 * radius,
-				colour: [1, 0.96, 0.94]
-			}
-		});
-	}
+		const progress = (ratio: number) => {
+			dom.$1(".progress").style.width = (ratio * 100) + "%";
+		};
 
-	generatePillarBlock(origin: sd.Float3, pillarDim: number, pillarHeight: number, width: number, depth: number, yVariance: number, uvRange: sd.Float2) {
-		const tiles: meshdata.gen.TransformedMeshGen[] = [];
-		const halfWidth = width * pillarDim / 2;
-		const halfDepth = depth * pillarDim / 2;
-		const oX = origin[0] - halfWidth;
-		const oY = origin[1] - yVariance;
-		const oZ = origin[2] - halfDepth;
-		const yRange = yVariance * 2;
+		loadAllAssets(rc, ac, this.scene_.meshMgr, progress).then(assets => {
+			console.info("ASSETS", assets);
+			this.assets_ = assets;
 
-		let pZ = oZ;
-		for (let tileZ = 0; tileZ < depth; ++tileZ) {
-			let pX = oX;
-			for (let tileX = 0; tileX < width; ++tileX) {
-				const pY = oY + (Math.random() * yRange);
-				tiles.push({
-					translation: [pX, pY, pZ],
-					generator: new meshdata.gen.Box({
-						width: pillarDim, depth: pillarDim, height: pillarHeight,
-						inward: false,
-						uvRange: uvRange, uvOffset: vec2.multiply([], uvRange, [tileX, tileZ])
-					})
-				});
-				pX += pillarDim;
-			}
-			pZ += pillarDim;
-		}
+			this.makeSkybox();
 
-		return meshdata.gen.generate(tiles, meshdata.AttrList.Pos3Norm3UV2());
-	}
-
-	makeInnerWalls(scene: world.Scene, assets: Assets) {
-		const walls: meshdata.gen.TransformedMeshGen[] = [];
-		const hwalls: number[][] = [[-10, -10.5], [5, -10.5], [-10, 10], [5, 10]];
-		const vwalls: number[][] = [[-10.5, -10], [10, -10], [-10.5, 5], [10, 5]];
-		const cwalls: number[][] = [[-.25, -10.5], [-10.5, -0.25], [-.25, 10], [10, -.25]];
-		for (let cwx = 0; cwx < 4; ++cwx) {
-			walls.push({
-				translation: [hwalls[cwx][0] + 2.25, 7.5, hwalls[cwx][1]],
-				generator: new meshdata.gen.Box({ width: 5, depth: 0.5, height: 15, inward: false, uvRange: [5, 15] })
+			this.level_ = new LevelGen(rc, ac, assets, this.scene_);
+			this.level_.generate().then(() => {
+				this.setMode(GameMode.Title);
 			});
-			walls.push({
-				translation: [vwalls[cwx][0], 7.5, vwalls[cwx][1] + 2.25],
-				generator: new meshdata.gen.Box({ width: 0.5, depth: 5, height: 15, inward: false, uvRange: [5, 15] })
-			});
-			if ((cwx & 1) == 0) {
-				walls.push({
-					translation: [cwalls[cwx][0], 9, cwalls[cwx][1]],
-					generator: new meshdata.gen.Box({ width: 10, depth: 0.5, height: 12, inward: false, uvRange: [11, 12], uvOffset: [-1, 0] })
-				});
-			}
-			else {
-				walls.push({
-					translation: [cwalls[cwx][0], 9, cwalls[cwx][1]],
-					generator: new meshdata.gen.Box({ width: 0.5, depth: 10, height: 12, inward: false, uvRange: [11, 12], uvOffset: [-1, 0] })
-				});
-			}
-		}
-		const innerWalls = scene.makeEntity({
-			mesh: {
-				name: "innerwalls",
-				meshData: meshdata.gen.generate(walls)
-			},
-			pbrModel: {
-				materials: [assets.mat.chipmetal]
-			}
 		});
+
 	}
 
 	makeSkybox() {
 		const sb = this.scene_.makeEntity();
 		this.skyBox_ = new world.Skybox(this.rc, this.scene_.transformMgr, this.scene_.meshMgr, this.assets_.tex.envCubeSpace);
 		this.skyBox_.setEntity(sb.entity);
-	}
-
-	createScene() {
-		const scene = this.scene_;
-		const pbrm = scene.pbrModelMgr;
-		const ltm = scene.lightMgr;
-		const rc = this.rc;
-		const ac = this.ac;
-
-		const progress = (ratio: number) => {
-			dom.$1(".progress").style.width = (ratio * 100) + "%";
-		};
-
-		loadAllAssets(rc, ac, scene.meshMgr, progress).then(assets => {
-			console.info("ASSETS", assets);
-			this.assets_ = assets;
-
-			// -- skybox and global lights
-			this.makeSkybox();
-
-			// -- floor and ceiling of main room
-			const floor = scene.makeEntity({
-				mesh: {
-					name: "floor",
-					meshData: this.generatePillarBlock([0, 0, 0], .5, .5, 40, 40, .05, [0.125, 0.125])
-				},
-				pbrModel: {
-					materials: [assets.mat.bronzepatina]
-				}
-			});
-			const ceiling = scene.makeEntity({
-				mesh: {
-					name: "ceil",
-					meshData: this.generatePillarBlock([0, 10, 0], .5, 5, 40, 40, 3, [.5, 3])
-				},
-				pbrModel: {
-					materials: [assets.mat.medmetal]
-				}
-			});
-
-			this.makeInnerWalls(scene, assets);
-
-			this.makeGlower([0, 1, 0], .5);
-
-			this.setMode(GameMode.Title);
-		});
 	}
 
 
@@ -262,7 +142,7 @@ class MainScene implements sd.SceneController {
 				viewMatrix: this.flyCam_.cam.viewMatrix // this.playerController_.viewMatrix
 			};
 
-			this.scene_.lightMgr.prepareLightsForRender(this.scene_.lightMgr.all(), camera, renderPass.viewport()!);
+			this.scene_.lightMgr.prepareLightsForRender(this.scene_.lightMgr.allEnabled(), camera, renderPass.viewport()!);
 
 			renderPass.setDepthTest(render.DepthTest.Less);
 			renderPass.setFaceCulling(render.FaceCulling.Back);
