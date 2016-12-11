@@ -1,3 +1,22 @@
+ROOM
+----
+
+Floor grouped tiled with slight height differences
+Glow spheres: clustered into 3-5 groups for render groups, lights are added separately
+	intensity oscillates per group
+
+Ceiling like floor but with much larger height variation: baseColour variations?
+	some lights on the ceiling
+	some pillars extend all the way through the floor
+
+Movement: simple 2D collision map, circle for player
+	construct map from floor creation
+	place colliders such that we don't have > 1 collision at a time
+
+Bunch of coloured lights circling around for height-map wall effects
+
+
+
 IDEAS
 -----
 
