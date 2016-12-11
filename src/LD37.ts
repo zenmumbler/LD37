@@ -46,6 +46,7 @@ class MainScene implements sd.SceneController {
 
 	private skyBox_: world.Skybox;
 	private spotLight_: world.LightInstance;
+	private glowLight_: world.EntityInfo;
 
 	private mode_ = GameMode.None;
 
@@ -62,7 +63,7 @@ class MainScene implements sd.SceneController {
 
 
 	makeGlower(position: sd.Float3, radius: number) {
-		this.scene_.makeEntity({
+		this.glowLight_ = this.scene_.makeEntity({
 			transform: {
 				position: position
 			},
@@ -77,8 +78,8 @@ class MainScene implements sd.SceneController {
 				name: "spherelight1",
 				type: asset.LightType.Point,
 				intensity: 8,
-				range: radius * 1.5,
-				colour: [1, 1, 0.92]
+				range: 2.5 * radius,
+				colour: [1, 0.96, 0.94]
 			}
 		});
 	}
@@ -113,6 +114,44 @@ class MainScene implements sd.SceneController {
 		return meshdata.gen.generate(tiles, meshdata.AttrList.Pos3Norm3UV2());
 	}
 
+	makeInnerWalls(scene: world.Scene, assets: Assets) {
+		const walls: meshdata.gen.TransformedMeshGen[] = [];
+		const hwalls: number[][] = [[-10, -10.5], [5, -10.5], [-10, 10], [5, 10]];
+		const vwalls: number[][] = [[-10.5, -10], [10, -10], [-10.5, 5], [10, 5]];
+		const cwalls: number[][] = [[-.25, -10.5], [-10.5, -0.25], [-.25, 10], [10, -.25]];
+		for (let cwx = 0; cwx < 4; ++cwx) {
+			walls.push({
+				translation: [hwalls[cwx][0] + 2.25, 7.5, hwalls[cwx][1]],
+				generator: new meshdata.gen.Box({ width: 5, depth: 0.5, height: 15, inward: false, uvRange: [5, 15] })
+			});
+			walls.push({
+				translation: [vwalls[cwx][0], 7.5, vwalls[cwx][1] + 2.25],
+				generator: new meshdata.gen.Box({ width: 0.5, depth: 5, height: 15, inward: false, uvRange: [5, 15] })
+			});
+			if ((cwx & 1) == 0) {
+				walls.push({
+					translation: [cwalls[cwx][0], 9, cwalls[cwx][1]],
+					generator: new meshdata.gen.Box({ width: 10, depth: 0.5, height: 12, inward: false, uvRange: [11, 12], uvOffset: [-1, 0] })
+				});
+			}
+			else {
+				walls.push({
+					translation: [cwalls[cwx][0], 9, cwalls[cwx][1]],
+					generator: new meshdata.gen.Box({ width: 0.5, depth: 10, height: 12, inward: false, uvRange: [11, 12], uvOffset: [-1, 0] })
+				});
+			}
+		}
+		const innerWalls = scene.makeEntity({
+			mesh: {
+				name: "innerwalls",
+				meshData: meshdata.gen.generate(walls)
+			},
+			pbrModel: {
+				materials: [assets.mat.chipmetal]
+			}
+		});
+	}
+
 	makeSkybox() {
 		const sb = this.scene_.makeEntity();
 		this.skyBox_ = new world.Skybox(this.rc, this.scene_.transformMgr, this.scene_.meshMgr, this.assets_.tex.envCubeSpace);
@@ -137,26 +176,6 @@ class MainScene implements sd.SceneController {
 			// -- skybox and global lights
 			this.makeSkybox();
 
-			const sun = scene.makeEntity({
-				light: {
-					name: "sun",
-					type: asset.LightType.Directional,
-					colour: [1, 1, 1],
-					intensity: 1
-				}
-			});
-			ltm.setDirection(sun.light!, [-1, -1, -1]);
-			const sun2 = scene.makeEntity({
-				light: {
-					name: "sun2",
-					type: asset.LightType.Directional,
-					colour: [1, 1, 1],
-					intensity: 1
-				}
-			});
-			ltm.setDirection(sun2.light!, [1, -1, 1]);
-
-
 			// -- floor and ceiling of main room
 			const floor = scene.makeEntity({
 				mesh: {
@@ -177,43 +196,9 @@ class MainScene implements sd.SceneController {
 				}
 			});
 
+			this.makeInnerWalls(scene, assets);
 
-			// -- inner walls
-			const walls: meshdata.gen.TransformedMeshGen[] = [];
-			const hwalls: number[][] = [[-10, -10.5], [5, -10.5], [-10, 10], [5, 10]];
-			const vwalls: number[][] = [[-10.5, -10], [10, -10], [-10.5, 5], [10, 5]];
-			const cwalls: number[][] = [[-.25, -10.5], [-10.5, -0.25], [-.25, 10], [10, -.25]];
-			for (let cwx = 0; cwx < 4; ++cwx) {
-				walls.push({
-					translation: [hwalls[cwx][0] + 2.25, 7.5, hwalls[cwx][1]],
-					generator: new meshdata.gen.Box({ width: 5, depth: 0.5, height: 15, inward: false, uvRange: [5, 15] })
-				});
-				walls.push({
-					translation: [vwalls[cwx][0], 7.5, vwalls[cwx][1] + 2.25],
-					generator: new meshdata.gen.Box({ width: 0.5, depth: 5, height: 15, inward: false, uvRange: [5, 15] })
-				});
-				if ((cwx & 1) == 0) {
-					walls.push({
-						translation: [cwalls[cwx][0], 9, cwalls[cwx][1]],
-						generator: new meshdata.gen.Box({ width: 10, depth: 0.5, height: 12, inward: false, uvRange: [11, 12], uvOffset: [-1, 0] })
-					});
-				}
-				else {
-					walls.push({
-						translation: [cwalls[cwx][0], 9, cwalls[cwx][1]],
-						generator: new meshdata.gen.Box({ width: 0.5, depth: 10, height: 12, inward: false, uvRange: [11, 12], uvOffset: [-1, 0] })
-					});
-				}
-			}
-			const innerWalls = scene.makeEntity({
-				mesh: {
-					name: "innerwalls",
-					meshData: meshdata.gen.generate(walls)
-				},
-				pbrModel: {
-					materials: [assets.mat.chipmetal]
-				}
-			});
+			this.makeGlower([0, 1, 0], .5);
 
 			this.setMode(GameMode.Title);
 		});
@@ -295,6 +280,13 @@ class MainScene implements sd.SceneController {
 
 		if (this.skyBox_) {
 			this.skyBox_.setCenter(this.flyCam_.cam.pos);
+		}
+
+		if (this.glowLight_) {
+			const t = Math.sin(sd.defaultRunLoop.globalTime);
+			this.scene_.lightMgr.setIntensity(this.glowLight_.light!, 1 + t * .5);
+			const gma = this.scene_.pbrModelMgr.materialRange(this.glowLight_.pbrModel!);
+			this.scene_.pbrModelMgr.materialManager.setEmissiveIntensity(gma.first, 0.8 + t * .2);
 		}
 	}
 }

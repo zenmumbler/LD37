@@ -1,5 +1,6 @@
 newmtl whitemarble
 	Pm 0
+	Ke 1 0.96, 0.94
 	map_Kd -s 4 4 TexturesCom_Marble_Polished_White_2_diffuse_S.png
 	map_Pr TexturesCom_Marble_Polished_White_2_roughness_S.png
 	norm TexturesCom_Marble_Polished_White_2_normalmap_S.png
