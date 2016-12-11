@@ -134,45 +134,8 @@ class MainScene implements sd.SceneController {
 			console.info("ASSETS", assets);
 			this.assets_ = assets;
 
-			// scene.makeEntity({
-			// 	transform: {
-			// 		position: [1.2, 1, 1.2]
-			// 	},
-			// 	mesh: {
-			// 		name: "cube",
-			// 		meshData: meshdata.gen.generate(new meshdata.gen.Box({ width: 2, depth: 2, height: 2, inward: false }))
-			// 	},
-			// 	pbrModel: {
-			// 		materials: [assets.mat.chipmetal]
-			// 	}
-			// });
-
+			// -- skybox and global lights
 			this.makeSkybox();
-
-			const floor = scene.makeEntity({
-				transform: {
-					position: [0, 0, 0]
-				},
-				mesh: {
-					name: "floor",
-					meshData: this.generatePillarBlock([0, 0, 0], .5, .5, 40, 40, .05, [0.125, 0.125])
-				},
-				pbrModel: {
-					materials: [assets.mat.bronzepatina]
-				}
-			});
-			const ceiling = scene.makeEntity({
-				transform: {
-					position: [0, 0, 0]
-				},
-				mesh: {
-					name: "ceil",
-					meshData: this.generatePillarBlock([0, 10, 0], .5, 5, 40, 40, 3, [.5, 3])
-				},
-				pbrModel: {
-					materials: [assets.mat.medmetal]
-				}
-			});
 
 			const sun = scene.makeEntity({
 				light: {
@@ -183,6 +146,74 @@ class MainScene implements sd.SceneController {
 				}
 			});
 			ltm.setDirection(sun.light!, [-1, -1, -1]);
+			const sun2 = scene.makeEntity({
+				light: {
+					name: "sun2",
+					type: asset.LightType.Directional,
+					colour: [1, 1, 1],
+					intensity: 1
+				}
+			});
+			ltm.setDirection(sun2.light!, [1, -1, 1]);
+
+
+			// -- floor and ceiling of main room
+			const floor = scene.makeEntity({
+				mesh: {
+					name: "floor",
+					meshData: this.generatePillarBlock([0, 0, 0], .5, .5, 40, 40, .05, [0.125, 0.125])
+				},
+				pbrModel: {
+					materials: [assets.mat.bronzepatina]
+				}
+			});
+			const ceiling = scene.makeEntity({
+				mesh: {
+					name: "ceil",
+					meshData: this.generatePillarBlock([0, 10, 0], .5, 5, 40, 40, 3, [.5, 3])
+				},
+				pbrModel: {
+					materials: [assets.mat.medmetal]
+				}
+			});
+
+
+			// -- inner walls
+			const cornerWalls: meshdata.gen.TransformedMeshGen[] = [];
+			const hwalls: number[][] = [[-10, -10.5], [5, -10.5], [-10, 10], [5, 10]];
+			const vwalls: number[][] = [[-10.5, -10], [10, -10], [-10.5, 5], [10, 5]];
+			const cwalls: number[][] = [[-.25, -10.5], [-10.5, -0.25], [-.25, 10], [10, -.25]];
+			for (let cwx = 0; cwx < 4; ++cwx) {
+				cornerWalls.push({
+					translation: [hwalls[cwx][0] + 2.25, 7.5, hwalls[cwx][1]],
+					generator: new meshdata.gen.Box({ width: 5, depth: 0.5, height: 15, inward: false, uvRange: [5, 15] })
+				});
+				cornerWalls.push({
+					translation: [vwalls[cwx][0], 7.5, vwalls[cwx][1] + 2.25],
+					generator: new meshdata.gen.Box({ width: 0.5, depth: 5, height: 15, inward: false, uvRange: [5, 15] })
+				});
+				if ((cwx & 1) == 0) {
+					cornerWalls.push({
+						translation: [cwalls[cwx][0], 9, cwalls[cwx][1]],
+						generator: new meshdata.gen.Box({ width: 10, depth: 0.5, height: 12, inward: false, uvRange: [11, 12], uvOffset: [-1, 0] })
+					});
+				}
+				else {
+					cornerWalls.push({
+						translation: [cwalls[cwx][0], 9, cwalls[cwx][1]],
+						generator: new meshdata.gen.Box({ width: 0.5, depth: 10, height: 12, inward: false, uvRange: [11, 12], uvOffset: [-1, 0] })
+					});
+				}
+			}
+			const corners = scene.makeEntity({
+				mesh: {
+					name: "corners",
+					meshData: meshdata.gen.generate(cornerWalls)
+				},
+				pbrModel: {
+					materials: [assets.mat.chipmetal]
+				}
+			});
 
 			this.setMode(GameMode.Title);
 		});
@@ -255,7 +286,6 @@ class MainScene implements sd.SceneController {
 
 			this.skyBox_.draw(renderPass, camera);
 		});
-
 	}
 
 
