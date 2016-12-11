@@ -61,6 +61,57 @@ class MainScene implements sd.SceneController {
 	}
 
 
+	makeGlower(position: sd.Float3, radius: number) {
+		this.scene_.makeEntity({
+			transform: {
+				position: position
+			},
+			mesh: {
+				name: "sphere",
+				meshData: meshdata.gen.generate(new meshdata.gen.Sphere({ radius: radius, rows: 20, segs: 30 }))
+			},
+			pbrModel: {
+				materials: [this.assets_.mat.whitemarble]
+			},
+			light: {
+				name: "spherelight1",
+				type: asset.LightType.Point,
+				intensity: 8,
+				range: radius * 1.5,
+				colour: [1, 1, 0.92]
+			}
+		});
+	}
+
+	generatePillarBlock(origin: sd.Float3, pillarDim: number, pillarHeight: number, width: number, depth: number, yVariance: number, uvRange: sd.Float2) {
+		const tiles: meshdata.gen.TransformedMeshGen[] = [];
+		const halfWidth = width * pillarDim / 2;
+		const halfDepth = depth * pillarDim / 2;
+		const oX = origin[0] - halfWidth;
+		const oY = origin[1] - yVariance;
+		const oZ = origin[2] - halfDepth;
+		const yRange = yVariance * 2;
+
+		let pZ = oZ;
+		for (let tileZ = 0; tileZ < depth; ++tileZ) {
+			let pX = oX;
+			for (let tileX = 0; tileX < width; ++tileX) {
+				const pY = oY + (Math.random() * yRange);
+				tiles.push({
+					translation: [pX, pY, pZ],
+					generator: new meshdata.gen.Box({
+						width: pillarDim, depth: pillarDim, height: pillarHeight,
+						inward: false,
+						uvRange: uvRange, uvOffset: vec2.multiply([], uvRange, [tileX, tileZ])
+					})
+				});
+				pX += pillarDim;
+			}
+			pZ += pillarDim;
+		}
+
+		return meshdata.gen.generate(tiles, meshdata.AttrList.Pos3Norm3UV2());
+	}
 
 	makeSkybox() {
 		const sb = this.scene_.makeEntity();
@@ -80,101 +131,58 @@ class MainScene implements sd.SceneController {
 		};
 
 		loadAllAssets(rc, ac, scene.meshMgr, progress).then(assets => {
-			const mat = asset.makeMaterial("floor");
-			mat.roughness = 0.3;
 			console.info("ASSETS", assets);
 			this.assets_ = assets;
 
-			scene.makeEntity({
-				transform: {
-					position: [1.2, 0, 1.2]
-				},
-				mesh: {
-					name: "cube",
-					meshData: meshdata.gen.generate(new meshdata.gen.Box({ width: 2, depth: 2, height: 2, inward: false }))
-				},
-				pbrModel: {
-					materials: [assets.mat.chipmetal]
-				}
-			});
-			scene.makeEntity({
+			// scene.makeEntity({
+			// 	transform: {
+			// 		position: [1.2, 1, 1.2]
+			// 	},
+			// 	mesh: {
+			// 		name: "cube",
+			// 		meshData: meshdata.gen.generate(new meshdata.gen.Box({ width: 2, depth: 2, height: 2, inward: false }))
+			// 	},
+			// 	pbrModel: {
+			// 		materials: [assets.mat.chipmetal]
+			// 	}
+			// });
 
 			this.makeSkybox();
 
+			const floor = scene.makeEntity({
 				transform: {
-					position: [-1.2, 0, -1.2]
+					position: [0, 0, 0]
 				},
 				mesh: {
-					name: "sphere",
-					meshData: meshdata.gen.generate(new meshdata.gen.Sphere({ radius: 1, rows: 20, segs: 30 }))
+					name: "floor",
+					meshData: this.generatePillarBlock([0, 0, 0], .5, .5, 40, 40, .05, [0.125, 0.125])
 				},
 				pbrModel: {
-					materials: [assets.mat.medmetal]
+					materials: [assets.mat.bronzepatina]
 				}
 			});
-			scene.makeEntity({
+			const ceiling = scene.makeEntity({
 				transform: {
-					position: [0, -1, 0],
-					// rotation: quat.fromEuler(0, 0, Math.PI / 2)
+					position: [0, 0, 0]
 				},
 				mesh: {
-					name: "floor2",
-					meshData: meshdata.gen.generate(new meshdata.gen.Plane({ width: 8, depth: 8, rows: 2, segs: 2 }))
+					name: "ceil",
+					meshData: this.generatePillarBlock([0, 10, 0], .5, 5, 40, 40, 3, [.5, 3])
 				},
 				pbrModel: {
 					materials: [assets.mat.medmetal]
 				}
 			});
 
-			// const l1 = scene.makeEntity({
-			// 	transform: { position: [2, 3, 2] },
-			// 	light: {
-			// 		name: "point",
-			// 		type: asset.LightType.Point,
-			// 		intensity: 2,
-			// 		range: 8,
-			// 		colour: [0, 1, 1],
-			// 	}
-			// });
-			// const l2 = scene.makeEntity({
-			// 	transform: { position: [-2, 3, 2] },
-			// 	light: {
-			// 		name: "point",
-			// 		type: asset.LightType.Point,
-			// 		intensity: 2,
-			// 		range: 8,
-			// 		colour: [1, 0, 1],
-			// 	}
-			// });
-			// const l3 = scene.makeEntity({
-			// 	transform: { position: [2, 3, -2] },
-			// 	light: {
-			// 		name: "point",
-			// 		type: asset.LightType.Point,
-			// 		intensity: 2,
-			// 		range: 8,
-			// 		colour: [1, 1, 0],
-			// 	}
-			// });
-			const l4 = scene.makeEntity({
-				transform: { position: [3.5, 2.5, 3.5] },
+			const sun = scene.makeEntity({
 				light: {
-					name: "spot",
-					type: asset.LightType.Spot,
-					intensity: 2.5,
-					range: 12,
+					name: "sun",
+					type: asset.LightType.Directional,
 					colour: [1, 1, 1],
-					cutoff: math.deg2rad(35),
-					shadowType: asset.ShadowType.Soft,
-					shadowQuality: asset.ShadowQuality.Auto,
-					shadowStrength: 1,
-					shadowBias: 0.002
+					intensity: 1
 				}
 			});
-
-			this.spotLight_ = l4.light!;
-			ltm.setDirection(this.spotLight_, [-1, -1, -1]);
-			scene.pbrModelMgr.setShadowCaster(this.spotLight_);
+			ltm.setDirection(sun.light!, [-1, -1, -1]);
 
 			this.setMode(GameMode.Title);
 		});
