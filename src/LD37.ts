@@ -179,36 +179,36 @@ class MainScene implements sd.SceneController {
 
 
 			// -- inner walls
-			const cornerWalls: meshdata.gen.TransformedMeshGen[] = [];
+			const walls: meshdata.gen.TransformedMeshGen[] = [];
 			const hwalls: number[][] = [[-10, -10.5], [5, -10.5], [-10, 10], [5, 10]];
 			const vwalls: number[][] = [[-10.5, -10], [10, -10], [-10.5, 5], [10, 5]];
 			const cwalls: number[][] = [[-.25, -10.5], [-10.5, -0.25], [-.25, 10], [10, -.25]];
 			for (let cwx = 0; cwx < 4; ++cwx) {
-				cornerWalls.push({
+				walls.push({
 					translation: [hwalls[cwx][0] + 2.25, 7.5, hwalls[cwx][1]],
 					generator: new meshdata.gen.Box({ width: 5, depth: 0.5, height: 15, inward: false, uvRange: [5, 15] })
 				});
-				cornerWalls.push({
+				walls.push({
 					translation: [vwalls[cwx][0], 7.5, vwalls[cwx][1] + 2.25],
 					generator: new meshdata.gen.Box({ width: 0.5, depth: 5, height: 15, inward: false, uvRange: [5, 15] })
 				});
 				if ((cwx & 1) == 0) {
-					cornerWalls.push({
+					walls.push({
 						translation: [cwalls[cwx][0], 9, cwalls[cwx][1]],
 						generator: new meshdata.gen.Box({ width: 10, depth: 0.5, height: 12, inward: false, uvRange: [11, 12], uvOffset: [-1, 0] })
 					});
 				}
 				else {
-					cornerWalls.push({
+					walls.push({
 						translation: [cwalls[cwx][0], 9, cwalls[cwx][1]],
 						generator: new meshdata.gen.Box({ width: 0.5, depth: 10, height: 12, inward: false, uvRange: [11, 12], uvOffset: [-1, 0] })
 					});
 				}
 			}
-			const corners = scene.makeEntity({
+			const innerWalls = scene.makeEntity({
 				mesh: {
-					name: "corners",
-					meshData: meshdata.gen.generate(cornerWalls)
+					name: "innerwalls",
+					meshData: meshdata.gen.generate(walls)
 				},
 				pbrModel: {
 					materials: [assets.mat.chipmetal]
