@@ -13,6 +13,7 @@ interface MeshAssets {
 
 interface TextureAssets {
 	envCubeSpace: render.Texture;
+	reflectCubeSpace: render.Texture;
 }
 
 interface Assets {
@@ -47,9 +48,13 @@ function loadAllAssets(rc: render.RenderContext, ac: audio.AudioContext, meshMgr
 
 	function loadEnvCubeTex<K extends keyof TextureAssets>(dirPath: string, k: K) {
 		render.loadCubeTexture(rc, render.makeCubeMapPaths(dirPath, ".jpg")).then(texture => {
-			const envTexture = render.prefilteredEnvMap(rc, meshMgr, texture, 256);
-			a.tex[k] = <any>envTexture;
+			a.tex[k] = <any>texture;
 		});
+	}
+
+	function makeReflectionMap<K extends keyof TextureAssets>(k1: K, k2: K) {
+		const envTexture = render.prefilteredEnvMap(rc, meshMgr, <any>a.tex[k1] as render.Texture, 256);
+		a.tex[k2] = <any>envTexture;
 	}
 
 	const stuff = [
@@ -57,11 +62,12 @@ function loadAllAssets(rc: render.RenderContext, ac: audio.AudioContext, meshMgr
 		loadLocalMTL("data/mat/medmetal/medmetal.mtl", "medmetal"),
 		loadLocalMTL("data/mat/bronzepatina/bronzepatina.mtl", "bronzepatina"),
 		loadLocalMTL("data/mat/whitemarble/whitemarble.mtl", "whitemarble"),
-		loadEnvCubeTex("data/mat/galaxy/galaxy-", "envCubeSpace"),
+		loadEnvCubeTex("data/mat/galaxy/galaxy-", "envCubeSpace")
 	];
 	totalAssets = stuff.length;
 
 	return Promise.all(stuff).then(() => {
+		makeReflectionMap("envCubeSpace", "reflectCubeSpace");
 		return a;
 	});
 }
