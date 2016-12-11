@@ -202,13 +202,13 @@ class MainScene implements sd.SceneController {
 
 		// -- shadow pass
 		let spotShadow: world.ShadowView | null = null;
+		const shadowCaster = this.scene_.pbrModelMgr.shadowCaster();
 
-		if (render.canUseShadowMaps(this.rc)) {
+		if (shadowCaster && render.canUseShadowMaps(this.rc)) {
 			let rpdShadow = render.makeRenderPassDescriptor();
 			rpdShadow.clearMask = render.ClearMask.Depth;
 
-			spotShadow = this.scene_.lightMgr.shadowViewForLight(this.rc, this.spotLight_, .1);
-
+			spotShadow = this.scene_.lightMgr.shadowViewForLight(this.rc, shadowCaster, .1);
 			if (spotShadow) {
 				render.runRenderPass(this.rc, this.scene_.meshMgr, rpdShadow, spotShadow.shadowFBO, (renderPass) => {
 					this.scene_.pbrModelMgr.drawShadows(this.scene_.pbrModelMgr.all(), renderPass, spotShadow!.lightProjection);
