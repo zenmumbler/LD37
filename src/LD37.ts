@@ -284,7 +284,7 @@ class MainScene implements sd.SceneController {
 
 		if (this.glowLight_) {
 			const t = Math.sin(sd.defaultRunLoop.globalTime);
-			this.scene_.lightMgr.setIntensity(this.glowLight_.light!, 1 + t * .5);
+			this.scene_.lightMgr.setIntensity(this.glowLight_.light!, 1.5 + t * .5);
 			const gma = this.scene_.pbrModelMgr.materialRange(this.glowLight_.pbrModel!);
 			this.scene_.pbrModelMgr.materialManager.setEmissiveIntensity(gma.first, 0.8 + t * .2);
 		}
