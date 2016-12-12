@@ -21,6 +21,15 @@ const enum Quadrant {
 	Bottom
 }
 
+interface Orb {
+	worldPos: sd.Float3;
+	index: number;
+	quadrant: Quadrant;
+	pbrModel: world.PBRModelInstance;
+	pbrMat: world.PBRMaterialInstance;
+}
+
+
 class Level {
 	theColorMatsBack: asset.Material[] = [];
 	theColorMatsLeft: asset.Material[] = [];
@@ -29,6 +38,8 @@ class Level {
 	spotLeft: world.LightInstance;
 	spotRight: world.LightInstance;
 	spotBack: world.LightInstance;
+
+	orbs: Orb[][];
 
 	constructor(private rc: render.RenderContext, private ac: audio.AudioContext, private assets: Assets, private scene: world.Scene) {
 		for (let c = 0; c < TheColors.length; ++c) {
@@ -42,6 +53,11 @@ class Level {
 			this.theColorMatsLeft[c] = sd.cloneStruct(m);
 			this.theColorMatsRight[c] = sd.cloneStruct(m);
 		}
+
+		this.orbs = [];
+		this.orbs[Quadrant.Left] = [];
+		this.orbs[Quadrant.Right] = [];
+		this.orbs[Quadrant.Top] = [];
 	}
 
 
@@ -170,7 +186,7 @@ class Level {
 	}
 
 
-	makePillars(origin: sd.Float3, spacing: number, zodiacSigns: number[] | null, scene: world.Scene, assets: Assets) {
+	makeOrbPillars(quadrant: Quadrant, origin: sd.Float3, spacing: number, zodiacSigns: number[] | null, scene: world.Scene, assets: Assets) {
 		const baseEnt = scene.makeEntity({
 			transform: { position: origin }
 		});
@@ -183,11 +199,18 @@ class Level {
 				generator: new meshdata.gen.Box({ width: pw, depth: pw, height: 1.3, inward: false, uvRange: [pw, 1.3] })
 			});
 
-			scene.makeEntity({
+			const orb = scene.makeEntity({
 				parent: baseEnt.transform,
 				transform: { position: [p * spacing, 1.4, 0] },
 				mesh: { name: `pillar-sphere-${p}`, meshData: meshdata.gen.generate(new meshdata.gen.Sphere({ radius: pw * .9, rows: 12, segs: 18 })) },
 				pbrModel: { materials: [this.theColorMatsBack[p]] }
+			});
+			this.orbs[quadrant].push({
+				index: p,
+				quadrant: quadrant,
+				worldPos: scene.transformMgr.worldPosition(orb.transform),
+				pbrModel: orb.pbrModel!,
+				pbrMat: 0
 			});
 		}
 		scene.makeEntity({
@@ -280,7 +303,7 @@ class Level {
 
 		// -- BACK ROOM: zodiac signs associated with colors
 
-		this.makePillars([-1.5, 0, -12], 1, [0, 1, 2, 3], scene, assets);
+		this.makeOrbPillars(Quadrant.Top, [-1.5, 0, -12], 1, [0, 1, 2, 3], scene, assets);
 
 		const spotBack = scene.makeEntity({
 			transform: { position: [0, 4, -8] },
@@ -300,7 +323,7 @@ class Level {
 
 		// -- LEFT ROOM: easy puzzle
 
-		const pilleft = this.makePillars([-12, 0, -1], .67, null, scene, assets);
+		const pilleft = this.makeOrbPillars(Quadrant.Left, [-12, 0, -1], .67, null, scene, assets);
 		scene.transformMgr.rotateByAngles(pilleft.transform, [0, math.deg2rad(80), 0]);
 		const tabletLeft = this.makePuzzleTablet([-11.5, 1, 1.5], [3, 1, 2, 0, 2, 0, 1, 3], scene, assets);
 		scene.transformMgr.rotateByAngles(tabletLeft.transform, [math.deg2rad(-10), math.deg2rad(100), 0]);
@@ -323,7 +346,7 @@ class Level {
 
 		// -- RIGHT ROOM: hard puzzle
 
-		const pilright = this.makePillars([12, 0, 1], .67, null, scene, assets);
+		const pilright = this.makeOrbPillars(Quadrant.Right, [12, 0, 1], .67, null, scene, assets);
 		scene.transformMgr.rotateByAngles(pilright.transform, [0, math.deg2rad(-100), 0]);
 		const tabletRight = this.makePuzzleTablet([11.5, 1, -1.5], [3, 1, 2, 0, 2, 0, 1, 3], scene, assets);
 		scene.transformMgr.rotateByAngles(tabletRight.transform, [math.deg2rad(-10), math.deg2rad(-80), 0]);
