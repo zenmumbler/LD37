@@ -55,10 +55,7 @@ class MainScene implements sd.SceneController {
 		this.scene_ = new world.Scene(rc);
 		// this.sfx_ = new Sound(ac);
 
-		this.flyCam_ = new FlyCamController(rc.gl.canvas, [0, 2, 5]);
-
 		this.setMode(GameMode.Loading);
-
 
 		const progress = (ratio: number) => {
 			dom.$1(".progress").style.width = (ratio * 100) + "%";
@@ -83,7 +80,7 @@ class MainScene implements sd.SceneController {
 				});
 				this.scene_.lightMgr.setDirection(sun.light!, [0, 1, .3]);
 
-				this.setMode(GameMode.Title);
+				this.setMode(GameMode.Main);
 			});
 		});
 
@@ -111,11 +108,19 @@ class MainScene implements sd.SceneController {
 
 
 	setMode(newMode: GameMode) {
-		if (newMode != GameMode.Loading) {
-			dom.hide(".loading");
-		}
+		dom.hide(".loading");
 		dom.hide(".titles");
-		dom.show("#stage");
+		if (newMode == GameMode.Loading) {
+			dom.show(".loading");
+		}
+		else if (newMode == GameMode.Title) {
+			dom.show(".titles");
+		}
+
+		if (newMode !== GameMode.Loading) {
+			dom.show("#stage");
+			this.flyCam_ = new FlyCamController(this.rc.gl.canvas, [0, 2, 5]);
+		}
 
 		this.mode_ = newMode;
 	}
@@ -167,18 +172,23 @@ class MainScene implements sd.SceneController {
 
 	simulationStep(timeStep: number) {
 		const txm = this.scene_.transformMgr;
-		this.flyCam_.step(timeStep);
+		if (this.flyCam_) {
+			this.flyCam_.step(timeStep);
 
-		if (this.skyBox_) {
-			this.skyBox_.setCenter(this.flyCam_.cam.pos);
+			if (this.skyBox_) {
+				this.skyBox_.setCenter(this.flyCam_.cam.pos);
+			}
+
+			const playerXZ = [this.flyCam_.cam.pos[0], this.flyCam_.cam.pos[2]];
+			
 		}
 
-		if (this.glowLight_) {
-			const t = Math.sin(sd.defaultRunLoop.globalTime);
-			this.scene_.lightMgr.setIntensity(this.glowLight_.light!, 1.5 + t * .5);
-			const gma = this.scene_.pbrModelMgr.materialRange(this.glowLight_.pbrModel!);
-			this.scene_.pbrModelMgr.materialManager.setEmissiveIntensity(gma.first, 0.8 + t * .2);
-		}
+		// if (this.glowLight_) {
+		// 	const t = Math.sin(sd.defaultRunLoop.globalTime);
+		// 	this.scene_.lightMgr.setIntensity(this.glowLight_.light!, 1.5 + t * .5);
+		// 	const gma = this.scene_.pbrModelMgr.materialRange(this.glowLight_.pbrModel!);
+		// 	this.scene_.pbrModelMgr.materialManager.setEmissiveIntensity(gma.first, 0.8 + t * .2);
+		// }
 	}
 }
 

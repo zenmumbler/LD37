@@ -223,7 +223,7 @@ class LevelGen {
 			const mulX = ((corneria > 0) && (corneria < 3)) ? 1 : -1;
 			const mulZ = ((corneria & 2) == 0) ? -1 : 1;
 			scene.makeEntity({
-				transform: { position: [mulX * 8.5, 3.5, mulZ * 8.5] },
+				transform: { position: [mulX * 8.5, 2.7, mulZ * 8.5] },
 				light: {
 					name: `corner_color_${corneria}`,
 					colour: TheColors[corneria],
@@ -329,7 +329,7 @@ class LevelGen {
 			}
 		});
 		ltm.setDirection(spotRight.light!, [.707, -.707, 0]);
-		ltm.setEnabled(spotRight.light!, true);
+		ltm.setEnabled(spotRight.light!, false);
 
 
 		// -- walls
