@@ -131,12 +131,12 @@ class LevelGen {
 		const tgen: meshdata.gen.TransformedMeshGen[] = [];
 
 		let pX = 0;
-		let pY = 0;
+		let pY = spacing[1];
 
 		for (let pos = 0; pos < indexes.length; ++pos) {
 			if ((pos % 4) == 0) {
 				pX = 0;
-				pY += spacing[1];
+				pY -= spacing[1];
 			}
 			else {
 				pX += spacing[0];
@@ -191,6 +191,28 @@ class LevelGen {
 			const zt = this.makeZodiacTable(baseEnt.transform, zodiacSigns, pw, [1, .5], scene, assets);
 			scene.transformMgr.setPosition(zt.transform, [0, .57, pw / 2]);
 		}
+
+		return baseEnt;
+	}
+
+
+	makePuzzleTablet(origin: sd.Float3, zodiacSigns: number[], scene: world.Scene, assets: Assets) {
+		const baseEnt = scene.makeEntity({
+			transform: { position: origin }
+		});
+		scene.makeEntity({
+			parent: baseEnt.transform,
+			mesh: {
+				name: "slab",
+				meshData: meshdata.gen.generate(new meshdata.gen.Box({ width: 2.25, height: 1.25, depth: 0.1, inward: false }))
+			},
+			pbrModel: {
+				materials: [assets.mat.medmetal]
+			}
+		});
+
+		const zt = this.makeZodiacTable(baseEnt.transform, zodiacSigns, .25, [.5, .5], scene, assets);
+		scene.transformMgr.setPosition(zt.transform, [-.75, 0.25, 0.07]);
 
 		return baseEnt;
 	}
@@ -267,8 +289,10 @@ class LevelGen {
 
 		// -- LEFT ROOM: easy puzzle
 
-		const pilleft = this.makePillars([-12, 0, -1.2], .6, null, scene, assets);
+		const pilleft = this.makePillars([-12, 0, -1], .67, null, scene, assets);
 		scene.transformMgr.rotateByAngles(pilleft.transform, [0, math.deg2rad(80), 0]);
+		const tabletLeft = this.makePuzzleTablet([-11.5, 1, 1.5], [3, 1, 2, 0, 2, 0, 1, 3], scene, assets);
+		scene.transformMgr.rotateByAngles(tabletLeft.transform, [math.deg2rad(-10), math.deg2rad(100), 0]);
 
 		const spotLeft = scene.makeEntity({
 			transform: { position: [-8, 4, 0] },
@@ -282,13 +306,16 @@ class LevelGen {
 			}
 		});
 		ltm.setDirection(spotLeft.light!, [-.707, -.707, 0]);
-		ltm.setEnabled(spotLeft.light!, true);
+		ltm.setEnabled(spotLeft.light!, false);
+		// pbrm.setShadowCaster(spotLeft.light!);
 
 
 		// -- RIGHT ROOM: hard puzzle
 
-		const pilright = this.makePillars([12, 0, 1.2], .6, null, scene, assets);
+		const pilright = this.makePillars([12, 0, 1], .67, null, scene, assets);
 		scene.transformMgr.rotateByAngles(pilright.transform, [0, math.deg2rad(-100), 0]);
+		const tabletRight = this.makePuzzleTablet([11.5, 1, -1.5], [3, 1, 2, 0, 2, 0, 1, 3], scene, assets);
+		scene.transformMgr.rotateByAngles(tabletRight.transform, [math.deg2rad(-10), math.deg2rad(-80), 0]);
 
 		const spotRight = scene.makeEntity({
 			transform: { position: [8, 4, 0] },
@@ -302,11 +329,10 @@ class LevelGen {
 			}
 		});
 		ltm.setDirection(spotRight.light!, [.707, -.707, 0]);
-		ltm.setEnabled(spotRight.light!, false);
+		ltm.setEnabled(spotRight.light!, true);
 
 
 		// -- walls
-
 
 		this.makeInnerWalls(scene, assets);
 
