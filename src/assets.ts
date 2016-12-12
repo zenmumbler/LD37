@@ -6,6 +6,7 @@ interface MaterialAssets {
 	medmetal: asset.Material;
 	bronzepatina: asset.Material;
 	whitemarble: asset.Material;
+	zodiac: asset.Material;
 }
 
 interface MeshAssets {
@@ -66,6 +67,7 @@ function loadAllAssets(rc: render.RenderContext, ac: audio.AudioContext, meshMgr
 		loadLocalMTL("data/mat/medmetal/medmetal.mtl", ["medmetal"]),
 		loadLocalMTL("data/mat/bronzepatina/bronzepatina.mtl", ["bronzepatina"]),
 		loadLocalMTL("data/mat/whitemarble/whitemarble.mtl", ["whitemarble"]),
+		loadLocalMTL("data/mat/zodiac/zodiac.mtl", ["zodiac"]),
 		loadEnvCubeTex("data/mat/galaxy/galaxy-", "envCubeSpace")
 	];
 	totalAssets = stuff.length;
