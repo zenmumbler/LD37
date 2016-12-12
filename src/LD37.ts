@@ -72,6 +72,28 @@ class MainScene implements sd.SceneController {
 
 			this.level_ = new LevelGen(rc, ac, assets, this.scene_);
 			this.level_.generate().then(() => {
+
+				const spotRight = this.scene_.makeEntity({
+					transform: { position: [-8.5, 3.5, -8.5] },
+					light: {
+						name: "flypoint",
+						colour: [1, 0, 1],
+						type: asset.LightType.Point,
+						intensity: 4,
+						range: 3.4
+					}
+				});
+				const spotRightX = this.scene_.makeEntity({
+					transform: { position: [8.5, 3.5, -8.5] },
+					light: {
+						name: "flypoint2",
+						colour: [0, 1, 1],
+						type: asset.LightType.Point,
+						intensity: 4,
+						range: 3.4
+					}
+				});
+
 				this.setMode(GameMode.Title);
 			});
 		});

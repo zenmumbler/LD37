@@ -152,7 +152,7 @@ class LevelGen {
 			}
 		});
 		ltm.setDirection(spotPillars.light!, [0, -.707, -.707]);
-
+		ltm.setEnabled(spotPillars.light!, false);
 
 		// -- puzzle room left
 		const floorPuzzleLeft = scene.makeEntity({
