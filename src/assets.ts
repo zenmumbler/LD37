@@ -1,16 +1,25 @@
 // Callisto, a Ludum Dare 37 Entry
 // (c) 2016 by Arthur Langereis (@zenmumbler)
 
+interface SoundAssets {
+	steps: AudioBuffer[];
+	lightOn: AudioBuffer;
+	lightOff: AudioBuffer;
+	doorOpen: AudioBuffer;
+	swoosh: AudioBuffer;
+	mainMusic: AudioBuffer;
+	endMusic: AudioBuffer;
+}
+
 interface MaterialAssets {
 	chipmetal: asset.Material;
 	medmetal: asset.Material;
 	bronzepatina: asset.Material;
 	whitemarble: asset.Material;
+	roughbronze: asset.Material;
 	zodiac: asset.Material;
 	signs: asset.Material;
-}
-
-interface MeshAssets {
+	whiteness: asset.Material;
 }
 
 interface TextureAssets {
@@ -19,14 +28,13 @@ interface TextureAssets {
 }
 
 interface Assets {
-	// sound: SoundAssets;
+	sound: SoundAssets;
 	mat: MaterialAssets;
-	mesh: MeshAssets;
 	tex: TextureAssets;
 }
 
 function loadAllAssets(rc: render.RenderContext, ac: audio.AudioContext, meshMgr: world.MeshManager, progress: (ratio: number) => void) {
-	const a = { mat: {}, mesh: {}, tex: {} } as Assets;
+	const a = { mat: {}, sound: {}, tex: {} } as Assets;
 
 	var totalAssets = 1, assetsLoaded = 0;
 	const loaded = (n = 1) => {
@@ -66,10 +74,23 @@ function loadAllAssets(rc: render.RenderContext, ac: audio.AudioContext, meshMgr
 	}
 
 	const stuff = [
+		asset.loadSoundFile(ac, "data/sound/34253__ddohler__hard-walking_0.mp3").then(buf => { a.sound.steps = a.sound.steps || []; a.sound.steps[0] = buf; loaded(); }),
+		asset.loadSoundFile(ac, "data/sound/34253__ddohler__hard-walking_1.mp3").then(buf => { a.sound.steps = a.sound.steps || []; a.sound.steps[1] = buf; loaded(); }),
+
+		asset.loadSoundFile(ac, "data/sound/131599__alvinwhatup2__kill-switch-large-breaker-switch.mp3").then(buf => { a.sound.lightOn = buf; loaded(); }),
+		asset.loadSoundFile(ac, "data/sound/132998__cosmicd__light-switch-of-doom.mp3").then(buf => { a.sound.lightOff = buf; loaded(); }),
+
+		asset.loadSoundFile(ac, "data/sound/232102__thalamus-lab__stone-grind_83631__arithni__heavy-thud.mp3").then(buf => { a.sound.doorOpen = buf; loaded(); }),
+		asset.loadSoundFile(ac, "data/sound/264777__shinplaster__swoosh.mp3").then(buf => { a.sound.swoosh = buf; loaded(); }),
+
+		asset.loadSoundFile(ac, "data/sound/274222__limetoe__space-atmosphere.mp3").then(buf => { a.sound.mainMusic = buf; loaded(); }),
+		asset.loadSoundFile(ac, "data/sound/Incompetech-Comfortable-Mystery-4.mp3").then(buf => { a.sound.endMusic = buf; loaded(); }),
+
 		loadLocalMTL("data/mat/chipmetal/chipmetal.mtl", ["chipmetal"]),
 		loadLocalMTL("data/mat/medmetal/medmetal.mtl", ["medmetal"]),
 		loadLocalMTL("data/mat/bronzepatina/bronzepatina.mtl", ["bronzepatina"]),
 		loadLocalMTL("data/mat/whitemarble/whitemarble.mtl", ["whitemarble"]),
+		loadLocalMTL("data/mat/roughbronze/roughbronze.mtl", ["roughbronze"]),
 		loadLocalMTL("data/mat/zodiac/zodiac.mtl", ["zodiac"]),
 		loadLocalMTL("data/mat/signs/signs.mtl", ["signs"]),
 		loadEnvCubeTex("data/mat/galaxy/galaxy-", "envCubeSpace")
@@ -78,6 +99,12 @@ function loadAllAssets(rc: render.RenderContext, ac: audio.AudioContext, meshMgr
 
 	return Promise.all(stuff).then(() => {
 		makeReflectionMap("envCubeSpace", "reflectCubeSpace");
+
+		a.mat.whiteness = asset.makeMaterial("whiteness");
+		a.mat.whiteness.flags |= asset.MaterialFlags.usesEmissive;
+		vec3.set(a.mat.whiteness.emissiveColour, 1, 1, 1);
+		a.mat.whiteness.emissiveIntensity = 1;
+
 		return a;
 	});
 }
