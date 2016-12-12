@@ -38,8 +38,12 @@ class Level {
 	spotLeft: world.LightInstance;
 	spotRight: world.LightInstance;
 	spotBack: world.LightInstance;
+	spotDoor: world.LightInstance;
+	spotExit: world.LightInstance;
 
 	orbs: Orb[][];
+
+	finalDoor: world.EntityInfo;
 
 	constructor(private rc: render.RenderContext, private ac: audio.AudioContext, private assets: Assets, private scene: world.Scene) {
 		for (let c = 0; c < TheColors.length; ++c) {
@@ -172,7 +176,7 @@ class Level {
 		}));
 
 		const iwLeft = scene.makeEntity({
-			transform: { position: [-3.75, 1.5, 10.01] },
+			transform: { position: [-3.75, 1.5, 10.001] },
 			mesh: {
 				name: "infoWallA",
 				meshData: meshdata.gen.generate(new meshdata.gen.Box({
@@ -198,7 +202,7 @@ class Level {
 		});
 
 		const iwRight = scene.makeEntity({
-			transform: { position: [3.25, 1.5, 10.01] },
+			transform: { position: [3.25, 1.5, 10.001] },
 			mesh: {
 				name: "infoWallB",
 				meshData: meshdata.gen.generate(new meshdata.gen.Box({
@@ -239,7 +243,44 @@ class Level {
 
 
 	makeBigHonkingDoor(scene: world.Scene, assets: Assets) {
+		this.finalDoor = scene.makeEntity({
+			transform: { position: [-0.25, 1.5, 10.001] },
+			mesh: {
+				name: "bigdoor",
+				meshData: meshdata.gen.generate(new meshdata.gen.Box({
+					width: 4, height: 3, depth: 0.5, inward: false,
+					uvRange: [2, 1.5], uvOffset: [0, 0]
+				}))
+			},
+			pbrModel: { materials: [assets.mat.roughbronze] }
+		});
+	}
 
+
+	makeExit(scene: world.Scene, assets: Assets) {
+		scene.makeEntity({
+			transform: { position: [-0.251, 1.52, 10.26 + 1.5] },
+			mesh: {
+				name: "exit",
+				meshData: meshdata.gen.generate(new meshdata.gen.Box({ width: 4, height: 3, depth: 3, inward: true }))
+			},
+			pbrModel: { materials: [assets.mat.whiteness], castsShadows: false }
+		});
+		const spotExit = scene.makeEntity({
+			transform: { position: [0, 3, 14] },
+			light: {
+				name: "exitlight",
+				colour: [1, 1, 1],
+				intensity: 8,
+				type: asset.LightType.Spot,
+				range: 12,
+				cutoff: math.deg2rad(50)
+			}
+		});
+		this.spotExit = spotExit.light!;
+		scene.lightMgr.setDirection(this.spotExit, [0, -.7, -1]);
+		scene.lightMgr.setEnabled(this.spotExit, false);
+		// scene.pbrModelMgr.setShadowCaster(this.spotExit);
 	}
 
 
@@ -380,14 +421,14 @@ class Level {
 					}
 				)
 			},
-			pbrModel: { materials: [assets.mat.bronzepatina] }
+			pbrModel: { materials: [assets.mat.bronzepatina], castsShadows: false }
 		});
 		const ceiling = scene.makeEntity({
 			mesh: {
 				name: "ceil",
 				meshData: this.generateColumnBlock([0, 10, 0], 1, 4, 20, 20, [.5, .5], (pxz, txz, y) => y - 1.9 + (Math.random() * 3))
 			},
-			pbrModel: { materials: [assets.mat.medmetal] }
+			pbrModel: { materials: [assets.mat.medmetal], castsShadows: false }
 		});
 
 
@@ -461,7 +502,8 @@ class Level {
 
 		this.makeInnerWalls(scene, assets);
 		this.makeInfoWalls(scene, assets);
-		this.makeBigHonkingDoor(scene, assets);
+		// this.makeBigHonkingDoor(scene, assets);
+		this.makeExit(scene, assets);
 
 
 		// -- lights, so many lights
