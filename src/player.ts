@@ -146,6 +146,25 @@ class PlayerController {
 
 		return keys ? keys[this.keyboardType_] : 0;
 	}
+
+
+	private stepSoundTimer_ = -1;
+
+	handleStepSounds() {
+		if (this.view.effectiveSpeed > 0.01) {
+			if (this.stepSoundTimer_ == -1) {
+				this.stepSoundTimer_ = setInterval(() => { this.sfx.play(SFX.FootStep); }, 500);
+			}
+		}
+		else {
+			if (this.stepSoundTimer_ > -1) {
+				clearInterval(this.stepSoundTimer_);
+				this.stepSoundTimer_ = -1;
+			}
+		}
+	}
+
+
 	step(timeStep: number) {
 		const maxAccel = 0.66;
 		var accel = 0, sideAccel = 0;
@@ -164,5 +183,6 @@ class PlayerController {
 		}
 
 		this.view.update(timeStep, accel, sideAccel);
+		this.handleStepSounds();
 	}
 }
