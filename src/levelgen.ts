@@ -502,7 +502,7 @@ class Level {
 
 		this.makeInnerWalls(scene, assets);
 		this.makeInfoWalls(scene, assets);
-		// this.makeBigHonkingDoor(scene, assets);
+		this.makeBigHonkingDoor(scene, assets);
 		this.makeExit(scene, assets);
 
 

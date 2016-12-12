@@ -30,23 +30,27 @@ class Sound {
 	private stepGain: GainNode;
 	private musicGain: GainNode;
 	private effectGain: GainNode;
-	private ambienceGain: GainNode;
+	private toneGain: GainNode;
 
+	private stepSource: AudioBufferSourceNode | null = null;
 	private musicSource: AudioBufferSourceNode | null = null;
 	private effectSource: AudioBufferSourceNode | null = null;
+	private toneSources: (AudioBufferSourceNode | null)[] = [];
 
 	private stepToggle = 0;
 
 	constructor(private ac: audio.AudioContext) {
-		var ctx = this.ctx = ac.ctx;
+		const ctx = this.ctx = ac.ctx;
 
 		this.stepGain = ctx.createGain();
 		this.musicGain = ctx.createGain();
 		this.effectGain = ctx.createGain();
+		this.toneGain = ctx.createGain();
 
 		this.stepGain.connect(ac.ctx.destination);
 		this.musicGain.connect(ac.ctx.destination);
 		this.effectGain.connect(ac.ctx.destination);
+		this.toneGain.connect(ac.ctx.destination);
 	}
 
 
@@ -91,24 +95,25 @@ class Sound {
 
 		var buffer: AudioBuffer | null = null;
 		var source: AudioBufferSourceNode | null = null;
+		var gain: GainNode | null = null;
 		var volume = 0;
 
 		switch (what) {
-			case SFX.FootStep: buffer = assets.steps[this.stepToggle]; source = this.effectSource; volume = 1; this.stepToggle ^= 1; break;
-			case SFX.LightOn: buffer = assets.lightOn; source = this.effectSource; volume = .5; break;
-			case SFX.LightOff: buffer = assets.lightOff; source = this.effectSource; volume = .7; break;
-			case SFX.DoorOpen: buffer = assets.doorOpen; source = this.effectSource; volume = 1; break;
-			case SFX.Swoosh: buffer = assets.swoosh; source = this.effectSource; volume = 1; break;
+			case SFX.FootStep: buffer = assets.steps[this.stepToggle]; source = this.stepSource; gain = this.stepGain; volume = .65; this.stepToggle ^= 1; break;
+			case SFX.LightOn: buffer = assets.lightOn; source = this.effectSource; gain = this.effectGain; volume = .5; break;
+			case SFX.LightOff: buffer = assets.lightOff; source = this.effectSource; gain = this.effectGain; volume = .7; break;
+			case SFX.DoorOpen: buffer = assets.doorOpen; source = this.effectSource; gain = this.effectGain; volume = 1; break;
+			case SFX.Swoosh: buffer = assets.swoosh; source = this.effectSource; gain = this.effectGain; volume = 1; break;
 
-			case SFX.ToneA:
-			case SFX.ToneB:
-			case SFX.ToneC:
-			case SFX.ToneD:
+			case SFX.ToneA: buffer = null; source = this.toneSources[0]; gain = this.toneGain; volume = 1; break;
+			case SFX.ToneB: buffer = null; source = this.toneSources[1]; gain = this.toneGain; volume = 1; break;
+			case SFX.ToneC: buffer = null; source = this.toneSources[2]; gain = this.toneGain; volume = 1; break;
+			case SFX.ToneD: buffer = null; source = this.toneSources[3]; gain = this.toneGain; volume = 1; break;
 
 			default: buffer = null;
 		}
 
-		if (! buffer) {
+		if (! buffer || ! gain) {
 			return;
 		}
 		if (source) {
@@ -117,16 +122,31 @@ class Sound {
 
 		var bufferSource: AudioBufferSourceNode | null = this.ac.ctx.createBufferSource();
 		bufferSource.buffer = buffer;
-		bufferSource.connect(this.effectGain);
+		bufferSource.connect(gain);
 		bufferSource.start(0);
-		this.effectGain.gain.value = volume;
+		gain.gain.value = volume;
 
-		this.effectSource = bufferSource;
+		if (what === SFX.FootStep) {
+			this.stepSource = bufferSource;
+		}
+		else if (what >= SFX.ToneA) {
+			this.toneSources[what - SFX.ToneA] = bufferSource;
+		}
+		else {
+			this.effectSource = bufferSource;
+		}
 
 		bufferSource.onended = () => {
 			if (this.effectSource == bufferSource) {
 				this.effectSource = null;
 			}
+			else if (this.stepSource == bufferSource) {
+				this.stepSource = null;
+			}
+			else if (this.toneSources[0] == bufferSource) { this.toneSources[0] = null; }
+			else if (this.toneSources[1] == bufferSource) { this.toneSources[1] = null; }
+			else if (this.toneSources[2] == bufferSource) { this.toneSources[2] = null; }
+			else if (this.toneSources[3] == bufferSource) { this.toneSources[3] = null; }
 
 			bufferSource!.disconnect();
 			bufferSource = null;
