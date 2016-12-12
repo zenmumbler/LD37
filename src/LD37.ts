@@ -25,6 +25,7 @@ import mat2 = veclib.mat2;
 import mat3 = veclib.mat3;
 import mat4 = veclib.mat4;
 
+
 const enum GameMode {
 	None,
 	Loading,
@@ -34,9 +35,6 @@ const enum GameMode {
 	End
 }
 
-const enum KeyCommand {
-	DooEet
-}
 
 class MainScene implements sd.SceneController {
 	private scene_: world.Scene;
@@ -44,11 +42,10 @@ class MainScene implements sd.SceneController {
 	private sfx_: Sound;
 	private level_: Level;
 
-	private flyCam_: FlyCamController;
-
 	private skyBox_: world.Skybox;
 	private glowLight_: world.EntityInfo;
 
+	private player_: PlayerController;
 	private mode_ = GameMode.None;
 
 
@@ -64,6 +61,7 @@ class MainScene implements sd.SceneController {
 
 		loadAllAssets(rc, ac, this.scene_.meshMgr, progress).then(assets => {
 			this.assets_ = assets;
+			this.sfx_.setAssets(assets.sound);
 
 			this.makeSkybox();
 
@@ -95,14 +93,14 @@ class MainScene implements sd.SceneController {
 
 	resume() {
 		if (this.mode_ >= GameMode.Title) {
-			// this.sfx_.startMusic();
+			this.sfx_.startMusic();
 		}
 	}
 
 
 	suspend() {
 		if (this.mode_ >= GameMode.Title) {
-			// this.sfx_.stopMusic();
+			this.sfx_.stopMusic();
 		}
 	}
 
@@ -119,7 +117,8 @@ class MainScene implements sd.SceneController {
 
 		if (newMode !== GameMode.Loading) {
 			dom.show("#stage");
-			this.flyCam_ = new FlyCamController(this.rc.gl.canvas, [0, 2, 5]);
+			this.sfx_.startMusic();
+			this.player_ = new PlayerController(this.rc.gl.canvas, [0, 1.5, 5], this.level_, this.sfx_);
 		}
 
 		this.mode_ = newMode;
@@ -155,7 +154,7 @@ class MainScene implements sd.SceneController {
 		render.runRenderPass(this.rc, this.scene_.meshMgr, rpdMain, null, (renderPass) => {
 			let camera: world.ProjectionSetup = {
 				projectionMatrix: mat4.perspective([], math.deg2rad(50), this.rc.gl.drawingBufferWidth / this.rc.gl.drawingBufferHeight, 0.1, 100),
-				viewMatrix: this.flyCam_.cam.viewMatrix // this.playerController_.viewMatrix
+				viewMatrix: this.player_.view.viewMatrix
 			};
 
 			this.scene_.lightMgr.prepareLightsForRender(this.scene_.lightMgr.allEnabled(), camera, renderPass.viewport()!);
@@ -169,18 +168,19 @@ class MainScene implements sd.SceneController {
 		});
 	}
 
+
 	curQuad = Quadrant.Bottom;
 
 	simulationStep(timeStep: number) {
 		const txm = this.scene_.transformMgr;
-		if (this.flyCam_) {
-			this.flyCam_.step(timeStep);
+		if (this.mode_ >= GameMode.Main) {
+			this.player_.step(timeStep);
 
 			if (this.skyBox_) {
-				this.skyBox_.setCenter(this.flyCam_.cam.pos);
+				this.skyBox_.setCenter(this.player_.view.pos);
 			}
 
-			const quadrant = this.level_.positionQuadrant(this.flyCam_.cam.pos);
+			const quadrant = this.level_.positionQuadrant(this.player_.view.pos);
 			if (quadrant != this.curQuad) {
 				switch (this.curQuad) {
 					case Quadrant.Bottom: break;
@@ -197,13 +197,6 @@ class MainScene implements sd.SceneController {
 				}
 			}
 		}
-
-		// if (this.glowLight_) {
-		// 	const t = Math.sin(sd.defaultRunLoop.globalTime);
-		// 	this.scene_.lightMgr.setIntensity(this.glowLight_.light!, 1.5 + t * .5);
-		// 	const gma = this.scene_.pbrModelMgr.materialRange(this.glowLight_.pbrModel!);
-		// 	this.scene_.pbrModelMgr.materialManager.setEmissiveIntensity(gma.first, 0.8 + t * .2);
-		// }
 	}
 }
 
