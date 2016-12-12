@@ -3,6 +3,17 @@
 
 type PillarYGen = (xz: sd.Float2, tileXZ: sd.Float2, baseY: number) => number;
 
+function rgb8Color(r: number, g: number, b: number) {
+	return [r / 255, g / 255, b / 255];
+}
+
+const TheColors: number[][] = [
+	rgb8Color(69, 204, 255),
+	rgb8Color(255, 212, 49),
+	rgb8Color(232, 75, 48),
+	rgb8Color(178, 67, 255)
+];
+
 
 class LevelGen {
 	constructor(private rc: render.RenderContext, private ac: audio.AudioContext, private assets: Assets, private scene: world.Scene) {}
