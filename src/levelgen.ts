@@ -111,6 +111,29 @@ class LevelGen {
 	}
 
 
+	makePillars(scene: world.Scene, assets: Assets) {
+		
+	}
+
+
+	makeCornerLights(scene: world.Scene, assets: Assets) {
+		for (let corneria = 0; corneria < 4; ++corneria) {
+			const mulX = ((corneria > 0) && (corneria < 3)) ? 1 : -1;
+			const mulZ = ((corneria & 2) == 0) ? -1 : 1;
+			scene.makeEntity({
+				transform: { position: [mulX * 8.5, 3.5, mulZ * 8.5] },
+				light: {
+					name: `corner_color_${corneria}`,
+					colour: TheColors[corneria],
+					type: asset.LightType.Point,
+					intensity: 4,
+					range: 3.4
+				}
+			});
+		}
+	}
+
+
 	generate() {
 		const scene = this.scene;
 		const assets = this.assets;
@@ -190,6 +213,10 @@ class LevelGen {
 		this.makeInnerWalls(scene, assets);
 
 		this.makeGlower([0, 1, 0], 1);
+
+		this.makeCornerLights(scene, assets);
+
+		this.makePillars(scene, assets);
 
 		// for (let qq = 0; qq < 8; ++qq) {
 		// 	this.makeGlower([((qq * 16) % 20) - 10, 6.5, ((qq * 34) % 20) - 10], .6);
