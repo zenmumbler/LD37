@@ -246,7 +246,7 @@ class LevelGen {
 		});
 
 
-		const spotPillars = scene.makeEntity({
+		const spotBack = scene.makeEntity({
 			transform: { position: [0, 4, -8] },
 			light: {
 				name: "spot-pillars",
@@ -257,8 +257,8 @@ class LevelGen {
 				cutoff: math.deg2rad(35)
 			}
 		});
-		ltm.setDirection(spotPillars.light!, [0, -.707, -.707]);
-		ltm.setEnabled(spotPillars.light!, true);
+		ltm.setDirection(spotBack.light!, [0, -.707, -.707]);
+		ltm.setEnabled(spotBack.light!, true);
 
 		const spotLeft = scene.makeEntity({
 			transform: { position: [-8, 4, 0] },
@@ -273,7 +273,6 @@ class LevelGen {
 		});
 		ltm.setDirection(spotLeft.light!, [-.707, -.707, 0]);
 		ltm.setEnabled(spotLeft.light!, false);
-
 
 		const spotRight = scene.makeEntity({
 			transform: { position: [8, 4, 0] },
@@ -290,6 +289,7 @@ class LevelGen {
 		ltm.setEnabled(spotRight.light!, false);
 
 		// --
+
 		this.makeInnerWalls(scene, assets);
 
 		this.makeGlower([0, 1, 0], 1);
