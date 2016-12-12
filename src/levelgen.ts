@@ -127,8 +127,72 @@ class LevelGen {
 	}
 
 
-	makePillars(scene: world.Scene, assets: Assets) {
-		
+	makeZodiacTable(parentTX: world.TransformInstance, indexes: number[], slabSize: number, spacing: sd.Float2, scene: world.Scene, assets: Assets) {
+		const tgen: meshdata.gen.TransformedMeshGen[] = [];
+
+		let pX = 0;
+		let pY = 0;
+
+		for (let pos = 0; pos < indexes.length; ++pos) {
+			if ((pos % 4) == 0) {
+				pX = 0;
+				pY += spacing[1];
+			}
+			else {
+				pX += spacing[0];
+			}
+
+			tgen.push({
+				translation: [pX, pY, 0],
+				generator: new meshdata.gen.Box({
+					width: slabSize, height: slabSize, depth: 0.05, inward: false,
+					uvOffset: [indexes[pos] * .25, 0],
+					uvRange: [.28, .29]
+				})
+			});
+		}
+
+		return scene.makeEntity({
+			parent: parentTX,
+			mesh: { name: `zodiac-sheet`, meshData: meshdata.gen.generate(tgen) },
+			pbrModel: { materials: [assets.mat.zodiac] }
+		});
+	}
+
+
+	makePillars(origin: sd.Float3, zodiacSigns: number[] | null, scene: world.Scene, assets: Assets) {
+		const baseEnt = scene.makeEntity({
+			transform: { position: origin }
+		});
+
+		const pgen: meshdata.gen.TransformedMeshGen[] = [];
+		const pw = .25;
+		for (let p = 0; p < 4; ++p) {
+			pgen.push({
+				translation: [p * 1, 0, 0],
+				generator: new meshdata.gen.Box({ width: pw, depth: pw, height: 1.3, inward: false, uvRange: [pw, 1.3] })
+			});
+
+			scene.makeEntity({
+				parent: baseEnt.transform,
+				transform: { position: [p, 1.4, 0] },
+				mesh: { name: `pillar-sphere-${p}`, meshData: meshdata.gen.generate(new meshdata.gen.Sphere({ radius: pw * .9, rows: 12, segs: 18 })) },
+				pbrModel: { materials: [this.theColorMatsBack[p]] }
+			});
+		}
+		scene.makeEntity({
+			parent: baseEnt.transform,
+			transform: { position: [0, 1.3 / 2, 0]},
+			mesh: { name: "pillars", meshData: meshdata.gen.generate(pgen) },
+			pbrModel: { materials: [assets.mat.medmetal] }
+		});
+
+		if (zodiacSigns != null) {
+			const zt = this.makeZodiacTable(baseEnt.transform, zodiacSigns, pw, [1, .5], scene, assets);
+			scene.transformMgr.setPosition(zt.transform, [0, .57, pw / 2]);
+		}
+
+		return baseEnt;
 	}
 
 
@@ -232,11 +296,11 @@ class LevelGen {
 
 		this.makeCornerLights(scene, assets);
 
-		this.makePillars(scene, assets);
+		this.makePillars([-1.5, 0, -12], [0, 1, 2, 3], scene, assets);
 
-		// for (let qq = 0; qq < 8; ++qq) {
-		// 	this.makeGlower([((qq * 16) % 20) - 10, 6.5, ((qq * 34) % 20) - 10], .6);
-		// }
+		for (let qq = 0; qq < 8; ++qq) {
+			this.makeGlower([((qq * 16) % 20) - 10, 6.5, ((qq * 34) % 20) - 10], .6);
+		}
 
 		return Promise.resolve();
 	}
