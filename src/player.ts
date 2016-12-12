@@ -69,8 +69,19 @@ class PlayerView {
 }
 
 
+const enum KeyboardType {
+	QWERTY,
+	QWERTZ,
+	AZERTY
+}
+
+
 const enum KeyCommand {
-	DooEet
+	Forward,
+	Backward,
+	Left,
+	Right,
+	Interact
 }
 
 
@@ -80,6 +91,8 @@ class PlayerController {
 	private vpHeight_: number;
 	private tracking_ = false;
 	private lastPos_ = [0, 0];
+	private keyboardType_ = KeyboardType.QWERTY;
+
 
 	constructor(sensingElem: HTMLElement, initialPos: sd.Float3, private level: Level, private sfx: Sound) {
 		this.view = new PlayerView(initialPos);
@@ -110,20 +123,43 @@ class PlayerController {
 		});
 	}
 
+
+	private keyForKeyCommand(cmd: KeyCommand): io.Key {
+		let keys: io.Key[] | undefined;
+		switch (cmd) {
+			case KeyCommand.Forward:
+				keys = [io.Key.W, io.Key.W, io.Key.Z];
+				break;
+			case KeyCommand.Backward:
+				keys = [io.Key.S, io.Key.S, io.Key.S];
+				break;
+			case KeyCommand.Left:
+				keys = [io.Key.A, io.Key.A, io.Key.Q];
+				break;
+			case KeyCommand.Right:
+				keys = [io.Key.D, io.Key.D, io.Key.D];
+				break;
+			case KeyCommand.Interact:
+				keys = [io.Key.E, io.Key.E, io.Key.E];
+				break;
+		}
+
+		return keys ? keys[this.keyboardType_] : 0;
+	}
 	step(timeStep: number) {
-		const maxAccel = 0.6;
+		const maxAccel = 0.66;
 		var accel = 0, sideAccel = 0;
 
-		if (io.keyboard.down(io.Key.UP) || io.keyboard.down(io.Key.W)) {
+		if (io.keyboard.down(io.Key.UP) || io.keyboard.down(this.keyForKeyCommand(KeyCommand.Forward))) {
 			accel = maxAccel;
 		}
-		else if (io.keyboard.down(io.Key.DOWN) || io.keyboard.down(io.Key.S)) {
+		else if (io.keyboard.down(io.Key.DOWN) || io.keyboard.down(this.keyForKeyCommand(KeyCommand.Backward))) {
 			accel = -maxAccel;
 		}
-		if (io.keyboard.down(io.Key.LEFT) || io.keyboard.down(io.Key.A)) {
+		if (io.keyboard.down(io.Key.LEFT) || io.keyboard.down(this.keyForKeyCommand(KeyCommand.Left))) {
 			sideAccel = -maxAccel;
 		}
-		else if (io.keyboard.down(io.Key.RIGHT) || io.keyboard.down(io.Key.D)) {
+		else if (io.keyboard.down(io.Key.RIGHT) || io.keyboard.down(this.keyForKeyCommand(KeyCommand.Right))) {
 			sideAccel = maxAccel;
 		}
 
