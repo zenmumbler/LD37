@@ -14,6 +14,8 @@ const TheColors: number[][] = [
 	rgb8Color(178, 67, 255)
 ];
 
+type ClipLine = sd.Float4;
+
 const enum Quadrant {
 	Left,
 	Top,
@@ -34,6 +36,8 @@ class Level {
 	theColorMatsBack: asset.Material[] = [];
 	theColorMatsLeft: asset.Material[] = [];
 	theColorMatsRight: asset.Material[] = [];
+
+	clipLines: ClipLine[] = [];
 
 	spotLeft: world.LightInstance;
 	spotRight: world.LightInstance;
@@ -400,6 +404,15 @@ class Level {
 	}
 
 
+	makeClipLines() {
+		this.clipLines.push([-10, -10,  -5, -10]);
+		this.clipLines.push([ -5, -10,  -5, -11]);
+		this.clipLines.push([ -5, -11,   5, -11]);
+		this.clipLines.push([  5, -11,   5, -10]);
+		this.clipLines.push([  5, -10,  10, -10]);
+	}
+
+
 	generate() {
 		const scene = this.scene;
 		const assets = this.assets;
@@ -505,6 +518,7 @@ class Level {
 		this.makeBigHonkingDoor(scene, assets);
 		this.makeExit(scene, assets);
 
+		this.makeClipLines();
 
 		// -- lights, so many lights
 

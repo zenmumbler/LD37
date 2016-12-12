@@ -14,9 +14,13 @@ class PlayerView {
 	private sideSpeed_ = 0;
 	private effectiveSpeed_ = 0;
 
-	constructor(initialPos: sd.Float3) {
+	constructor(initialPos: sd.Float3, private clipLines: ClipLine[]) {
 		vec3.copy(this.pos_, initialPos);
 		this.rotate([0, 0]);
+	}
+
+	private clipMovement(a: sd.Float3, b: sd.Float3): sd.Float3 {
+		return b;
 	}
 
 	update(timeStep: number, acceleration: number, sideAccel: number) {
@@ -32,8 +36,12 @@ class PlayerView {
 		const sumVel = vec3.add([], fwdVel, sideVel);
 		if (vec3.length(sumVel) > 0.001) {
 			const effectiveVel = vec3.scale([], vec3.normalize([], sumVel), Math.max(Math.abs(this.speed_), Math.abs(this.sideSpeed_)));
-			vec3.add(this.pos_, this.pos_, effectiveVel);
-			this.effectiveSpeed_ = vec3.length(effectiveVel);
+			const targetPos = vec3.add([], this.pos_, effectiveVel);
+			const clippedPos = this.clipMovement(this.pos, targetPos);
+			const clippedVel = vec3.sub([], clippedPos, this.pos_);
+			vec3.copy(this.pos_, clippedPos);
+
+			this.effectiveSpeed_ = vec3.length(clippedVel);
 		}
 		else {
 			this.effectiveSpeed_ = 0;
@@ -95,7 +103,7 @@ class PlayerController {
 
 
 	constructor(sensingElem: HTMLElement, initialPos: sd.Float3, private level: Level, private sfx: Sound) {
-		this.view = new PlayerView(initialPos);
+		this.view = new PlayerView(initialPos, level.clipLines);
 
 		this.vpWidth_ = sensingElem.offsetWidth;
 		this.vpHeight_ = sensingElem.offsetHeight;

@@ -100,7 +100,7 @@ class Sound {
 		var rate: number | null = null;
 
 		switch (what) {
-			case SFX.FootStep: buffer = assets.steps[this.stepToggle]; source = this.stepSource; gain = this.stepGain; volume = .65; this.stepToggle ^= 1; break;
+			case SFX.FootStep: buffer = assets.steps[this.stepToggle]; source = this.stepSource; gain = this.stepGain; volume = .5; rate = .85; this.stepToggle ^= 1; break;
 			case SFX.LightOn: buffer = assets.lightOn; source = this.effectSource; gain = this.effectGain; volume = .5; break;
 			case SFX.LightOff: buffer = assets.lightOff; source = this.effectSource; gain = this.effectGain; volume = .7; break;
 			case SFX.DoorOpen: buffer = assets.doorOpen; source = this.effectSource; gain = this.effectGain; volume = 1; break;
