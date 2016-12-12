@@ -14,11 +14,21 @@ const TheColors: number[][] = [
 	rgb8Color(178, 67, 255)
 ];
 
+const enum Quadrant {
+	Left,
+	Top,
+	Right,
+	Bottom
+}
 
-class LevelGen {
+class Level {
 	theColorMatsBack: asset.Material[] = [];
 	theColorMatsLeft: asset.Material[] = [];
 	theColorMatsRight: asset.Material[] = [];
+
+	spotLeft: world.LightInstance;
+	spotRight: world.LightInstance;
+	spotBack: world.LightInstance;
 
 	constructor(private rc: render.RenderContext, private ac: audio.AudioContext, private assets: Assets, private scene: world.Scene) {
 		for (let c = 0; c < TheColors.length; ++c) {
@@ -189,7 +199,7 @@ class LevelGen {
 
 		if (zodiacSigns != null) {
 			const zt = this.makeZodiacTable(baseEnt.transform, zodiacSigns, pw, [1, .5], scene, assets);
-			scene.transformMgr.setPosition(zt.transform, [0, .57, pw / 2]);
+			scene.transformMgr.setPosition(zt.transform, [0, .9, pw / 2]);
 		}
 
 		return baseEnt;
@@ -285,6 +295,7 @@ class LevelGen {
 		});
 		ltm.setDirection(spotBack.light!, [0, -.707, -.707]);
 		ltm.setEnabled(spotBack.light!, false);
+		this.spotBack = spotBack.light!;
 
 
 		// -- LEFT ROOM: easy puzzle
@@ -307,7 +318,7 @@ class LevelGen {
 		});
 		ltm.setDirection(spotLeft.light!, [-.707, -.707, 0]);
 		ltm.setEnabled(spotLeft.light!, false);
-		// pbrm.setShadowCaster(spotLeft.light!);
+		this.spotLeft = spotLeft.light!;
 
 
 		// -- RIGHT ROOM: hard puzzle
@@ -330,6 +341,7 @@ class LevelGen {
 		});
 		ltm.setDirection(spotRight.light!, [.707, -.707, 0]);
 		ltm.setEnabled(spotRight.light!, false);
+		this.spotRight = spotRight.light!;
 
 
 		// -- walls
@@ -347,5 +359,29 @@ class LevelGen {
 		}
 
 		return Promise.resolve();
+	}
+
+	// -----------
+
+	positionQuadrant(pos: sd.Float3): Quadrant {
+		const inABC = (pos[2] - pos[0]) < 0; // z - x = 0
+		const inBCD = (pos[2] + pos[0]) > 0; // z + x = 0
+
+		if (inABC) {
+			if (inBCD) {
+				return Quadrant.Right;
+			}
+			else {
+				return Quadrant.Top;
+			}
+		}
+		else {
+			if (inBCD) {
+				return Quadrant.Bottom;
+			}
+			else {
+				return Quadrant.Left;
+			}
+		}
 	}
 }

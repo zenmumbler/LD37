@@ -33,7 +33,6 @@ const enum GameMode {
 	End
 }
 
-
 const enum KeyCommand {
 	DooEet
 }
@@ -41,7 +40,7 @@ const enum KeyCommand {
 class MainScene implements sd.SceneController {
 	private scene_: world.Scene;
 	private assets_: Assets;
-	private level_: LevelGen;
+	private level_: Level;
 
 	private flyCam_: FlyCamController;
 
@@ -62,12 +61,11 @@ class MainScene implements sd.SceneController {
 		};
 
 		loadAllAssets(rc, ac, this.scene_.meshMgr, progress).then(assets => {
-			console.info("ASSETS", assets);
 			this.assets_ = assets;
 
 			this.makeSkybox();
 
-			this.level_ = new LevelGen(rc, ac, assets, this.scene_);
+			this.level_ = new Level(rc, ac, assets, this.scene_);
 			this.level_.generate().then(() => {
 				const sun = this.scene_.makeEntity({
 					transform: { position: [0, 1, .3] },
@@ -169,6 +167,7 @@ class MainScene implements sd.SceneController {
 		});
 	}
 
+	curQuad = Quadrant.Bottom;
 
 	simulationStep(timeStep: number) {
 		const txm = this.scene_.transformMgr;
@@ -179,8 +178,22 @@ class MainScene implements sd.SceneController {
 				this.skyBox_.setCenter(this.flyCam_.cam.pos);
 			}
 
-			const playerXZ = [this.flyCam_.cam.pos[0], this.flyCam_.cam.pos[2]];
-			
+			const quadrant = this.level_.positionQuadrant(this.flyCam_.cam.pos);
+			if (quadrant != this.curQuad) {
+				switch (this.curQuad) {
+					case Quadrant.Bottom: break;
+					case Quadrant.Right: this.scene_.lightMgr.setEnabled(this.level_.spotRight, false); break;
+					case Quadrant.Left: this.scene_.lightMgr.setEnabled(this.level_.spotLeft, false); break;
+					case Quadrant.Top: this.scene_.lightMgr.setEnabled(this.level_.spotBack, false); break;
+				}
+				this.curQuad = quadrant;
+				switch (this.curQuad) {
+					case Quadrant.Bottom: break;
+					case Quadrant.Right: this.scene_.lightMgr.setEnabled(this.level_.spotRight, true); break;
+					case Quadrant.Left: this.scene_.lightMgr.setEnabled(this.level_.spotLeft, true); break;
+					case Quadrant.Top: this.scene_.lightMgr.setEnabled(this.level_.spotBack, true); break;
+				}
+			}
 		}
 
 		// if (this.glowLight_) {
