@@ -5,6 +5,7 @@
 /// <reference path="flycam.ts" />
 /// <reference path="assets.ts" />
 /// <reference path="levelgen.ts" />
+/// <reference path="sfx.ts" />
 
 import io = sd.io;
 import math = sd.math;
@@ -40,6 +41,7 @@ const enum KeyCommand {
 class MainScene implements sd.SceneController {
 	private scene_: world.Scene;
 	private assets_: Assets;
+	private sfx_: Sound;
 	private level_: Level;
 
 	private flyCam_: FlyCamController;
@@ -52,7 +54,7 @@ class MainScene implements sd.SceneController {
 
 	constructor(private rc: render.RenderContext, private ac: audio.AudioContext) {
 		this.scene_ = new world.Scene(rc);
-		// this.sfx_ = new Sound(ac);
+		this.sfx_ = new Sound(ac);
 
 		this.setMode(GameMode.Loading);
 
