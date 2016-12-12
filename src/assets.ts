@@ -7,6 +7,7 @@ interface MaterialAssets {
 	bronzepatina: asset.Material;
 	whitemarble: asset.Material;
 	zodiac: asset.Material;
+	signs: asset.Material;
 }
 
 interface MeshAssets {
@@ -28,8 +29,8 @@ function loadAllAssets(rc: render.RenderContext, ac: audio.AudioContext, meshMgr
 	const a = { mat: {}, mesh: {}, tex: {} } as Assets;
 
 	var totalAssets = 1, assetsLoaded = 0;
-	const loaded = () => {
-		assetsLoaded += 1;
+	const loaded = (n = 1) => {
+		assetsLoaded += n;
 		progress(assetsLoaded / totalAssets);
 	};
 
@@ -39,6 +40,7 @@ function loadAllAssets(rc: render.RenderContext, ac: audio.AudioContext, meshMgr
 
 	function loadLocalMTL<K extends keyof MaterialAssets>(path: string, ks: K[]) {
 		return asset.loadMTLFile(localURL(path)).then(ag => {
+			loaded();
 			for (const mat of ag.materials) {
 				if (ks.indexOf(<any>mat.name) > -1) {
 					a.mat[mat.name as K] = <any>mat;
@@ -46,13 +48,14 @@ function loadAllAssets(rc: render.RenderContext, ac: audio.AudioContext, meshMgr
 			}
 			totalAssets += ag.textures.length;
 			return asset.resolveTextures(rc, ag.textures).then(tex => {
-				assetsLoaded += tex.length;
+				loaded(tex.length);
 			});
 		});
 	}
 
 	function loadEnvCubeTex<K extends keyof TextureAssets>(dirPath: string, k: K) {
 		render.loadCubeTexture(rc, render.makeCubeMapPaths(dirPath, ".jpg")).then(texture => {
+			loaded();
 			a.tex[k] = <any>texture;
 		});
 	}
@@ -68,6 +71,7 @@ function loadAllAssets(rc: render.RenderContext, ac: audio.AudioContext, meshMgr
 		loadLocalMTL("data/mat/bronzepatina/bronzepatina.mtl", ["bronzepatina"]),
 		loadLocalMTL("data/mat/whitemarble/whitemarble.mtl", ["whitemarble"]),
 		loadLocalMTL("data/mat/zodiac/zodiac.mtl", ["zodiac"]),
+		loadLocalMTL("data/mat/signs/signs.mtl", ["signs"]),
 		loadEnvCubeTex("data/mat/galaxy/galaxy-", "envCubeSpace")
 	];
 	totalAssets = stuff.length;
