@@ -16,7 +16,23 @@ const TheColors: number[][] = [
 
 
 class LevelGen {
-	constructor(private rc: render.RenderContext, private ac: audio.AudioContext, private assets: Assets, private scene: world.Scene) {}
+	theColorMatsBack: asset.Material[] = [];
+	theColorMatsLeft: asset.Material[] = [];
+	theColorMatsRight: asset.Material[] = [];
+
+	constructor(private rc: render.RenderContext, private ac: audio.AudioContext, private assets: Assets, private scene: world.Scene) {
+		for (let c = 0; c < TheColors.length; ++c) {
+			const color = TheColors[c];
+			const m = asset.makeMaterial(`core_color_${c}`);
+			m.emissiveColour = color;
+			m.emissiveIntensity = 1;
+			m.flags |= asset.MaterialFlags.usesEmissive;
+
+			this.theColorMatsBack[c] = m;
+			this.theColorMatsLeft[c] = sd.cloneStruct(m);
+			this.theColorMatsRight[c] = sd.cloneStruct(m);
+		}
+	}
 
 
 	makeGlower(position: sd.Float3, radius: number) {
