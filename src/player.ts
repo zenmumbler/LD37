@@ -39,9 +39,9 @@ class PlayerView {
 	}
 
 	rotate(localRelXY: sd.Float2) {
-		this.angleX_ -= Math.PI * 1.5 * localRelXY[1];
+		this.angleX_ -= Math.PI * 1.3 * localRelXY[1];
 		this.angleX_ = math.clamp(this.angleX_, -Math.PI * 0.27, Math.PI * 0.21);
-		this.angleY_ += Math.PI * 2 * localRelXY[0];
+		this.angleY_ += Math.PI * 1.8 * localRelXY[0];
 		this.rot_ = quat.fromEuler(0, this.angleY_, this.angleX_);
 		vec3.transformQuat(this.dir_, [0, 0, 1], this.rot_);
 		vec3.normalize(this.dir_, this.dir_);
@@ -99,7 +99,7 @@ class PlayerController {
 	}
 
 	step(timeStep: number) {
-		const maxAccel = 0.8;
+		const maxAccel = 0.6;
 		var accel = 0, sideAccel = 0;
 
 		if (io.keyboard.down(io.Key.UP) || io.keyboard.down(io.Key.W)) {
