@@ -12,6 +12,7 @@ class PlayerView {
 	private up_ = [0, 1, 0];
 	private speed_ = 0;
 	private sideSpeed_ = 0;
+	private effectiveSpeed_ = 0;
 
 	constructor(initialPos: sd.Float3) {
 		vec3.copy(this.pos_, initialPos);
@@ -24,15 +25,25 @@ class PlayerView {
 
 		const dirXZ = vec3.normalize([], [this.dir_[0], 0, this.dir_[2]]);
 
-		vec3.scaleAndAdd(this.pos_, this.pos_, dirXZ, this.speed_);
-		var right = vec3.cross([], dirXZ, [0, 1, 0]);
-		vec3.scaleAndAdd(this.pos_, this.pos_, right, this.sideSpeed_);
+		const fwdVel = vec3.scale([], dirXZ, this.speed_);
+		const right = vec3.cross([], dirXZ, [0, 1, 0]);
+		const sideVel = vec3.scale([], right, this.sideSpeed_);
 
-		this.speed_ *= 0.9;
+		const sumVel = vec3.add([], fwdVel, sideVel);
+		if (vec3.length(sumVel) > 0.001) {
+			const effectiveVel = vec3.scale([], vec3.normalize([], sumVel), Math.max(Math.abs(this.speed_), Math.abs(this.sideSpeed_)));
+			vec3.add(this.pos_, this.pos_, effectiveVel);
+			this.effectiveSpeed_ = vec3.length(effectiveVel);
+		}
+		else {
+			this.effectiveSpeed_ = 0;
+		}
+
+		this.speed_ *= 0.85;
 		if (Math.abs(this.speed_) < 0.001) {
 			this.speed_ = 0;
 		}
-		this.sideSpeed_ *= 0.9;
+		this.sideSpeed_ *= 0.85;
 		if (Math.abs(this.sideSpeed_) < 0.001) {
 			this.sideSpeed_ = 0;
 		}
@@ -52,6 +63,7 @@ class PlayerView {
 	get pos() { return this.pos_; }
 	get dir() { return this.dir_; }
 	get rotation() { return this.rot_; }
+	get effectiveSpeed() { return this.effectiveSpeed_; }
 	get focusPos() { return vec3.add([], this.pos_, this.dir_); }
 	get viewMatrix() { return mat4.lookAt([], this.pos_, this.focusPos, this.up_); }
 }
