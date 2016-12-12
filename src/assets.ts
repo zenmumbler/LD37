@@ -5,6 +5,7 @@ interface SoundAssets {
 	steps: AudioBuffer[];
 	lightOn: AudioBuffer;
 	lightOff: AudioBuffer;
+	ping: AudioBuffer;
 	doorOpen: AudioBuffer;
 	swoosh: AudioBuffer;
 	mainMusic: AudioBuffer;
@@ -79,6 +80,7 @@ function loadAllAssets(rc: render.RenderContext, ac: audio.AudioContext, meshMgr
 
 		asset.loadSoundFile(ac, "data/sound/131599__alvinwhatup2__kill-switch-large-breaker-switch.mp3").then(buf => { a.sound.lightOn = buf; loaded(); }),
 		asset.loadSoundFile(ac, "data/sound/132998__cosmicd__light-switch-of-doom.mp3").then(buf => { a.sound.lightOff = buf; loaded(); }),
+		asset.loadSoundFile(ac, "data/sound/215415__unfa__ping.mp3").then(buf => { a.sound.ping = buf; loaded(); }),
 
 		asset.loadSoundFile(ac, "data/sound/232102__thalamus-lab__stone-grind_83631__arithni__heavy-thud.mp3").then(buf => { a.sound.doorOpen = buf; loaded(); }),
 		asset.loadSoundFile(ac, "data/sound/264777__shinplaster__swoosh.mp3").then(buf => { a.sound.swoosh = buf; loaded(); }),

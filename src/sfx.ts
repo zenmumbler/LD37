@@ -97,6 +97,7 @@ class Sound {
 		var source: AudioBufferSourceNode | null = null;
 		var gain: GainNode | null = null;
 		var volume = 0;
+		var rate: number | null = null;
 
 		switch (what) {
 			case SFX.FootStep: buffer = assets.steps[this.stepToggle]; source = this.stepSource; gain = this.stepGain; volume = .65; this.stepToggle ^= 1; break;
@@ -105,10 +106,10 @@ class Sound {
 			case SFX.DoorOpen: buffer = assets.doorOpen; source = this.effectSource; gain = this.effectGain; volume = 1; break;
 			case SFX.Swoosh: buffer = assets.swoosh; source = this.effectSource; gain = this.effectGain; volume = 1; break;
 
-			case SFX.ToneA: buffer = null; source = this.toneSources[0]; gain = this.toneGain; volume = 1; break;
-			case SFX.ToneB: buffer = null; source = this.toneSources[1]; gain = this.toneGain; volume = 1; break;
-			case SFX.ToneC: buffer = null; source = this.toneSources[2]; gain = this.toneGain; volume = 1; break;
-			case SFX.ToneD: buffer = null; source = this.toneSources[3]; gain = this.toneGain; volume = 1; break;
+			case SFX.ToneA: buffer = null; source = this.toneSources[0]; gain = this.toneGain; volume = 1; rate = 1; break;
+			case SFX.ToneB: buffer = null; source = this.toneSources[1]; gain = this.toneGain; volume = 1; rate = 1; break;
+			case SFX.ToneC: buffer = null; source = this.toneSources[2]; gain = this.toneGain; volume = 1; rate = 1; break;
+			case SFX.ToneD: buffer = null; source = this.toneSources[3]; gain = this.toneGain; volume = 1; rate = 1; break;
 
 			default: buffer = null;
 		}
@@ -123,6 +124,9 @@ class Sound {
 		var bufferSource: AudioBufferSourceNode | null = this.ac.ctx.createBufferSource();
 		bufferSource.buffer = buffer;
 		bufferSource.connect(gain);
+		if (rate !== null) {
+			bufferSource.playbackRate.value = rate;
+		}
 		bufferSource.start(0);
 		gain.gain.value = volume;
 
