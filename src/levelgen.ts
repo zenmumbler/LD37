@@ -124,7 +124,13 @@ class LevelGen {
 		const floor = scene.makeEntity({
 			mesh: {
 				name: "floor",
-				meshData: this.generatePillarBlock([0, 0, 0], .5, .5, 40, 40, [0.125, 0.125], (pxz, txz, y) => y - 0.025 + (Math.random() * 0.05))
+				meshData: this.generatePillarBlock([0, 0, 0], .5, .5, 62, 62, [0.125, 0.125], 
+					(pxz, txz, y) => {
+						let dist = vec2.len(vec2.sub([], pxz, [0, 0]));
+						dist = Math.max(0, dist - 14);
+						return y + dist - 0.025 + (Math.random() * 0.05);
+					}
+				)
 			},
 			pbrModel: { materials: [assets.mat.bronzepatina] }
 		});
@@ -137,25 +143,11 @@ class LevelGen {
 		});
 
 
-		// -- pillar room (back)
-		const floorPillars = scene.makeEntity({
-			mesh: {
-				name: "floor-pillars",
-				meshData: this.generatePillarBlock([0, 0, -12.5], .5, 2, 20, 10, [0.125, 0.125],
-					(pxz, txz, y) => {
-						let dist = vec2.len(vec2.sub([], pxz, [0, -10]));
-						dist = Math.max(0, dist - 4);
-						return y - 0.8 + dist - 0.025 + (Math.random() * 0.05);
-					}
-				)
-			},
-			pbrModel: { materials: [assets.mat.bronzepatina] }
-		});
 		const spotPillars = scene.makeEntity({
 			transform: { position: [0, 4, -8] },
 			light: {
 				name: "spot-pillars",
-				colour: [1, .96, .94],
+				colour: [1, .94, .88],
 				type: asset.LightType.Spot,
 				intensity: 2.5,
 				range: 10,
@@ -163,22 +155,8 @@ class LevelGen {
 			}
 		});
 		ltm.setDirection(spotPillars.light!, [0, -.707, -.707]);
-		ltm.setEnabled(spotPillars.light!, false);
+		ltm.setEnabled(spotPillars.light!, true);
 
-		// -- puzzle room left
-		const floorPuzzleLeft = scene.makeEntity({
-			mesh: {
-				name: "floor-left",
-				meshData: this.generatePillarBlock([-12.5, 0, 0], .5, 2, 10, 20, [0.125, 0.125],
-					(pxz, txz, y) => {
-						let dist = vec2.len(vec2.sub([], pxz, [-10, 0]));
-						dist = Math.max(0, dist - 4);
-						return y - 0.8 + dist - 0.025 + (Math.random() * 0.05);
-					}
-				)
-			},
-			pbrModel: { materials: [assets.mat.bronzepatina] }
-		});
 		const spotLeft = scene.makeEntity({
 			transform: { position: [-8, 4, 0] },
 			light: {
@@ -194,20 +172,6 @@ class LevelGen {
 		ltm.setEnabled(spotLeft.light!, false);
 
 
-		// -- puzzle room right
-		const floorPuzzleRight = scene.makeEntity({
-			mesh: {
-				name: "floor-right",
-				meshData: this.generatePillarBlock([12.5, 0, 0], .5, 2, 10, 20, [0.125, 0.125],
-					(pxz, txz, y) => {
-						let dist = vec2.len(vec2.sub([], pxz, [10, 0]));
-						dist = Math.max(0, dist - 4);
-						return y - 0.8 + dist - 0.025 + (Math.random() * 0.05);
-					}
-				)
-			},
-			pbrModel: { materials: [assets.mat.bronzepatina] }
-		});
 		const spotRight = scene.makeEntity({
 			transform: { position: [8, 4, 0] },
 			light: {
@@ -227,9 +191,9 @@ class LevelGen {
 
 		this.makeGlower([0, 1, 0], 1);
 
-		for (let qq = 0; qq < 8; ++qq) {
-			this.makeGlower([((qq * 16) % 20) - 10, 6.5, ((qq * 34) % 20) - 10], .6);
-		}
+		// for (let qq = 0; qq < 8; ++qq) {
+		// 	this.makeGlower([((qq * 16) % 20) - 10, 6.5, ((qq * 34) % 20) - 10], .6);
+		// }
 
 		return Promise.resolve();
 	}
