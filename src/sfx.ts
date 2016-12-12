@@ -61,6 +61,7 @@ class Sound {
 			this.musicSource.buffer = this.endMusic_ ? this.assets_.endMusic : this.assets_.mainMusic;
 			this.musicSource.loop = !this.endMusic_;
 			this.musicSource.connect(this.musicGain);
+			this.musicGain.gain.value = 0.7;
 
 			this.musicSource.start(0);
 		}
@@ -94,8 +95,8 @@ class Sound {
 
 		switch (what) {
 			case SFX.FootStep: buffer = assets.steps[this.stepToggle]; source = this.effectSource; volume = 1; this.stepToggle ^= 1; break;
-			case SFX.LightOn: buffer = assets.lightOn; source = this.effectSource; volume = 1; break;
-			case SFX.LightOff: buffer = assets.lightOff; source = this.effectSource; volume = 1; break;
+			case SFX.LightOn: buffer = assets.lightOn; source = this.effectSource; volume = .5; break;
+			case SFX.LightOff: buffer = assets.lightOff; source = this.effectSource; volume = .7; break;
 			case SFX.DoorOpen: buffer = assets.doorOpen; source = this.effectSource; volume = 1; break;
 			case SFX.Swoosh: buffer = assets.swoosh; source = this.effectSource; volume = 1; break;
 
