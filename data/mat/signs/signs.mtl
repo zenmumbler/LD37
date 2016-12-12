@@ -1,2 +1,3 @@
 newmtl signs
+	Ke .4 .4 .4
 	map_Kd diffuse.jpg

@@ -131,13 +131,13 @@ class Level {
 			if ((cwx & 1) == 0) {
 				walls.push({
 					translation: [cwalls[cwx][0], 9, cwalls[cwx][1]],
-					generator: new meshdata.gen.Box({ width: 10, depth: 0.5, height: 12, inward: false, uvRange: [11, 12], uvOffset: [-1, 0] })
+					generator: new meshdata.gen.Box({ width: 10, depth: 0.5, height: 12, inward: false, uvRange: [11, 12], uvOffset: [1, 0] })
 				});
 			}
 			else {
 				walls.push({
 					translation: [cwalls[cwx][0], 9, cwalls[cwx][1]],
-					generator: new meshdata.gen.Box({ width: 0.5, depth: 10, height: 12, inward: false, uvRange: [11, 12], uvOffset: [-1, 0] })
+					generator: new meshdata.gen.Box({ width: 0.5, depth: 10, height: 12, inward: false, uvRange: [11, 12], uvOffset: [1, 0] })
 				});
 			}
 		}
@@ -150,6 +150,96 @@ class Level {
 				materials: [assets.mat.chipmetal]
 			}
 		});
+	}
+
+
+	makeInfoWalls(scene: world.Scene, assets: Assets) {
+		const signA = meshdata.gen.generate(new meshdata.gen.Box({
+			width: 1, height: 1, depth: 0.1, inward: false,
+			uvRange: [0.5, 0.5], uvOffset: [0, 0.5]
+		}));
+		const signB = meshdata.gen.generate(new meshdata.gen.Box({
+			width: 1, height: 1, depth: 0.1, inward: false,
+			uvRange: [0.5, 0.5], uvOffset: [0.5, 0.5]
+		}));
+		const dirA = meshdata.gen.generate(new meshdata.gen.Box({
+			width: 1, height: 1, depth: 0.1, inward: false,
+			uvRange: [0.5, 0.5], uvOffset: [0, 0]
+		}));
+		const dirB = meshdata.gen.generate(new meshdata.gen.Box({
+			width: 1, height: 1, depth: 0.1, inward: false,
+			uvRange: [0.5, 0.5], uvOffset: [0.5, 0]
+		}));
+
+		const iwLeft = scene.makeEntity({
+			transform: { position: [-3.75, 1.5, 10.01] },
+			mesh: {
+				name: "infoWallA",
+				meshData: meshdata.gen.generate(new meshdata.gen.Box({
+					width: 3, height: 3, depth: .5, inward: false,
+					uvRange: [3.25, 3], uvOffset: [.75, 0]
+				}))
+			},
+			pbrModel: {
+				materials: [assets.mat.chipmetal]
+			}
+		});
+		scene.makeEntity({
+			parent: iwLeft.transform,
+			transform: { position: [0, .7, -0.3] },
+			mesh: { name: "doorSignA", meshData: signA },
+			pbrModel: { materials: [assets.mat.signs] }
+		});
+		scene.makeEntity({
+			parent: iwLeft.transform,
+			transform: { position: [0, -.6, -0.3] },
+			mesh: { name: "doorDirA", meshData: dirA },
+			pbrModel: { materials: [assets.mat.signs] }
+		});
+
+		const iwRight = scene.makeEntity({
+			transform: { position: [3.25, 1.5, 10.01] },
+			mesh: {
+				name: "infoWallB",
+				meshData: meshdata.gen.generate(new meshdata.gen.Box({
+					width: 3, height: 3, depth: .5, inward: false,
+					uvRange: [3.25, 3], uvOffset: [1, 0]
+				}))
+			},
+			pbrModel: {
+				materials: [assets.mat.chipmetal]
+			}
+		});
+		scene.makeEntity({
+			parent: iwRight.transform,
+			transform: { position: [0, .7, -0.3] },
+			mesh: { name: "doorSignB", meshData: signB },
+			pbrModel: { materials: [assets.mat.signs] }
+		});
+		scene.makeEntity({
+			parent: iwRight.transform,
+			transform: { position: [0, -.6, -0.3] },
+			mesh: { name: "doorDirB", meshData: dirB },
+			pbrModel: { materials: [assets.mat.signs] }
+		});
+
+		// -- signs above the puzzle rooms
+
+		scene.makeEntity({
+			transform: { position: [-10.2, 3.6, 0], rotation: quat.fromEuler(0, Math.PI / 2, 0) },
+			mesh: { name: "puzzleSignA", meshData: signA },
+			pbrModel: { materials: [assets.mat.signs] }
+		});
+		scene.makeEntity({
+			transform: { position: [9.6, 3.6, 0], rotation: quat.fromEuler(0, Math.PI / 2, 0) },
+			mesh: { name: "puzzleSignB", meshData: signB },
+			pbrModel: { materials: [assets.mat.signs] }
+		});
+	}
+
+
+	makeBigHonkingDoor(scene: world.Scene, assets: Assets) {
+
 	}
 
 
@@ -370,6 +460,8 @@ class Level {
 		// -- walls
 
 		this.makeInnerWalls(scene, assets);
+		this.makeInfoWalls(scene, assets);
+		this.makeBigHonkingDoor(scene, assets);
 
 
 		// -- lights, so many lights

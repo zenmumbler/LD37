@@ -78,7 +78,6 @@ function loadAllAssets(rc: render.RenderContext, ac: audio.AudioContext, meshMgr
 
 	return Promise.all(stuff).then(() => {
 		makeReflectionMap("envCubeSpace", "reflectCubeSpace");
-		a.mat.whitemarble.emissiveIntensity = 1;
 		return a;
 	});
 }
