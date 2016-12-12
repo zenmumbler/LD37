@@ -120,7 +120,7 @@ class LevelGen {
 		const ceiling = scene.makeEntity({
 			mesh: {
 				name: "ceil",
-				meshData: this.generatePillarBlock([0, 10, 0], .5, 5, 40, 40, [.5, 3], (pxz, txz, y) => y - 1.5 + (Math.random() * 3))
+				meshData: this.generatePillarBlock([0, 10, 0], 1, 4, 20, 20, [1, 4], (pxz, txz, y) => y - 1.9 + (Math.random() * 3))
 			},
 			pbrModel: { materials: [assets.mat.medmetal] }
 		});
