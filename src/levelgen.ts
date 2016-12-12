@@ -58,7 +58,7 @@ class LevelGen {
 	}
 
 
-	generatePillarBlock(origin: sd.Float3, pillarDim: number, pillarHeight: number, width: number, depth: number, uvRange: sd.Float2, yGen: PillarYGen) {
+	generateColumnBlock(origin: sd.Float3, pillarDim: number, pillarHeight: number, width: number, depth: number, uvRange: sd.Float2, yGen: PillarYGen) {
 		const tiles: meshdata.gen.TransformedMeshGen[] = [];
 		const halfWidth = width * pillarDim / 2;
 		const halfDepth = depth * pillarDim / 2;
@@ -163,7 +163,7 @@ class LevelGen {
 		const floor = scene.makeEntity({
 			mesh: {
 				name: "floor",
-				meshData: this.generatePillarBlock([0, 0, 0], .5, .5, 62, 62, [0.125, 0.125], 
+				meshData: this.generateColumnBlock([0, 0, 0], .5, .5, 62, 62, [0.125, 0.125], 
 					(pxz, txz, y) => {
 						let dist = vec2.len(vec2.sub([], pxz, [0, 0]));
 						dist = Math.max(0, dist - 14);
@@ -176,7 +176,7 @@ class LevelGen {
 		const ceiling = scene.makeEntity({
 			mesh: {
 				name: "ceil",
-				meshData: this.generatePillarBlock([0, 10, 0], 1, 4, 20, 20, [.5, .5], (pxz, txz, y) => y - 1.9 + (Math.random() * 3))
+				meshData: this.generateColumnBlock([0, 10, 0], 1, 4, 20, 20, [.5, .5], (pxz, txz, y) => y - 1.9 + (Math.random() * 3))
 			},
 			pbrModel: { materials: [assets.mat.medmetal] }
 		});
