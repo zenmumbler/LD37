@@ -160,7 +160,7 @@ class LevelGen {
 	}
 
 
-	makePillars(origin: sd.Float3, zodiacSigns: number[] | null, scene: world.Scene, assets: Assets) {
+	makePillars(origin: sd.Float3, spacing: number, zodiacSigns: number[] | null, scene: world.Scene, assets: Assets) {
 		const baseEnt = scene.makeEntity({
 			transform: { position: origin }
 		});
@@ -169,13 +169,13 @@ class LevelGen {
 		const pw = .25;
 		for (let p = 0; p < 4; ++p) {
 			pgen.push({
-				translation: [p * 1, 0, 0],
+				translation: [p * spacing, 0, 0],
 				generator: new meshdata.gen.Box({ width: pw, depth: pw, height: 1.3, inward: false, uvRange: [pw, 1.3] })
 			});
 
 			scene.makeEntity({
 				parent: baseEnt.transform,
-				transform: { position: [p, 1.4, 0] },
+				transform: { position: [p * spacing, 1.4, 0] },
 				mesh: { name: `pillar-sphere-${p}`, meshData: meshdata.gen.generate(new meshdata.gen.Sphere({ radius: pw * .9, rows: 12, segs: 18 })) },
 				pbrModel: { materials: [this.theColorMatsBack[p]] }
 			});
@@ -246,6 +246,10 @@ class LevelGen {
 		});
 
 
+		// -- BACK ROOM: zodiac signs associated with colors
+
+		this.makePillars([-1.5, 0, -12], 1, [0, 1, 2, 3], scene, assets);
+
 		const spotBack = scene.makeEntity({
 			transform: { position: [0, 4, -8] },
 			light: {
@@ -258,7 +262,13 @@ class LevelGen {
 			}
 		});
 		ltm.setDirection(spotBack.light!, [0, -.707, -.707]);
-		ltm.setEnabled(spotBack.light!, true);
+		ltm.setEnabled(spotBack.light!, false);
+
+
+		// -- LEFT ROOM: easy puzzle
+
+		const pilleft = this.makePillars([-12, 0, -1.2], .6, null, scene, assets);
+		scene.transformMgr.rotateByAngles(pilleft.transform, [0, math.deg2rad(80), 0]);
 
 		const spotLeft = scene.makeEntity({
 			transform: { position: [-8, 4, 0] },
@@ -272,7 +282,13 @@ class LevelGen {
 			}
 		});
 		ltm.setDirection(spotLeft.light!, [-.707, -.707, 0]);
-		ltm.setEnabled(spotLeft.light!, false);
+		ltm.setEnabled(spotLeft.light!, true);
+
+
+		// -- RIGHT ROOM: hard puzzle
+
+		const pilright = this.makePillars([12, 0, 1.2], .6, null, scene, assets);
+		scene.transformMgr.rotateByAngles(pilright.transform, [0, math.deg2rad(-100), 0]);
 
 		const spotRight = scene.makeEntity({
 			transform: { position: [8, 4, 0] },
@@ -288,16 +304,18 @@ class LevelGen {
 		ltm.setDirection(spotRight.light!, [.707, -.707, 0]);
 		ltm.setEnabled(spotRight.light!, false);
 
-		// --
+
+		// -- walls
+
 
 		this.makeInnerWalls(scene, assets);
 
-		this.makeGlower([0, 1, 0], 1);
+
+		// -- lights, so many lights
 
 		this.makeCornerLights(scene, assets);
 
-		this.makePillars([-1.5, 0, -12], [0, 1, 2, 3], scene, assets);
-
+		this.makeGlower([0, 1, 0], 1);
 		for (let qq = 0; qq < 8; ++qq) {
 			this.makeGlower([((qq * 16) % 20) - 10, 6.5, ((qq * 34) % 20) - 10], .6);
 		}
