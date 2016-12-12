@@ -72,6 +72,16 @@ class MainScene implements sd.SceneController {
 
 			this.level_ = new LevelGen(rc, ac, assets, this.scene_);
 			this.level_.generate().then(() => {
+				const sun = this.scene_.makeEntity({
+					transform: { position: [0, 1, .3] },
+					light: {
+						name: "sun",
+						colour: [.7, .9, .8],
+						type: asset.LightType.Directional,
+						intensity: .2,
+					}
+				});
+				this.scene_.lightMgr.setDirection(sun.light!, [0, 1, .3]);
 
 				const spotRight = this.scene_.makeEntity({
 					transform: { position: [-8.5, 3.5, -8.5] },

@@ -24,7 +24,7 @@ class LevelGen {
 				name: "spherelight1",
 				type: asset.LightType.Point,
 				intensity: 8,
-				range: 2.5 * radius,
+				range: 3 * radius,
 				colour: [1, 0.96, 0.94]
 			}
 		});
@@ -144,7 +144,7 @@ class LevelGen {
 			transform: { position: [0, 4, -8] },
 			light: {
 				name: "spot-pillars",
-				colour: [1, 1, 1],
+				colour: [1, .96, .94],
 				type: asset.LightType.Spot,
 				intensity: 2.5,
 				range: 10,
@@ -213,7 +213,12 @@ class LevelGen {
 
 		// --
 		this.makeInnerWalls(scene, assets);
+
 		this.makeGlower([0, 1, 0], 1);
+
+		for (let qq = 0; qq < 8; ++qq) {
+			this.makeGlower([((qq * 16) % 20) - 10, 6.5, ((qq * 34) % 20) - 10], .6);
+		}
 
 		return Promise.resolve();
 	}
