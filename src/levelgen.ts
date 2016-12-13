@@ -43,7 +43,6 @@ class Level {
 	spotLeft: world.LightInstance;
 	spotRight: world.LightInstance;
 	spotBack: world.LightInstance;
-	spotDoor: world.LightInstance;
 	spotExit: world.LightInstance;
 
 	orbs: Orb[][];
@@ -304,7 +303,6 @@ class Level {
 		this.spotExit = spotExit.light!;
 		scene.lightMgr.setDirection(this.spotExit, [0, -.7, -1]);
 		scene.lightMgr.setEnabled(this.spotExit, false);
-		// scene.pbrModelMgr.setShadowCaster(this.spotExit);
 	}
 
 

@@ -240,7 +240,7 @@ class PlayerController {
 
 	openExit() {
 		this.scene.lightMgr.setEnabled(this.level.spotExit, true);
-		// this.scene.pbrModelMgr.setShadowCaster(this.level.spotExit);
+		this.scene.pbrModelMgr.setShadowCaster(this.level.spotExit);
 		this.sfx.play(SFX.DoorOpen);
 		this.doorOpenStart = Date.now();
 	}
@@ -318,7 +318,7 @@ class PlayerController {
 		}
 		if (spotOn) {
 			this.scene.lightMgr.setEnabled(spotOn, true);
-			// this.scene.pbrModelMgr.setShadowCaster(spotOn);
+			this.scene.pbrModelMgr.setShadowCaster(spotOn);
 			this.sfx.play(SFX.LightOn);
 		}
 		else {

@@ -136,7 +136,7 @@ class MainScene implements sd.SceneController {
 
 		if (shadowCaster && render.canUseShadowMaps(this.rc)) {
 			let rpdShadow = render.makeRenderPassDescriptor();
-			rpdShadow.clearMask = render.ClearMask.Depth;
+			rpdShadow.clearMask = render.ClearMask.ColourDepth;
 
 			spotShadow = this.scene_.lightMgr.shadowViewForLight(this.rc, shadowCaster, .1);
 			if (spotShadow) {
