@@ -271,12 +271,13 @@ class PlayerController {
 		}
 		if (orbsOn) {
 			for (const o of orbsOn) {
-				this.scene.pbrModelMgr.materialManager.setEmissiveIntensity(o.pbrMat, 0.4);
+				this.scene.pbrModelMgr.materialManager.setEmissiveIntensity(o.pbrMat, 0.3);
 			}
 		}
 	}
 
 	hoverOrb: Orb | null = null;
+	lastInteract = 0;
 
 	step(timeStep: number) {
 		const maxAccel = 0.66;
@@ -306,6 +307,7 @@ class PlayerController {
 		}
 
 		// physical interaction
+		const now = Date.now();
 		const posXZ = this.view.posXZ;
 		const reachXZ = vec2.scale([], this.view.dirXZ, 2);
 		const touchXZ = vec2.add([], posXZ, reachXZ);
@@ -320,18 +322,30 @@ class PlayerController {
 					anyHover = true;
 					if (this.hoverOrb != orb) {
 						if (this.hoverOrb) {
-							this.scene.pbrModelMgr.materialManager.setEmissiveIntensity(this.hoverOrb.pbrMat, 0.4);
+							this.scene.pbrModelMgr.materialManager.setEmissiveIntensity(this.hoverOrb.pbrMat, 0.3);
 						}
 						this.hoverOrb = orb;
-						this.scene.pbrModelMgr.materialManager.setEmissiveIntensity(orb.pbrMat, 0.75);
+						this.scene.pbrModelMgr.materialManager.setEmissiveIntensity(orb.pbrMat, 0.5);
+					}
+					else {
+						const timeSinceTap = Date.now() - this.lastInteract;
+						if (timeSinceTap < 1000) {
+							const shine = 1 - (timeSinceTap / 1000) * .5;
+							this.scene.pbrModelMgr.materialManager.setEmissiveIntensity(orb.pbrMat, shine);
+						}
 					}
 				}
 			}
 		}
 
 		if (!anyHover && this.hoverOrb) {
-			this.scene.pbrModelMgr.materialManager.setEmissiveIntensity(this.hoverOrb.pbrMat, 0.4);
+			this.scene.pbrModelMgr.materialManager.setEmissiveIntensity(this.hoverOrb.pbrMat, 0.3);
 			this.hoverOrb = null;
+		}
+
+		if (io.keyboard.pressed(this.keyForKeyCommand(KeyCommand.Interact)) && this.hoverOrb) {
+			this.lastInteract = Date.now();
+			this.sfx.play(SFX.ToneA + this.hoverOrb.index);
 		}
 	}
 }
