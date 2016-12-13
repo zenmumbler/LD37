@@ -47,10 +47,25 @@ class Level {
 	spotExit: world.LightInstance;
 
 	orbs: Orb[][];
+	glowers: { light: world.LightInstance; mat: world.PBRMaterialInstance }[] = [];
 
 	finalDoor: world.EntityInfo;
 
+	orderLeft: number[];
+	orderRight: number[];
+
+	checkOrderLeft: number[];
+	checkOrderRight: number[];
+
 	constructor(private rc: render.RenderContext, private ac: audio.AudioContext, private assets: Assets, private scene: world.Scene) {
+		// gen random permutations
+		const ZL = this.orderLeft = this.genRandomPuzzleOrder();
+		const ZR = this.orderRight = this.genRandomPuzzleOrder();
+
+		// place permutations in checking order
+		this.checkOrderLeft  = [ZL[0], ZL[1], ZL[2], ZL[3], ZL[7], ZL[6], ZL[5], ZL[4]];
+		this.checkOrderRight = [ZR[4], ZR[0], ZR[1], ZR[5], ZR[6], ZR[2], ZR[3], ZR[7]];
+
 		for (let c = 0; c < TheColors.length; ++c) {
 			const color = TheColors[c];
 			const m = asset.makeMaterial(`core_color_${c}`);
@@ -71,7 +86,7 @@ class Level {
 
 
 	makeGlower(position: sd.Float3, radius: number) {
-		this.scene.makeEntity({
+		const g = this.scene.makeEntity({
 			transform: {
 				position: position
 			},
@@ -89,6 +104,10 @@ class Level {
 				range: 3 * radius,
 				colour: [1, 0.96, 0.94]
 			}
+		});
+		this.glowers.push({
+			light: g.light!,
+			mat: this.scene.pbrModelMgr.materialRange(g.pbrModel!).first
 		});
 	}
 
@@ -448,6 +467,13 @@ class Level {
 	}
 
 
+	genRandomPuzzleOrder() {
+		const signs = [0, 1, 2, 3, 0, 1, 2, 3];
+		signs.sort((a, b) => Math.random() > .5 ? -1 : 1);
+		return signs;
+	}
+
+
 	generate() {
 		const scene = this.scene;
 		const assets = this.assets;
@@ -490,7 +516,7 @@ class Level {
 				name: "spot-pillars",
 				colour: [1, .94, .88],
 				type: asset.LightType.Spot,
-				intensity: 2.5,
+				intensity: 2,
 				range: 10,
 				cutoff: math.deg2rad(35)
 			}
@@ -504,7 +530,7 @@ class Level {
 
 		const pilleft = this.makeOrbPillars(Quadrant.Left, [-12, 0, -1], .67, null, scene, assets);
 		scene.transformMgr.rotateByAngles(pilleft.transform, [0, math.deg2rad(80), 0]);
-		const tabletLeft = this.makePuzzleTablet([-11.5, 1, 1.5], [3, 1, 2, 0, 2, 0, 1, 3], scene, assets);
+		const tabletLeft = this.makePuzzleTablet([-11.5, 1, 1.5], this.orderLeft, scene, assets);
 		scene.transformMgr.rotateByAngles(tabletLeft.transform, [math.deg2rad(-10), math.deg2rad(100), 0]);
 
 		const spotLeft = scene.makeEntity({
@@ -513,7 +539,7 @@ class Level {
 				name: "spot-left",
 				colour: [1, 1, 1],
 				type: asset.LightType.Spot,
-				intensity: 2.5,
+				intensity: 2,
 				range: 10,
 				cutoff: math.deg2rad(35)
 			}
@@ -527,7 +553,7 @@ class Level {
 
 		const pilright = this.makeOrbPillars(Quadrant.Right, [12, 0, 1], .67, null, scene, assets);
 		scene.transformMgr.rotateByAngles(pilright.transform, [0, math.deg2rad(-100), 0]);
-		const tabletRight = this.makePuzzleTablet([11.5, 1, -1.5], [3, 1, 2, 0, 2, 0, 1, 3], scene, assets);
+		const tabletRight = this.makePuzzleTablet([11.5, 1, -1.5], this.orderRight, scene, assets);
 		scene.transformMgr.rotateByAngles(tabletRight.transform, [math.deg2rad(-10), math.deg2rad(-80), 0]);
 
 		const spotRight = scene.makeEntity({
@@ -536,7 +562,7 @@ class Level {
 				name: "spot-right",
 				colour: [1, 1, 1],
 				type: asset.LightType.Spot,
-				intensity: 2.5,
+				intensity: 2,
 				range: 10,
 				cutoff: math.deg2rad(35)
 			}
@@ -560,7 +586,7 @@ class Level {
 		this.makeCornerLights(scene, assets);
 
 		this.makeGlower([0, 1, 0], 1);
-		for (let qq = 0; qq < 8; ++qq) {
+		for (let qq = 0; qq < 7; ++qq) {
 			this.makeGlower([((qq * 16) % 20) - 10, 6.5, ((qq * 34) % 20) - 10], .6);
 		}
 

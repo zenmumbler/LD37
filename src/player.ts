@@ -177,6 +177,9 @@ class PlayerController {
 		});
 
 		dom.on(window, "mousemove", (evt: MouseEvent) => {
+			if (this.restrictMovement) {
+				return;
+			}
 			if (!this.tracking_) {
 				return;
 			}
@@ -235,27 +238,78 @@ class PlayerController {
 	}
 
 
+	openExit() {
+		this.scene.lightMgr.setEnabled(this.level.spotExit, true);
+		// this.scene.pbrModelMgr.setShadowCaster(this.level.spotExit);
+		this.sfx.play(SFX.DoorOpen);
+		this.doorOpenStart = Date.now();
+	}
+
+
+	private solvedLeft = false;
+	private solvedRight = false;
+	private endGame = false;
+	private doorOpenStart = 0;
+
 	setPoweredQuadrant(q: Quadrant) {
+		if (this.endGame) {
+			return;
+		}
+
 		let orbsOff: Orb[] | undefined = this.level.orbs[this.curQuad];
 		let orbsOn: Orb[] | undefined = this.level.orbs[q];
 		let spotOff: world.LightInstance | undefined;
 		let spotOn: world.LightInstance | undefined;
 		switch (this.curQuad) {
 			case Quadrant.Bottom: break;
-			case Quadrant.Right: spotOff = this.level.spotRight; break;
-			case Quadrant.Left: spotOff = this.level.spotLeft; break;
-			case Quadrant.Top: spotOff = this.level.spotBack; break;
+			case Quadrant.Left:
+				spotOff = this.level.spotLeft; this.sequenceLeft = [];
+				break;
+			case Quadrant.Right:
+				spotOff = this.level.spotRight; this.sequenceRight = [];
+				break;
+			case Quadrant.Top:
+				spotOff = this.level.spotBack;
+				break;
 		}
 		this.curQuad = q;
 		switch (this.curQuad) {
 			case Quadrant.Bottom: break;
-			case Quadrant.Right: spotOn = this.level.spotRight; break;
 			case Quadrant.Left: spotOn = this.level.spotLeft; break;
+			case Quadrant.Right: spotOn = this.level.spotRight; break;
 			case Quadrant.Top: spotOn = this.level.spotBack; break;
 		}
 
+		if (this.solvedLeft && this.solvedRight) {
+			spotOn = undefined;
+			orbsOn = undefined;
+			this.endGame = true;
+			this.sfx.stopMusic();
+			for (const g of this.level.glowers) {
+				this.scene.lightMgr.setEnabled(g.light, false);
+				this.scene.pbrModelMgr.materialManager.setEmissiveIntensity(g.mat, 0);
+			}
+
+			setTimeout(() => { this.openExit(); }, 2500);
+		}
+		else {
+			if (q == Quadrant.Left && this.solvedLeft) {
+				spotOn = undefined;
+				orbsOn = undefined;
+			}
+			if (q == Quadrant.Right && this.solvedRight) {
+				spotOn = undefined;
+				orbsOn = undefined;
+			}
+		}
+
 		if (spotOff) {
-			this.scene.lightMgr.setEnabled(spotOff, false);
+			if (this.scene.lightMgr.enabled(spotOff)) {
+				this.scene.lightMgr.setEnabled(spotOff, false);
+			}
+			else {
+				spotOff = undefined;
+			}
 		}
 		if (orbsOff) {
 			for (const o of orbsOff) {
@@ -264,20 +318,27 @@ class PlayerController {
 		}
 		if (spotOn) {
 			this.scene.lightMgr.setEnabled(spotOn, true);
+			// this.scene.pbrModelMgr.setShadowCaster(spotOn);
 			this.sfx.play(SFX.LightOn);
 		}
 		else {
-			this.sfx.play(SFX.LightOff);
+			this.scene.pbrModelMgr.setShadowCaster(0);
+			if (spotOff) {
+				this.sfx.play(SFX.LightOff);
+			}
 		}
 		if (orbsOn) {
 			for (const o of orbsOn) {
-				this.scene.pbrModelMgr.materialManager.setEmissiveIntensity(o.pbrMat, 0.3);
+				this.scene.pbrModelMgr.materialManager.setEmissiveIntensity(o.pbrMat, 0.20);
 			}
 		}
 	}
 
 	hoverOrb: Orb | null = null;
 	lastInteract = 0;
+	sequenceLeft: number[] = [];
+	sequenceRight: number[] = [];
+	restrictMovement = false;
 
 	step(timeStep: number) {
 		const maxAccel = 0.66;
@@ -296,9 +357,44 @@ class PlayerController {
 			sideAccel = maxAccel;
 		}
 
-		this.view.update(timeStep, accel, sideAccel);
-		this.handleStepSounds();
+		if (! this.restrictMovement) {
+			this.view.update(timeStep, accel, sideAccel);
+			this.handleStepSounds();
+		}
+		else {
+			if (this.stepSoundTimer_ > -1) {
+				clearInterval(this.stepSoundTimer_);
+				this.stepSoundTimer_ = -1;
+			}
+		}
 
+
+		if (this.endGame) {
+			if (this.doorOpenStart > 0) {
+				const lapsed = math.clamp(Date.now() - this.doorOpenStart, 0, 10000);
+				const doorY = 1.5 - (3 * (lapsed / 10000));
+				this.scene.transformMgr.setPosition(this.level.finalDoor.transform, [-0.25, doorY, 10.001]);
+
+				if (lapsed == 10000) {
+					this.doorOpenStart = 0;
+					this.level.clipLines.pop(); // open door
+				}
+			}
+
+			if (this.view.pos[2] > 10.75) {
+				if (! this.restrictMovement) {
+					this.restrictMovement = true;
+					this.sfx.play(SFX.Swoosh);
+					setTimeout(() => {
+						dom.show(".titles");
+						this.sfx.setEndMusic();
+						this.sfx.startMusic();
+					}, 3050);
+				}
+			}
+
+			return;
+		}
 
 		// positional interaction
 		const quadrant = this.level.positionQuadrant(this.view.pos);
@@ -309,7 +405,7 @@ class PlayerController {
 		// physical interaction
 		const now = Date.now();
 		const posXZ = this.view.posXZ;
-		const reachXZ = vec2.scale([], this.view.dirXZ, 2);
+		const reachXZ = vec2.scale([], this.view.dirXZ, 2.3);
 		const touchXZ = vec2.add([], posXZ, reachXZ);
 		const arm: LineSeg = [posXZ[0], posXZ[1], touchXZ[0], touchXZ[1]];
 
@@ -319,33 +415,60 @@ class PlayerController {
 				const owp = this.scene.transformMgr.worldPosition(orb.transform);
 				const cp = intersectCircleLineSeg([owp[0], owp[2]], .3, arm);
 				if (cp) {
+					if ((orb.quadrant == Quadrant.Left && this.solvedLeft) || (orb.quadrant == Quadrant.Right && this.solvedRight)) {
+						this.scene.pbrModelMgr.materialManager.setEmissiveIntensity(orb.pbrMat, 0);
+						continue;
+					}
+
 					anyHover = true;
 					if (this.hoverOrb != orb) {
 						if (this.hoverOrb) {
-							this.scene.pbrModelMgr.materialManager.setEmissiveIntensity(this.hoverOrb.pbrMat, 0.3);
+							this.scene.pbrModelMgr.materialManager.setEmissiveIntensity(this.hoverOrb.pbrMat, 0.20);
 						}
 						this.hoverOrb = orb;
 						this.scene.pbrModelMgr.materialManager.setEmissiveIntensity(orb.pbrMat, 0.5);
 					}
 					else {
-						const timeSinceTap = Date.now() - this.lastInteract;
-						if (timeSinceTap < 1000) {
-							const shine = 1 - (timeSinceTap / 1000) * .5;
-							this.scene.pbrModelMgr.materialManager.setEmissiveIntensity(orb.pbrMat, shine);
-						}
+							const timeSinceTap = Date.now() - this.lastInteract;
+							if (timeSinceTap < 1000) {
+								const shine = 1 - (timeSinceTap / 1000) * .5;
+								this.scene.pbrModelMgr.materialManager.setEmissiveIntensity(orb.pbrMat, shine);
+							}
 					}
 				}
 			}
 		}
 
 		if (!anyHover && this.hoverOrb) {
-			this.scene.pbrModelMgr.materialManager.setEmissiveIntensity(this.hoverOrb.pbrMat, 0.3);
+			this.scene.pbrModelMgr.materialManager.setEmissiveIntensity(this.hoverOrb.pbrMat, 0.20);
 			this.hoverOrb = null;
 		}
 
 		if (io.keyboard.pressed(this.keyForKeyCommand(KeyCommand.Interact)) && this.hoverOrb) {
 			this.lastInteract = Date.now();
 			this.sfx.play(SFX.ToneA + this.hoverOrb.index);
+
+			if (this.hoverOrb.quadrant == Quadrant.Left) {
+				this.sequenceLeft.push(this.hoverOrb.index);
+				if (this.sequenceLeft.length > 8) {
+					this.sequenceLeft.shift();
+				}
+				if (this.sequenceLeft.toString() === this.level.checkOrderLeft.toString()) {
+					this.solvedLeft = true;
+					this.setPoweredQuadrant(this.hoverOrb.quadrant);
+				}
+			}
+			else if (this.hoverOrb.quadrant == Quadrant.Right) {
+				this.sequenceRight.push(this.hoverOrb.index);
+				if (this.sequenceRight.length > 8) {
+					this.sequenceRight.shift();
+				}
+				if (this.sequenceRight.toString() === this.level.checkOrderRight.toString()) {
+					this.solvedRight = true;
+					this.setPoweredQuadrant(this.hoverOrb.quadrant);
+				}
+			}
+
 		}
 	}
 }

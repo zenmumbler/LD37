@@ -106,10 +106,10 @@ class Sound {
 			case SFX.DoorOpen: buffer = assets.doorOpen; source = this.effectSource; gain = this.effectGain; volume = 1; break;
 			case SFX.Swoosh: buffer = assets.swoosh; source = this.effectSource; gain = this.effectGain; volume = 1; break;
 
-			case SFX.ToneA: buffer = assets.ping; source = this.toneSources[0]; gain = this.toneGain; volume = 0.8; rate = .5; break;
-			case SFX.ToneB: buffer = assets.ping; source = this.toneSources[1]; gain = this.toneGain; volume = 0.8; rate = 1; break;
-			case SFX.ToneC: buffer = assets.ping; source = this.toneSources[2]; gain = this.toneGain; volume = 0.8; rate = 1.5; break;
-			case SFX.ToneD: buffer = assets.ping; source = this.toneSources[3]; gain = this.toneGain; volume = 0.8; rate = 2; break;
+			case SFX.ToneA: buffer = assets.ping; source = this.toneSources[0]; gain = this.toneGain; volume = 0.52; rate = .5; break;
+			case SFX.ToneB: buffer = assets.ping; source = this.toneSources[1]; gain = this.toneGain; volume = 0.52; rate = 1; break;
+			case SFX.ToneC: buffer = assets.ping; source = this.toneSources[2]; gain = this.toneGain; volume = 0.52; rate = 1.5; break;
+			case SFX.ToneD: buffer = assets.ping; source = this.toneSources[3]; gain = this.toneGain; volume = 0.52; rate = 2; break;
 
 			default: buffer = null;
 		}

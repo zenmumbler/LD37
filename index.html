@@ -38,11 +38,28 @@
 			width: 100%;
 			height: 100%;
 			display: none;
-			color: white;
+			color: #999;
 			font-size: 22px;
 		}
 		.titles {
-			padding: 30px 50px;
+			
+		}
+		.titles img {
+			position: absolute;
+			left: 340px;
+			top: 120px;
+			opacity: 1;
+			transition: opacity 2s ease-in;
+		}
+		.titles p {
+			position: absolute;
+			top: 340px;
+			width: 100%;
+			text-align: center;
+			font-size: 16px;
+		}
+		p.thx {
+			top: 400px;
 		}
 		.right {
 			position: absolute;
@@ -95,16 +112,23 @@
 		}
 
 		.info {
-			font-size: 16px;
+			font-size: 14px;
+			color: #888;
+			text-align: center;
+			position: absolute;
+			top: 12px;
+			width: 100%;
+			margin: 0;
+			padding: 0;
 		}
 
 		a, a:visited, a:active {
-			color: rgb(231, 211, 7);
+			color: rgba(178, 67, 255, .8);
 		}
 	</style>
 </head>
 <body>
-
+<p class="info">WASD / Arrow keys to move, Click and drag to look, E to interact — &copy; 2016 by @zenmumbler for <a href="http://ludumdare.com/compo/ludum-dare-37/?action=preview&uid=17143">LD37</a></p>
 <div class="stageholder hdready">
 	<canvas width="1280" height="720" id="stage"></canvas>
 
@@ -113,13 +137,16 @@
 	</div>
 
 	<div class="overlay titles">
+		<img src="data/img/callisto.png">
+		<p>A Ludum Dare 37 entry by Arthur Langereis</p>
+		<p class="thx">thank you for playing</p>
 	</div>
 </div>
 
 <script src="../stardazed-tx/ext/veclib.js"></script>
 <script src="../stardazed-tx/ext/inflate.js"></script>
 <script src="../stardazed-tx/dist/stardazed-tx.js"></script>
-<script src="build/LD37.js"></script>
+<script src="build/ld37.js"></script>
 
 </body>
 </html>
