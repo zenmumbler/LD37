@@ -118,7 +118,7 @@ class MainScene implements sd.SceneController {
 		if (newMode !== GameMode.Loading) {
 			dom.show("#stage");
 			this.sfx_.startMusic();
-			this.player_ = new PlayerController(this.rc.gl.canvas, [0, 1.5, 5], this.level_, this.sfx_);
+			this.player_ = new PlayerController(this.rc.gl.canvas, [0, 1.5, 5], this.scene_, this.level_, this.sfx_);
 		}
 
 		this.mode_ = newMode;
@@ -169,8 +169,6 @@ class MainScene implements sd.SceneController {
 	}
 
 
-	curQuad = Quadrant.Bottom;
-
 	simulationStep(timeStep: number) {
 		const txm = this.scene_.transformMgr;
 		if (this.mode_ >= GameMode.Main) {
@@ -178,23 +176,6 @@ class MainScene implements sd.SceneController {
 
 			if (this.skyBox_) {
 				this.skyBox_.setCenter(this.player_.view.pos);
-			}
-
-			const quadrant = this.level_.positionQuadrant(this.player_.view.pos);
-			if (quadrant != this.curQuad) {
-				switch (this.curQuad) {
-					case Quadrant.Bottom: break;
-					case Quadrant.Right: this.scene_.lightMgr.setEnabled(this.level_.spotRight, false); break;
-					case Quadrant.Left: this.scene_.lightMgr.setEnabled(this.level_.spotLeft, false); break;
-					case Quadrant.Top: this.scene_.lightMgr.setEnabled(this.level_.spotBack, false); break;
-				}
-				this.curQuad = quadrant;
-				switch (this.curQuad) {
-					case Quadrant.Bottom: break;
-					case Quadrant.Right: this.scene_.lightMgr.setEnabled(this.level_.spotRight, true); break;
-					case Quadrant.Left: this.scene_.lightMgr.setEnabled(this.level_.spotLeft, true); break;
-					case Quadrant.Top: this.scene_.lightMgr.setEnabled(this.level_.spotBack, true); break;
-				}
 			}
 		}
 	}

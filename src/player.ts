@@ -102,7 +102,6 @@ class PlayerView {
 		vec3.scaleAndAdd(this.velocity_, this.velocity_, rightXZ, sideAccel * timeStep);
 
 		if (vec3.length(this.velocity_) >= 0.001) {
-			// const effectiveVel = vec3.scale([], vec3.normalize([], sumVel), Math.max(Math.abs(this.speed_), Math.abs(this.sideSpeed_)));
 			const targetPos = vec3.add([], this.pos_, this.velocity_);
 			const clippedPos = this.clipMovement(this.pos, targetPos);
 			vec3.sub(this.velocity_, clippedPos, this.pos_);
@@ -130,7 +129,9 @@ class PlayerView {
 	}
 
 	get pos() { return this.pos_; }
+	get posXZ() { return [this.pos_[0], this.pos_[2]]; }
 	get dir() { return this.dir_; }
+	get dirXZ() { return [this.dir_[0], this.dir_[2]]; }
 	get rotation() { return this.rot_; }
 	get effectiveSpeed() { return this.effectiveSpeed_; }
 	get focusPos() { return vec3.add([], this.pos_, this.dir_); }
@@ -160,10 +161,10 @@ class PlayerController {
 	private vpHeight_: number;
 	private tracking_ = false;
 	private lastPos_ = [0, 0];
+	private curQuad = Quadrant.Bottom;
 	private keyboardType_ = KeyboardType.QWERTY;
 
-
-	constructor(sensingElem: HTMLElement, initialPos: sd.Float3, private level: Level, private sfx: Sound) {
+	constructor(sensingElem: HTMLElement, initialPos: sd.Float3, private scene: world.Scene, private level: Level, private sfx: Sound) {
 		this.view = new PlayerView(initialPos, level.clipLines);
 
 		this.vpWidth_ = sensingElem.offsetWidth;
@@ -234,6 +235,48 @@ class PlayerController {
 	}
 
 
+	setPoweredQuadrant(q: Quadrant) {
+		let orbsOff: Orb[] | undefined = this.level.orbs[this.curQuad];
+		let orbsOn: Orb[] | undefined = this.level.orbs[q];
+		let spotOff: world.LightInstance | undefined;
+		let spotOn: world.LightInstance | undefined;
+		switch (this.curQuad) {
+			case Quadrant.Bottom: break;
+			case Quadrant.Right: spotOff = this.level.spotRight; break;
+			case Quadrant.Left: spotOff = this.level.spotLeft; break;
+			case Quadrant.Top: spotOff = this.level.spotBack; break;
+		}
+		this.curQuad = q;
+		switch (this.curQuad) {
+			case Quadrant.Bottom: break;
+			case Quadrant.Right: spotOn = this.level.spotRight; break;
+			case Quadrant.Left: spotOn = this.level.spotLeft; break;
+			case Quadrant.Top: spotOn = this.level.spotBack; break;
+		}
+
+		if (spotOff) {
+			this.scene.lightMgr.setEnabled(spotOff, false);
+		}
+		if (orbsOff) {
+			for (const o of orbsOff) {
+				this.scene.pbrModelMgr.materialManager.setEmissiveIntensity(o.pbrMat, 0);
+			}
+		}
+		if (spotOn) {
+			this.scene.lightMgr.setEnabled(spotOn, true);
+			this.sfx.play(SFX.LightOn);
+		}
+		else {
+			this.sfx.play(SFX.LightOff);
+		}
+		if (orbsOn) {
+			for (const o of orbsOn) {
+				this.scene.pbrModelMgr.materialManager.setEmissiveIntensity(o.pbrMat, 1);
+			}
+		}
+	}
+
+
 	step(timeStep: number) {
 		const maxAccel = 0.66;
 		var accel = 0, sideAccel = 0;
@@ -253,5 +296,21 @@ class PlayerController {
 
 		this.view.update(timeStep, accel, sideAccel);
 		this.handleStepSounds();
+
+
+		// positional interaction
+		const quadrant = this.level.positionQuadrant(this.view.pos);
+		if (quadrant != this.curQuad) {
+			this.setPoweredQuadrant(quadrant);
+		}
+
+		// physical interaction
+		const posXZ = this.view.posXZ;
+		const reachXZ = vec2.scale([], this.view.dirXZ, 2);
+		const touchXZ = vec2.add([], posXZ, reachXZ);
+
+		// for (const orb of this.level.orbs) {
+		// 	orb
+		// }
 	}
 }
