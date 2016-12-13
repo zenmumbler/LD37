@@ -334,19 +334,21 @@ class Level {
 				generator: new meshdata.gen.Box({ width: pw, depth: pw, height: 1.3, inward: false, uvRange: [pw, 1.3] })
 			});
 
-			const orb = scene.makeEntity({
+			const orbInfo = scene.makeEntity({
 				parent: baseEnt.transform,
 				transform: { position: [p * spacing, 1.4, 0] },
 				mesh: { name: `pillar-sphere-${p}`, meshData: meshdata.gen.generate(new meshdata.gen.Sphere({ radius: pw * .9, rows: 12, segs: 18 })) },
 				pbrModel: { materials: [this.theColorMatsBack[p]] }
 			});
-			this.orbs[quadrant].push({
+			const orb = {
 				index: p,
 				quadrant: quadrant,
-				worldPos: scene.transformMgr.worldPosition(orb.transform),
-				pbrModel: orb.pbrModel!,
-				pbrMat: 0
-			});
+				worldPos: scene.transformMgr.worldPosition(orbInfo.transform),
+				pbrModel: orbInfo.pbrModel!,
+				pbrMat: scene.pbrModelMgr.materialRange(orbInfo.pbrModel!).first
+			};
+			this.orbs[quadrant].push(orb);
+			scene.pbrModelMgr.materialManager.setEmissiveIntensity(orb.pbrMat, 0);
 		}
 		scene.makeEntity({
 			parent: baseEnt.transform,
@@ -438,6 +440,9 @@ class Level {
 		this.clipLines.push([ 1.5, -1.5,  1.5,  1.5]);
 		this.clipLines.push([ 1.5,  1.5, -1.5,  1.5]);
 		this.clipLines.push([-1.5,  1.5, -1.5, -1.5]);
+
+		// door blocker
+		this.clipLines.push([ 1.5, 9.5, -2.0, 9.5]);
 	}
 
 
