@@ -3,6 +3,64 @@
 
 /// <reference path="levelgen.ts" />
 
+type ContactPoints = number[][];
+
+function intersectCircleLineSeg(C: sd.ConstFloat2, r: number, line: LineSeg): ContactPoints | null {
+	const E = [line[0], line[1]];
+	const L = [line[2], line[3]];
+	const d = vec2.sub([], L, E);
+	const f = vec2.sub([], E, C);
+	const a = vec2.dot(d, d);
+	const b = 2 * vec2.dot(f, d);
+	const c = vec2.dot(f, f) - r * r;
+
+	let discriminant = b * b - 4 * a * c;
+	if (discriminant < 0) {
+		// no intersection
+		return null;
+	}
+	else {
+		const result: ContactPoints = [];
+		// ray didn't totally miss sphere,
+		// so there is a solution to
+		// the equation.
+		discriminant = Math.sqrt(discriminant);
+
+		// either solution may be on or off the ray so need to test both
+		// t1 is always the smaller value, because BOTH discriminant and
+		// a are nonnegative.
+		const t1 = (-b - discriminant) / (2 * a);
+		const t2 = (-b + discriminant) / (2 * a);
+
+		// 3x HIT cases:
+		//          -o->             --|-->  |            |  --|->
+		// Impale(t1 hit,t2 hit), Poke(t1 hit,t2>1), ExitWound(t1<0, t2 hit), 
+
+		// 3x MISS cases:
+		//       ->  o                     o ->              | -> |
+		// FallShort (t1>1,t2>1), Past (t1<0,t2<0), CompletelyInside(t1<0, t2>1)
+
+		if (t1 >= 0 && t1 <= 1) {
+			// t1 is the intersection, and it's closer than t2
+			// (since t1 uses -b - discriminant)
+			// Impale, Poke
+
+			result.push(vec2.scaleAndAdd([], E, d, t1));
+		}
+
+		// here t1 didn't intersect so we are either started
+		// inside the sphere or completely past it
+		if (t2 >= 0 && t2 <= 1) {
+			// ExitWound
+			result.push(vec2.scaleAndAdd([], E, d, t2));
+		}
+
+		// no intn: FallShort, Past, CompletelyInside
+		return result.length === 0 ? null : result;
+	}
+}
+
+
 class PlayerView {
 	private pos_ = [0, 0, 0];
 	private angleX_ = 0;
@@ -10,50 +68,53 @@ class PlayerView {
 	private rot_: sd.Float4;
 	private dir_ = [0, 0, -1];
 	private up_ = [0, 1, 0];
-	private speed_ = 0;
-	private sideSpeed_ = 0;
+	private velocity_ = [0, 0, 0];
 	private effectiveSpeed_ = 0;
 
-	constructor(initialPos: sd.Float3, private clipLines: ClipLine[]) {
+	constructor(initialPos: sd.Float3, private clipLines: LineSeg[]) {
 		vec3.copy(this.pos_, initialPos);
 		this.rotate([0, 0]);
 	}
 
 	private clipMovement(a: sd.Float3, b: sd.Float3): sd.Float3 {
-		return b;
+		const posXZ = [b[0], b[2]];
+		for (const cl of this.clipLines) {
+			const ip = intersectCircleLineSeg(posXZ, .25, cl);
+			if (ip) {
+				if (ip.length == 2) {
+					const center = vec2.lerp([], ip[0], ip[1], .5);
+					const pdir = vec2.sub([], posXZ, center);
+					const pen = .25 / vec2.length(pdir);
+					vec2.scaleAndAdd(posXZ, posXZ, pdir, pen - 1);
+				}
+			}
+		}
+
+		// reconstruct 3d pos
+		return [posXZ[0], b[1], posXZ[1]];
 	}
 
 	update(timeStep: number, acceleration: number, sideAccel: number) {
-		this.speed_ += timeStep * acceleration;
-		this.sideSpeed_ += timeStep * sideAccel;
+		const fwdXZ = vec3.normalize([], [this.dir_[0], 0, this.dir_[2]]);
+		const rightXZ = vec3.cross([], fwdXZ, [0, 1, 0]);
 
-		const dirXZ = vec3.normalize([], [this.dir_[0], 0, this.dir_[2]]);
+		vec3.scaleAndAdd(this.velocity_, this.velocity_, fwdXZ, acceleration * timeStep);
+		vec3.scaleAndAdd(this.velocity_, this.velocity_, rightXZ, sideAccel * timeStep);
 
-		const fwdVel = vec3.scale([], dirXZ, this.speed_);
-		const right = vec3.cross([], dirXZ, [0, 1, 0]);
-		const sideVel = vec3.scale([], right, this.sideSpeed_);
-
-		const sumVel = vec3.add([], fwdVel, sideVel);
-		if (vec3.length(sumVel) > 0.001) {
-			const effectiveVel = vec3.scale([], vec3.normalize([], sumVel), Math.max(Math.abs(this.speed_), Math.abs(this.sideSpeed_)));
-			const targetPos = vec3.add([], this.pos_, effectiveVel);
+		if (vec3.length(this.velocity_) >= 0.001) {
+			// const effectiveVel = vec3.scale([], vec3.normalize([], sumVel), Math.max(Math.abs(this.speed_), Math.abs(this.sideSpeed_)));
+			const targetPos = vec3.add([], this.pos_, this.velocity_);
 			const clippedPos = this.clipMovement(this.pos, targetPos);
-			const clippedVel = vec3.sub([], clippedPos, this.pos_);
+			vec3.sub(this.velocity_, clippedPos, this.pos_);
 			vec3.copy(this.pos_, clippedPos);
 
-			this.effectiveSpeed_ = vec3.length(clippedVel);
-		}
-		else {
-			this.effectiveSpeed_ = 0;
+			this.effectiveSpeed_ = vec3.length(this.velocity_);
 		}
 
-		this.speed_ *= 0.85;
-		if (Math.abs(this.speed_) < 0.001) {
-			this.speed_ = 0;
-		}
-		this.sideSpeed_ *= 0.85;
-		if (Math.abs(this.sideSpeed_) < 0.001) {
-			this.sideSpeed_ = 0;
+		vec3.scale(this.velocity_, this.velocity_, 0.85);
+		if (vec3.length(this.velocity_) < 0.001) {
+			vec3.set(this.velocity_, 0, 0, 0);
+			this.effectiveSpeed_ = 0;
 		}
 	}
 

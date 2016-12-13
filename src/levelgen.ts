@@ -14,7 +14,7 @@ const TheColors: number[][] = [
 	rgb8Color(178, 67, 255)
 ];
 
-type ClipLine = sd.Float4;
+type LineSeg = sd.Float4;
 
 const enum Quadrant {
 	Left,
@@ -37,7 +37,7 @@ class Level {
 	theColorMatsLeft: asset.Material[] = [];
 	theColorMatsRight: asset.Material[] = [];
 
-	clipLines: ClipLine[] = [];
+	clipLines: LineSeg[] = [];
 
 	spotLeft: world.LightInstance;
 	spotRight: world.LightInstance;
@@ -405,11 +405,39 @@ class Level {
 
 
 	makeClipLines() {
+		// top
 		this.clipLines.push([-10, -10,  -5, -10]);
 		this.clipLines.push([ -5, -10,  -5, -11]);
-		this.clipLines.push([ -5, -11,   5, -11]);
-		this.clipLines.push([  5, -11,   5, -10]);
-		this.clipLines.push([  5, -10,  10, -10]);
+		this.clipLines.push([ -5, -11, 4.5, -11]);
+		this.clipLines.push([4.5, -11, 4.5, -10]);
+		this.clipLines.push([4.5, -10,   9.5, -10]);
+
+		// right
+		this.clipLines.push([  9.5, -10,  9.5,  -5]);
+		this.clipLines.push([  9.5,  -5, 10.5,  -5]);
+		this.clipLines.push([ 10.5,  -5, 10.5, 4.5]);
+		this.clipLines.push([ 10.5, 4.5,  9.5, 4.5]);
+		this.clipLines.push([  9.5, 4.5,  9.5, 9.5]);
+
+		// bottom
+		this.clipLines.push([ 9.5, 9.5,  1.5, 9.5]);
+		this.clipLines.push([ 1.5, 9.5,  1.5, 13]);
+		this.clipLines.push([ 1.5, 13, -2.0, 13]);
+		this.clipLines.push([-2.0, 13, -2.0, 9.0]);
+		this.clipLines.push([-2.0, 9.5, -10.5, 9.5]);
+
+		// left
+		this.clipLines.push([-10, 9.5, -10, 4.5]);
+		this.clipLines.push([-10, 4.5, -11, 4.5]);
+		this.clipLines.push([-11, 4.5, -11, -5]);
+		this.clipLines.push([-11,  -5, -10, -5]);
+		this.clipLines.push([-10,  -5, -10, -10]);
+
+		// center orb
+		this.clipLines.push([-1.5, -1.5,  1.5, -1.5]);
+		this.clipLines.push([ 1.5, -1.5,  1.5,  1.5]);
+		this.clipLines.push([ 1.5,  1.5, -1.5,  1.5]);
+		this.clipLines.push([-1.5,  1.5, -1.5, -1.5]);
 	}
 
 
