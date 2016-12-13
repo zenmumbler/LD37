@@ -271,11 +271,12 @@ class PlayerController {
 		}
 		if (orbsOn) {
 			for (const o of orbsOn) {
-				this.scene.pbrModelMgr.materialManager.setEmissiveIntensity(o.pbrMat, 1);
+				this.scene.pbrModelMgr.materialManager.setEmissiveIntensity(o.pbrMat, 0.4);
 			}
 		}
 	}
 
+	hoverOrb: Orb | null = null;
 
 	step(timeStep: number) {
 		const maxAccel = 0.66;
@@ -308,9 +309,29 @@ class PlayerController {
 		const posXZ = this.view.posXZ;
 		const reachXZ = vec2.scale([], this.view.dirXZ, 2);
 		const touchXZ = vec2.add([], posXZ, reachXZ);
+		const arm: LineSeg = [posXZ[0], posXZ[1], touchXZ[0], touchXZ[1]];
 
-		// for (const orb of this.level.orbs) {
-		// 	orb
-		// }
+		let anyHover = false;
+		for (const orbQ of this.level.orbs) {
+			for (const orb of orbQ) {
+				const owp = this.scene.transformMgr.worldPosition(orb.transform);
+				const cp = intersectCircleLineSeg([owp[0], owp[2]], .3, arm);
+				if (cp) {
+					anyHover = true;
+					if (this.hoverOrb != orb) {
+						if (this.hoverOrb) {
+							this.scene.pbrModelMgr.materialManager.setEmissiveIntensity(this.hoverOrb.pbrMat, 0.4);
+						}
+						this.hoverOrb = orb;
+						this.scene.pbrModelMgr.materialManager.setEmissiveIntensity(orb.pbrMat, 0.75);
+					}
+				}
+			}
+		}
+
+		if (!anyHover && this.hoverOrb) {
+			this.scene.pbrModelMgr.materialManager.setEmissiveIntensity(this.hoverOrb.pbrMat, 0.4);
+			this.hoverOrb = null;
+		}
 	}
 }

@@ -24,9 +24,10 @@ const enum Quadrant {
 }
 
 interface Orb {
-	worldPos: sd.Float3;
 	index: number;
 	quadrant: Quadrant;
+	transform: world.TransformInstance;
+	worldPos: sd.Float3;
 	pbrModel: world.PBRModelInstance;
 	pbrMat: world.PBRMaterialInstance;
 }
@@ -343,6 +344,7 @@ class Level {
 			const orb = {
 				index: p,
 				quadrant: quadrant,
+				transform: orbInfo.transform,
 				worldPos: scene.transformMgr.worldPosition(orbInfo.transform),
 				pbrModel: orbInfo.pbrModel!,
 				pbrMat: scene.pbrModelMgr.materialRange(orbInfo.pbrModel!).first
