@@ -1,3 +1,4 @@
 newmtl signs
-	Ke .4 .4 .4
+	Pr .5
+	Pm 0
 	map_Kd diffuse.jpg

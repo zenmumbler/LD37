@@ -1,3 +1,4 @@
 newmtl zodiac
-	Ke 0.05 0.05 0.05
+	Pr 0.5
+	Pm 0
 	map_Kd zodiac_glare.jpg

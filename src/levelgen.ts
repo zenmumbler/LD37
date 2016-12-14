@@ -71,6 +71,8 @@ class Level {
 			m.emissiveColour = color;
 			m.emissiveIntensity = 1;
 			m.flags |= asset.MaterialFlags.usesEmissive;
+			m.metallic = 0;
+			m.roughness = 0.1;
 
 			this.theColorMatsBack[c] = m;
 			this.theColorMatsLeft[c] = sd.cloneStruct(m);

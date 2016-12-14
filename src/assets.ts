@@ -106,6 +106,7 @@ function loadAllAssets(rc: render.RenderContext, ac: audio.AudioContext, meshMgr
 		a.mat.whiteness.flags |= asset.MaterialFlags.usesEmissive;
 		vec3.set(a.mat.whiteness.emissiveColour, 1, 1, 1);
 		a.mat.whiteness.emissiveIntensity = 1;
+		a.mat.whiteness.roughness = .5;
 
 		return a;
 	});
