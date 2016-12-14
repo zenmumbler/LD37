@@ -62,6 +62,7 @@ class MainScene implements sd.SceneController {
 		loadAllAssets(rc, ac, this.scene_.meshMgr, progress).then(assets => {
 			this.assets_ = assets;
 			this.sfx_.setAssets(assets.sound);
+			console.info("ASSETS", assets);
 
 			this.makeSkybox();
 
