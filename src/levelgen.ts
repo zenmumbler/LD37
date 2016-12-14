@@ -484,10 +484,12 @@ class Level {
 
 
 		// -- floor and ceiling of main room
+		const floorResolution = 1;
+		const floorTexRange = vec2.scale([], [.25, .25], floorResolution);
 		const floor = scene.makeEntity({
 			mesh: {
 				name: "floor",
-				meshData: this.generateColumnBlock([0, 0, 0], .5, .5, 62, 62, [0.125, 0.125], 
+				meshData: this.generateColumnBlock([0, 0, 0], floorResolution, .5, 31 / floorResolution, 31 / floorResolution, floorTexRange,
 					(pxz, txz, y) => {
 						let dist = vec2.len(vec2.sub([], pxz, [0, 0]));
 						dist = Math.max(0, dist - 14);
