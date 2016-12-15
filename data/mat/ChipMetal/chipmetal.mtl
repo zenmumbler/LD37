@@ -6,4 +6,4 @@ newmtl chipmetal
 	map_Kd -s .25 .25 diffuse.png
 	map_Pr rough.png
 	norm normalheight.png
-	disp normalheight.png
+#	disp normalheight.png
