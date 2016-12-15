@@ -93,7 +93,7 @@ class Level {
 			},
 			mesh: {
 				name: "sphere",
-				meshData: meshdata.gen.generate(new meshdata.gen.Sphere({ radius: radius, rows: 20, segs: 30 }))
+				meshData: meshdata.gen.generate(new meshdata.gen.Sphere({ radius: radius, rows: 16, segs: 24 }))
 			},
 			pbrModel: {
 				materials: [this.assets.mat.whiteness]
@@ -101,7 +101,7 @@ class Level {
 			light: {
 				name: "spherelight1",
 				type: asset.LightType.Point,
-				intensity: 8,
+				intensity: 7,
 				range: range,
 				colour: [1, 0.96, 0.94]
 			}
@@ -456,14 +456,8 @@ class Level {
 		this.clipLines.push([-11,  -5, -10, -5]);
 		this.clipLines.push([-10,  -5, -10, -10]);
 
-		// center orb
-		this.clipLines.push([-1.0, -1.0,  1.0, -1.0]);
-		this.clipLines.push([ 1.0, -1.0,  1.0,  1.0]);
-		this.clipLines.push([ 1.0,  1.0, -1.0,  1.0]);
-		this.clipLines.push([-1.0,  1.0, -1.0, -1.0]);
-
 		// door blocker
-		this.clipLines.push([ 1.5, 9.5, -2.0, 9.5]);
+		this.clipLines.push([ 1.7, 9.5, -2.0, 9.5]);
 	}
 
 
@@ -587,12 +581,21 @@ class Level {
 
 		this.makeCornerLights(scene, assets);
 
-		this.makeGlower([0, 1, 0], .5);
-		this.makeGlower([3.2, 1.55, 9.5], .05, 1);
-		this.makeGlower([-3.8, 1.55, 9.5], .05, 1);
+		// floor illum
+		// this.makeGlower([ 0, 0.3,  0], .05, 1.5);
+
+		this.makeGlower([-4, 0.3, -4], .05, 1.5);
+		this.makeGlower([ 4, 0.3, -4], .05, 1.5);
+		this.makeGlower([ 4, 0.3,  4], .05, 1.5);
+		this.makeGlower([-4, 0.3,  4], .05, 1.5);
+
+
+		// back wall sign illumination
+		this.makeGlower([3.2, 1.55, 9.5], .05, 1.2);
+		this.makeGlower([-3.8, 1.55, 9.5], .05, 1.2);
 
 		for (let qq = 0; qq < 7; ++qq) {
-			this.makeGlower([((qq * 16) % 20) - 10, 6.5, ((qq * 34) % 20) - 10], .6);
+			this.makeGlower([((qq * 16) % 20) - 10, 6.5, ((qq * 34) % 20) - 10], .4, 1.8);
 		}
 
 		return Promise.resolve();
