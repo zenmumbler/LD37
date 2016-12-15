@@ -17,10 +17,11 @@ interface MaterialAssets {
 	medmetal: asset.Material;
 	bronzepatina: asset.Material;
 	// whitemarble: asset.Material;
-	roughbronze: asset.Material;
+	// roughbronze: asset.Material;
 	zodiac: asset.Material;
 	signs: asset.Material;
 	whiteness: asset.Material;
+	blackness: asset.Material;
 }
 
 interface TextureAssets {
@@ -92,7 +93,7 @@ function loadAllAssets(rc: render.RenderContext, ac: audio.AudioContext, meshMgr
 		loadLocalMTL("data/mat/medmetal/medmetal.mtl", ["medmetal"]),
 		loadLocalMTL("data/mat/bronzepatina/bronzepatina.mtl", ["bronzepatina"]),
 		// loadLocalMTL("data/mat/whitemarble/whitemarble.mtl", ["whitemarble"]),
-		loadLocalMTL("data/mat/roughbronze/roughbronze.mtl", ["roughbronze"]),
+		// loadLocalMTL("data/mat/roughbronze/roughbronze.mtl", ["roughbronze"]),
 		loadLocalMTL("data/mat/zodiac/zodiac.mtl", ["zodiac"]),
 		loadLocalMTL("data/mat/signs/signs.mtl", ["signs"]),
 		loadEnvCubeTex("data/mat/galaxy/galaxy-", "envCubeSpace")
@@ -107,6 +108,11 @@ function loadAllAssets(rc: render.RenderContext, ac: audio.AudioContext, meshMgr
 		vec3.set(a.mat.whiteness.emissiveColour, 1, 1, 1);
 		a.mat.whiteness.emissiveIntensity = 1;
 		a.mat.whiteness.roughness = .5;
+
+		a.mat.blackness = asset.makeMaterial("blackness");
+		a.mat.blackness.roughness = .5;
+		a.mat.blackness.metallic = 1;
+		a.mat.blackness.roughnessTexture = a.mat.medmetal.roughnessTexture;
 
 		return a;
 	});

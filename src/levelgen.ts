@@ -277,7 +277,7 @@ class Level {
 					uvRange: [2, 1.5], uvOffset: [0, 0]
 				}))
 			},
-			pbrModel: { materials: [assets.mat.roughbronze] }
+			pbrModel: { materials: [assets.mat.blackness] }
 		});
 	}
 
