@@ -248,7 +248,7 @@ class PlayerController {
 
 	private solvedLeft = false;
 	private solvedRight = false;
-	private endGame = false;
+	public endGame = false;
 	private doorOpenStart = 0;
 
 	setPoweredQuadrant(q: Quadrant) {

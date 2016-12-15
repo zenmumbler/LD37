@@ -94,7 +94,9 @@ class MainScene implements sd.SceneController {
 
 	resume() {
 		if (this.mode_ >= GameMode.Title) {
-			this.sfx_.startMusic();
+			if (! this.player_.endGame) {
+				this.sfx_.startMusic();
+			}
 		}
 	}
 
