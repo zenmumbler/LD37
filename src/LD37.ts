@@ -136,7 +136,7 @@ class MainScene implements sd.SceneController {
 		// -- shadow pass
 		let spotShadow: world.ShadowView | null = null;
 		const shadowCaster = this.scene_.pbrModelMgr.shadowCaster();
-		const SHADOWS_ENABLED = true;
+		const SHADOWS_ENABLED = navigator.userAgent.indexOf("Safari") > -1 && navigator.userAgent.indexOf("Chrome") == -1 ; // still not working in other browsers
 
 		if (SHADOWS_ENABLED && shadowCaster && render.canUseShadowMaps(this.rc)) {
 			let rpdShadow = render.makeRenderPassDescriptor();
