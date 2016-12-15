@@ -260,7 +260,7 @@ class Level {
 			pbrModel: { materials: [assets.mat.signs] }
 		});
 		scene.makeEntity({
-			transform: { position: [9.6, 3.6, 0], rotation: quat.fromEuler(0, Math.PI / 2, 0) },
+			transform: { position: [9.7, 3.6, 0], rotation: quat.fromEuler(0, Math.PI / 2, 0) },
 			mesh: { name: "puzzleSignB", meshData: signB },
 			pbrModel: { materials: [assets.mat.signs] }
 		});
@@ -559,7 +559,7 @@ class Level {
 		scene.transformMgr.rotateByAngles(tabletRight.transform, [math.deg2rad(-10), math.deg2rad(-80), 0]);
 
 		const spotRight = scene.makeEntity({
-			transform: { position: [8, 4.6, 0] },
+			transform: { position: [7.9, 4.6, 0] },
 			light: {
 				name: "spot-right",
 				colour: [1, 1, 1],
