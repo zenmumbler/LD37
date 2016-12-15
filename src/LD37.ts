@@ -77,7 +77,7 @@ class MainScene implements sd.SceneController {
 						intensity: .2,
 					}
 				});
-				this.scene_.lightMgr.setDirection(sun.light!, [0, 1, .4]);
+				this.scene_.lightMgr.setDirection(sun.light!, [0, 1, .1]);
 
 				this.setMode(GameMode.Main);
 			});
