@@ -86,7 +86,7 @@ class Level {
 	}
 
 
-	makeGlower(position: sd.Float3, radius: number) {
+	makeGlower(position: sd.Float3, radius: number, range = 3 * radius) {
 		const g = this.scene.makeEntity({
 			transform: {
 				position: position
@@ -96,13 +96,13 @@ class Level {
 				meshData: meshdata.gen.generate(new meshdata.gen.Sphere({ radius: radius, rows: 20, segs: 30 }))
 			},
 			pbrModel: {
-				materials: [this.assets.mat.whitemarble]
+				materials: [this.assets.mat.whiteness]
 			},
 			light: {
 				name: "spherelight1",
 				type: asset.LightType.Point,
 				intensity: 8,
-				range: 3 * radius,
+				range: range,
 				colour: [1, 0.96, 0.94]
 			}
 		});
@@ -457,10 +457,10 @@ class Level {
 		this.clipLines.push([-10,  -5, -10, -10]);
 
 		// center orb
-		this.clipLines.push([-1.5, -1.5,  1.5, -1.5]);
-		this.clipLines.push([ 1.5, -1.5,  1.5,  1.5]);
-		this.clipLines.push([ 1.5,  1.5, -1.5,  1.5]);
-		this.clipLines.push([-1.5,  1.5, -1.5, -1.5]);
+		this.clipLines.push([-1.0, -1.0,  1.0, -1.0]);
+		this.clipLines.push([ 1.0, -1.0,  1.0,  1.0]);
+		this.clipLines.push([ 1.0,  1.0, -1.0,  1.0]);
+		this.clipLines.push([-1.0,  1.0, -1.0, -1.0]);
 
 		// door blocker
 		this.clipLines.push([ 1.5, 9.5, -2.0, 9.5]);
@@ -484,7 +484,7 @@ class Level {
 
 
 		// -- floor and ceiling of main room
-		const floorResolution = 1;
+		const floorResolution = 0.5;
 		const floorTexRange = vec2.scale([], [.25, .25], floorResolution);
 		const floor = scene.makeEntity({
 			mesh: {
@@ -513,7 +513,7 @@ class Level {
 		this.makeOrbPillars(Quadrant.Top, [-1.5, 0, -12], 1, [0, 1, 2, 3], scene, assets);
 
 		const spotBack = scene.makeEntity({
-			transform: { position: [0, 4, -8] },
+			transform: { position: [0, 4.6, -8] },
 			light: {
 				name: "spot-pillars",
 				colour: [1, .94, .88],
@@ -536,7 +536,7 @@ class Level {
 		scene.transformMgr.rotateByAngles(tabletLeft.transform, [math.deg2rad(-10), math.deg2rad(100), 0]);
 
 		const spotLeft = scene.makeEntity({
-			transform: { position: [-8, 4, 0] },
+			transform: { position: [-8, 4.6, 0] },
 			light: {
 				name: "spot-left",
 				colour: [1, 1, 1],
@@ -559,7 +559,7 @@ class Level {
 		scene.transformMgr.rotateByAngles(tabletRight.transform, [math.deg2rad(-10), math.deg2rad(-80), 0]);
 
 		const spotRight = scene.makeEntity({
-			transform: { position: [8, 4, 0] },
+			transform: { position: [8, 4.6, 0] },
 			light: {
 				name: "spot-right",
 				colour: [1, 1, 1],
@@ -587,7 +587,10 @@ class Level {
 
 		this.makeCornerLights(scene, assets);
 
-		this.makeGlower([0, 1, 0], 1);
+		this.makeGlower([0, 1, 0], .5);
+		this.makeGlower([3.2, 1.55, 9.5], .05, 1);
+		this.makeGlower([-3.8, 1.55, 9.5], .05, 1);
+
 		for (let qq = 0; qq < 7; ++qq) {
 			this.makeGlower([((qq * 16) % 20) - 10, 6.5, ((qq * 34) % 20) - 10], .6);
 		}
