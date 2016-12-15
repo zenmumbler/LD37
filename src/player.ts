@@ -389,7 +389,7 @@ class PlayerController {
 						dom.show(".titles");
 						this.sfx.setEndMusic();
 						this.sfx.startMusic();
-					}, 3050);
+					}, 2950);
 				}
 			}
 
