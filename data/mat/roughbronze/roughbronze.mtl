@@ -1,5 +1,0 @@
-newmtl roughbronze
-	Pm 1
-	map_Kd TexturesCom_Rough_Bronze_albedo_S.png
-	map_Pr TexturesCom_Rough_Bronze_roughness_S.png
-	norm TexturesCom_Rough_Bronze_normalmap_S.png
