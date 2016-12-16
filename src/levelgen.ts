@@ -577,18 +577,16 @@ class Level {
 
 		this.makeClipLines();
 
+
 		// -- lights, so many lights
 
 		this.makeCornerLights(scene, assets);
 
 		// floor illum
-		// this.makeGlower([ 0, 0.3,  0], .05, 1.5);
-
 		this.makeGlower([-4, 0.3, -4], .05, 1.5);
 		this.makeGlower([ 4, 0.3, -4], .05, 1.5);
 		this.makeGlower([ 4, 0.3,  4], .05, 1.5);
 		this.makeGlower([-4, 0.3,  4], .05, 1.5);
-
 
 		// back wall sign illumination
 		this.makeGlower([3.2, 1.55, 9.5], .05, 1.2);
