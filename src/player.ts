@@ -246,6 +246,18 @@ class PlayerController {
 	}
 
 
+	startEndGame() {
+		this.endGame = true;
+		this.sfx.stopMusic();
+		for (const g of this.level.glowers) {
+			this.scene.lightMgr.setEnabled(g.light, false);
+			this.scene.pbrModelMgr.materialManager.setEmissiveIntensity(g.mat, 0);
+		}
+
+		setTimeout(() => { this.openExit(); }, 2500);
+	}
+
+
 	private solvedLeft = false;
 	private solvedRight = false;
 	public endGame = false;
@@ -283,14 +295,7 @@ class PlayerController {
 		if (this.solvedLeft && this.solvedRight) {
 			spotOn = undefined;
 			orbsOn = undefined;
-			this.endGame = true;
-			this.sfx.stopMusic();
-			for (const g of this.level.glowers) {
-				this.scene.lightMgr.setEnabled(g.light, false);
-				this.scene.pbrModelMgr.materialManager.setEmissiveIntensity(g.mat, 0);
-			}
-
-			setTimeout(() => { this.openExit(); }, 2500);
+			this.startEndGame();
 		}
 		else {
 			if (q == Quadrant.Left && this.solvedLeft) {
@@ -343,6 +348,10 @@ class PlayerController {
 	step(timeStep: number) {
 		const maxAccel = 0.66;
 		var accel = 0, sideAccel = 0;
+
+		if (!this.endGame && io.keyboard.pressed(io.Key.P)) {
+			this.startEndGame();
+		}
 
 		if (io.keyboard.down(io.Key.UP) || io.keyboard.down(this.keyForKeyCommand(KeyCommand.Forward))) {
 			accel = maxAccel;
