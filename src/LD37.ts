@@ -190,6 +190,12 @@ class MainScene implements sd.SceneController {
 		this.mode_ = newMode;
 	}
 
+	fullQuad: world.MeshInstance = 0;
+	quadPipeline?: FSQPipeline;
+
+	SHADOW = true;
+	SHADQUAD = false;
+
 
 	renderFrame(timeStep: number) {
 		if (this.mode_ < GameMode.Title) {
@@ -199,40 +205,51 @@ class MainScene implements sd.SceneController {
 		// -- shadow pass
 		let spotShadow: world.ShadowView | null = null;
 		const shadowCaster = this.scene_.pbrModelMgr.shadowCaster();
-		const SHADOWS_ENABLED = true; // navigator.userAgent.indexOf("Safari") > -1 && navigator.userAgent.indexOf("Chrome") == -1 ; // still not working in other browsers
 
-		if (SHADOWS_ENABLED && shadowCaster && render.canUseShadowMaps(this.rc)) {
+		if (this.SHADOW && shadowCaster && render.canUseShadowMaps(this.rc)) {
 			let rpdShadow = render.makeRenderPassDescriptor();
 			rpdShadow.clearMask = render.ClearMask.ColourDepth;
+			vec4.set(rpdShadow.clearColour, 1, 1, 1, 1);
 
 			spotShadow = this.scene_.lightMgr.shadowViewForLight(this.rc, shadowCaster, .1);
 			if (spotShadow) {
 				render.runRenderPass(this.rc, this.scene_.meshMgr, rpdShadow, spotShadow.shadowFBO, (renderPass) => {
+					renderPass.setDepthTest(render.DepthTest.Less);
 					this.scene_.pbrModelMgr.drawShadows(this.scene_.pbrModelMgr.all(), renderPass, spotShadow!.lightProjection);
 				});
+				if (this.fullQuad === 0) {
+					const quad = meshdata.gen.generate(new meshdata.gen.Quad(2, 2), [meshdata.attrPosition2(), meshdata.attrUV2()]);
+					this.fullQuad = this.scene_.meshMgr.create({ name: "squareQuad", meshData: quad });
+					this.quadPipeline = makeFSQPipeline(this.rc);
+				}
+
+				if (this.SHADQUAD) {
+					drawFSQ(this.rc, this.scene_.meshMgr, this.boxFilter.output, this.quadPipeline!, this.fullQuad);
+				}
 			}
 		}
+		if (! this.SHADQUAD) {
+			// -- main forward pass
+			let rpdMain = render.makeRenderPassDescriptor();
+			vec4.set(rpdMain.clearColour, 0, 0, 0, 1);
+			rpdMain.clearMask = render.ClearMask.ColourDepth;
 
-		// -- main forward pass
-		let rpdMain = render.makeRenderPassDescriptor();
-		vec4.set(rpdMain.clearColour, 0, 0, 0, 1);
-		rpdMain.clearMask = render.ClearMask.ColourDepth;
+			render.runRenderPass(this.rc, this.scene_.meshMgr, rpdMain, null, (renderPass) => {
+				let camera: world.ProjectionSetup = {
+					projectionMatrix: mat4.perspective([], math.deg2rad(50), this.rc.gl.drawingBufferWidth / this.rc.gl.drawingBufferHeight, 0.1, 100),
+					viewMatrix: this.player_.view.viewMatrix
+				};
 
-		render.runRenderPass(this.rc, this.scene_.meshMgr, rpdMain, null, (renderPass) => {
-			let camera: world.ProjectionSetup = {
-				projectionMatrix: mat4.perspective([], math.deg2rad(50), this.rc.gl.drawingBufferWidth / this.rc.gl.drawingBufferHeight, 0.1, 100),
-				viewMatrix: this.player_.view.viewMatrix
-			};
+				this.scene_.lightMgr.prepareLightsForRender(this.scene_.lightMgr.allEnabled(), camera, renderPass.viewport()!);
 
-			this.scene_.lightMgr.prepareLightsForRender(this.scene_.lightMgr.allEnabled(), camera, renderPass.viewport()!);
+				renderPass.setDepthTest(render.DepthTest.Less);
+				renderPass.setFaceCulling(render.FaceCulling.Back);
 
-			renderPass.setDepthTest(render.DepthTest.Less);
-			renderPass.setFaceCulling(render.FaceCulling.Back);
+				this.scene_.pbrModelMgr.draw(this.scene_.pbrModelMgr.all(), renderPass, camera, spotShadow, world.PBRLightingQuality.CookTorrance, this.assets_.tex.reflectCubeSpace);
 
-			this.scene_.pbrModelMgr.draw(this.scene_.pbrModelMgr.all(), renderPass, camera, spotShadow, world.PBRLightingQuality.CookTorrance, this.assets_.tex.reflectCubeSpace);
-
-			this.skyBox_.draw(renderPass, camera);
-		});
+				this.skyBox_.draw(renderPass, camera);
+			});
+		}
 	}
 
 
@@ -241,6 +258,12 @@ class MainScene implements sd.SceneController {
 		if (this.mode_ >= GameMode.Main) {
 			this.player_.step(timeStep);
 
+			if (io.keyboard.pressed(io.Key.U)) {
+				this.SHADOW = !this.SHADOW;
+			}
+			if (io.keyboard.pressed(io.Key.O)) {
+				this.SHADQUAD = !this.SHADQUAD;
+			}
 			if (this.skyBox_) {
 				this.skyBox_.setCenter(this.player_.view.pos);
 			}
