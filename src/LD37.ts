@@ -196,10 +196,19 @@ class MainScene implements sd.SceneController {
 	SHADOW = true;
 	SHADQUAD = false;
 
+	downsample128: render.FilterPass;
+	downsample64: render.FilterPass;
+	boxFilter: render.FilterPass;
 
 	renderFrame(timeStep: number) {
 		if (this.mode_ < GameMode.Title) {
 			return;
+		}
+
+		if (! this.downsample128) {
+			this.downsample128 = render.resamplePass(this.rc, this.scene_.meshMgr, 512);
+			this.downsample64 = render.resamplePass(this.rc, this.scene_.meshMgr, 256);
+			this.boxFilter = render.boxFilterPass(this.rc, this.scene_.meshMgr, 256);
 		}
 
 		// -- shadow pass
@@ -217,6 +226,13 @@ class MainScene implements sd.SceneController {
 					renderPass.setDepthTest(render.DepthTest.Less);
 					this.scene_.pbrModelMgr.drawShadows(this.scene_.pbrModelMgr.all(), renderPass, spotShadow!.lightProjection);
 				});
+
+				//  filter shadow tex and set as source for shadow calcs
+				this.downsample128.apply(this.rc, this.scene_.meshMgr, spotShadow.shadowFBO.colourAttachmentTexture(0)!);
+				this.downsample64.apply(this.rc, this.scene_.meshMgr, this.downsample128.output);
+				this.boxFilter.apply(this.rc, this.scene_.meshMgr, this.downsample64.output);
+				spotShadow.filteredTexture = this.boxFilter.output;
+
 				if (this.fullQuad === 0) {
 					const quad = meshdata.gen.generate(new meshdata.gen.Quad(2, 2), [meshdata.attrPosition2(), meshdata.attrUV2()]);
 					this.fullQuad = this.scene_.meshMgr.create({ name: "squareQuad", meshData: quad });
