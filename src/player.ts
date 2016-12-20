@@ -239,8 +239,8 @@ class PlayerController {
 
 
 	openExit() {
-		this.scene.lightMgr.setEnabled(this.level.spotExit, true);
-		this.scene.pbrModelMgr.setShadowCaster(this.level.spotExit);
+		this.scene.lightMgr.setEnabled(this.level.spotExit.light!, true);
+		this.scene.pbrModelMgr.setShadowCaster(this.level.spotExit.light!);
 		this.sfx.play(SFX.DoorOpen);
 		this.doorOpenStart = Date.now();
 	}

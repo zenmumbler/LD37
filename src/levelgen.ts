@@ -43,7 +43,7 @@ class Level {
 	spotLeft: world.LightInstance;
 	spotRight: world.LightInstance;
 	spotBack: world.LightInstance;
-	spotExit: world.LightInstance;
+	spotExit: world.EntityInfo;
 
 	orbs: Orb[][];
 	glowers: { light: world.LightInstance; mat: world.PBRMaterialInstance }[] = [];
@@ -96,7 +96,8 @@ class Level {
 				meshData: meshdata.gen.generate(new meshdata.gen.Sphere({ radius: radius, rows: 16, segs: 24 }))
 			},
 			pbrModel: {
-				materials: [this.assets.mat.whiteness]
+				materials: [this.assets.mat.whiteness],
+				castsShadows: false
 			},
 			light: {
 				name: "spherelight1",
@@ -291,8 +292,8 @@ class Level {
 			},
 			pbrModel: { materials: [assets.mat.whiteness], castsShadows: false }
 		});
-		const spotExit = scene.makeEntity({
-			transform: { position: [0, 3, 14] },
+		this.spotExit = scene.makeEntity({
+			transform: { position: [-0.4, 3, 14.3] },
 			light: {
 				name: "exitlight",
 				colour: [1, 1, 1],
@@ -302,9 +303,8 @@ class Level {
 				cutoff: math.deg2rad(50)
 			}
 		});
-		this.spotExit = spotExit.light!;
-		scene.lightMgr.setDirection(this.spotExit, [0, -.7, -1]);
-		scene.lightMgr.setEnabled(this.spotExit, false);
+		scene.lightMgr.setDirection(this.spotExit.light!, [0, -.7, -1]);
+		scene.lightMgr.setEnabled(this.spotExit.light!, false);
 	}
 
 
