@@ -36,6 +36,69 @@ const enum GameMode {
 }
 
 
+interface FSQPipeline {
+	pipeline: render.Pipeline;
+	texUniform: WebGLUniformLocation;
+}
+
+function makeFSQPipeline(rc: render.RenderContext) {
+	const pfp = {} as FSQPipeline;
+
+	const vertexSource = `
+		attribute vec2 vertexPos_model;
+		varying vec2 vertexUV_intp;
+		void main() {
+			gl_Position = vec4(vertexPos_model, 0.5, 1.0);
+			vertexUV_intp = vertexPos_model * 0.5 + 0.5;
+		}
+	`.trim();
+
+	const fragmentSource = `
+		precision highp float;
+		varying vec2 vertexUV_intp;
+		uniform sampler2D texSampler;
+		void main() {
+			vec3 texColor = texture2D(texSampler, vertexUV_intp).xyz;
+			gl_FragColor = vec4(texColor, 1.0);
+		}
+	`.trim();
+
+	// -- pipeline
+	const pld = render.makePipelineDescriptor();
+	pld.colourPixelFormats[0] = render.PixelFormat.RGBA32F;
+	pld.vertexShader = render.makeShader(rc, rc.gl.VERTEX_SHADER, vertexSource);
+	pld.fragmentShader = render.makeShader(rc, rc.gl.FRAGMENT_SHADER, fragmentSource);
+	pld.attributeNames.set(meshdata.VertexAttributeRole.Position, "vertexPos_model");
+
+	pfp.pipeline = new render.Pipeline(rc, pld);
+	pfp.texUniform = rc.gl.getUniformLocation(pfp.pipeline.program, "texSampler")!;
+
+	// -- invariant uniform
+	pfp.pipeline.bind();
+	rc.gl.uniform1i(pfp.texUniform, 0);
+	pfp.pipeline.unbind();
+
+	return pfp;
+}
+
+function drawFSQ(rc: render.RenderContext, meshMgr: world.MeshManager, tex: render.Texture, p: FSQPipeline, m: world.MeshInstance) {
+	const rpd = render.makeRenderPassDescriptor();
+	rpd.clearMask = render.ClearMask.Colour;
+
+	render.runRenderPass(rc, meshMgr, rpd, null, (rp) => {
+		rp.setPipeline(p.pipeline);
+		rp.setTexture(tex, 0);
+		rp.setMesh(m);
+		rp.setDepthTest(render.DepthTest.Disabled);
+
+		// render quad without any transforms, filling full FB
+		const primGroup0 = meshMgr.primitiveGroups(m)[0];
+		rp.drawIndexedPrimitives(primGroup0.type, meshMgr.indexBufferElementType(m), 0, primGroup0.elementCount);
+	});
+}
+
+
+
 class MainScene implements sd.SceneController {
 	private scene_: world.Scene;
 	private assets_: Assets;
