@@ -323,11 +323,11 @@ class PlayerController {
 		}
 		if (spotOn) {
 			this.scene.lightMgr.setEnabled(spotOn, true);
-			// this.scene.pbrModelMgr.setShadowCaster(spotOn);
+			this.scene.pbrModelMgr.setShadowCaster(spotOn);
 			this.sfx.play(SFX.LightOn);
 		}
 		else {
-			// this.scene.pbrModelMgr.setShadowCaster(0);
+			this.scene.pbrModelMgr.setShadowCaster(0);
 			if (spotOff) {
 				this.sfx.play(SFX.LightOff);
 			}

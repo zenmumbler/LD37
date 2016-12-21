@@ -137,7 +137,7 @@ class MainScene implements sd.SceneController {
 						name: "sun",
 						colour: [.7, .9, .8],
 						type: asset.LightType.Directional,
-						intensity: .2,
+						intensity: .5,
 					}
 				});
 				this.scene_.lightMgr.setDirection(sun.light!, [0, 1, .1]);

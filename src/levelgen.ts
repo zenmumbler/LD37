@@ -419,7 +419,7 @@ class Level {
 					name: `corner_color_${corneria}`,
 					colour: TheColors[corneria],
 					type: asset.LightType.Point,
-					intensity: 4,
+					intensity: 6,
 					range: 3.4
 				}
 			});
@@ -530,17 +530,17 @@ class Level {
 		scene.transformMgr.rotateByAngles(tabletLeft.transform, [math.deg2rad(-10), math.deg2rad(100), 0]);
 
 		const spotLeft = scene.makeEntity({
-			transform: { position: [-8, 4.6, 0] },
+			transform: { position: [-7.9, 4.3, 0] },
 			light: {
 				name: "spot-left",
 				colour: [1, 1, 1],
 				type: asset.LightType.Spot,
-				intensity: 2,
-				range: 10,
+				intensity: 2.75,
+				range: 20,
 				cutoff: math.deg2rad(35)
 			}
 		});
-		ltm.setDirection(spotLeft.light!, [-.707, -.707, 0]);
+		ltm.setDirection(spotLeft.light!, [-.75, -.707, 0]);
 		ltm.setEnabled(spotLeft.light!, false);
 		this.spotLeft = spotLeft.light!;
 
@@ -553,17 +553,17 @@ class Level {
 		scene.transformMgr.rotateByAngles(tabletRight.transform, [math.deg2rad(-10), math.deg2rad(-80), 0]);
 
 		const spotRight = scene.makeEntity({
-			transform: { position: [7.9, 4.6, 0] },
+			transform: { position: [7.7, 4.3, 0] },
 			light: {
 				name: "spot-right",
 				colour: [1, 1, 1],
 				type: asset.LightType.Spot,
-				intensity: 2,
-				range: 10,
+				intensity: 2.75,
+				range: 20,
 				cutoff: math.deg2rad(35)
 			}
 		});
-		ltm.setDirection(spotRight.light!, [.707, -.707, 0]);
+		ltm.setDirection(spotRight.light!, [.75, -.707, 0]);
 		ltm.setEnabled(spotRight.light!, false);
 		this.spotRight = spotRight.light!;
 
