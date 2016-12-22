@@ -126,6 +126,25 @@
 			padding: 0;
 		}
 
+		.controls {
+			text-align: center;
+			padding-top: 20px;
+		}
+
+		.controls button {
+			border: 1px solid #aaa;
+			color: #aaa;
+			background: black;
+			border-radius: 4px;
+		}
+		.controls button:hover {
+			color: white;
+		}
+		.controls button:active {
+			background: #aaa;
+			color: #333;
+		}
+
 		a, a:visited, a:active {
 			color: rgba(178, 67, 255, .8);
 		}
@@ -137,7 +156,7 @@
 	WASD / Arrow keys to move, Click and drag to look, E to interact —
 	&copy; 2016 by @zenmumbler for <a href="http://ludumdare.com/compo/ludum-dare-37/?action=preview&uid=17143">LD37</a> —
 	<a href="credits.html">credits &amp; asset acknowledgements</a>
-	</p>
+</p>
 <div class="stageholder hdready">
 	<canvas width="1280" height="720" id="stage"></canvas>
 
@@ -150,6 +169,9 @@
 		<p>A Ludum Dare 37 entry by Arthur Langereis</p>
 		<p class="thx">thank you for playing</p>
 	</div>
+</div>
+<div class="controls">
+	<button id="fullscreen">Play Fullscreen</button>
 </div>
 
 <script src="../stardazed-tx/ext/veclib.js"></script>
