@@ -7,6 +7,10 @@
 /// <reference path="levelgen.ts" />
 /// <reference path="sfx.ts" />
 
+interface Element {
+	mozRequestFullScreen(): void;
+}
+
 import io = sd.io;
 import math = sd.math;
 import world = sd.world;
@@ -143,6 +147,14 @@ class MainScene implements sd.SceneController {
 				this.scene_.lightMgr.setDirection(sun.light!, [0, 1, .1]);
 
 				this.setMode(GameMode.Main);
+
+				dom.on("#fullscreen", "click", () => {
+					if (this.mode_ == GameMode.Main) {
+						const canvas = rc.gl.canvas;
+						(canvas.requestFullscreen || canvas.webkitRequestFullscreen || canvas.mozRequestFullScreen).call(canvas);
+					}
+				});
+
 			});
 		});
 
