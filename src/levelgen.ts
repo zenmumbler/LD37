@@ -3,15 +3,15 @@
 
 type PillarYGen = (xz: sd.Float2, tileXZ: sd.Float2, baseY: number) => number;
 
-function rgb8Color(r: number, g: number, b: number) {
-	return [r / 255, g / 255, b / 255];
+function srgb8Color(r: number, g: number, b: number) {
+	return [Math.pow(r / 255, 2.2), Math.pow(g / 255, 2.2), Math.pow(b / 255, 2.2)];
 }
 
 const TheColors: number[][] = [
-	rgb8Color(69, 204, 255),
-	rgb8Color(255, 212, 49),
-	rgb8Color(232, 75, 48),
-	rgb8Color(178, 67, 255)
+	srgb8Color(69, 204, 255),
+	srgb8Color(255, 212, 49),
+	srgb8Color(232, 75, 48),
+	srgb8Color(178, 67, 255)
 ];
 
 type LineSeg = sd.Float4;
@@ -72,7 +72,7 @@ class Level {
 			m.emissiveIntensity = 1;
 			m.flags |= asset.MaterialFlags.usesEmissive;
 			m.metallic = 0;
-			m.roughness = 0.1;
+			m.roughness = 0.2;
 
 			this.theColorMatsBack[c] = m;
 			this.theColorMatsLeft[c] = sd.cloneStruct(m);
@@ -420,8 +420,8 @@ class Level {
 					name: `corner_color_${corneria}`,
 					colour: TheColors[corneria],
 					type: asset.LightType.Point,
-					intensity: 1,
-					range: 3.4
+					intensity: 3.0,
+					range: 2.6
 				}
 			});
 		}
@@ -513,9 +513,10 @@ class Level {
 				name: "spot-pillars",
 				colour: [1, .94, .88],
 				type: asset.LightType.Spot,
-				intensity: 1.25,
+				intensity: 0.25,
 				range: 10,
-				cutoff: math.deg2rad(35)
+				cutoff: math.deg2rad(35),
+				shadowBias: 0.045
 			}
 		});
 		ltm.setDirection(spotBack.light!, [0, -.707, -.707]);
@@ -536,9 +537,10 @@ class Level {
 				name: "spot-left",
 				colour: [1, 1, 1],
 				type: asset.LightType.Spot,
-				intensity: 2.75,
-				range: 20,
-				cutoff: math.deg2rad(35)
+				intensity: 0.3,
+				range: 10,
+				cutoff: math.deg2rad(35),
+				shadowBias: 0.045
 			}
 		});
 		ltm.setDirection(spotLeft.light!, [-.75, -.707, 0]);
@@ -559,9 +561,10 @@ class Level {
 				name: "spot-right",
 				colour: [1, 1, 1],
 				type: asset.LightType.Spot,
-				intensity: 2.75,
-				range: 20,
-				cutoff: math.deg2rad(35)
+				intensity: 0.3,
+				range: 10,
+				cutoff: math.deg2rad(35),
+				shadowBias: 0.045
 			}
 		});
 		ltm.setDirection(spotRight.light!, [.75, -.707, 0]);

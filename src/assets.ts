@@ -106,8 +106,8 @@ function loadAllAssets(rc: render.RenderContext, ac: audio.AudioContext, meshMgr
 		a.mat.whiteness.roughness = .8;
 
 		a.mat.blackness = asset.makeMaterial("blackness");
-		a.mat.blackness.roughness = .5;
-		a.mat.blackness.metallic = 1;
+		a.mat.blackness.roughness = .1666;
+		a.mat.blackness.metallic = .8;
 		a.mat.blackness.roughnessTexture = a.mat.medmetal.roughnessTexture;
 
 		return a;
