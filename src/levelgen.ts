@@ -300,7 +300,8 @@ class Level {
 				intensity: 8,
 				type: asset.LightType.Spot,
 				range: 12,
-				cutoff: math.deg2rad(50)
+				cutoff: math.deg2rad(50),
+				shadowBias: 0.05
 			}
 		});
 		scene.lightMgr.setDirection(this.spotExit.light!, [0, -.7, -1]);
@@ -419,7 +420,7 @@ class Level {
 					name: `corner_color_${corneria}`,
 					colour: TheColors[corneria],
 					type: asset.LightType.Point,
-					intensity: 6,
+					intensity: 1,
 					range: 3.4
 				}
 			});
@@ -512,7 +513,7 @@ class Level {
 				name: "spot-pillars",
 				colour: [1, .94, .88],
 				type: asset.LightType.Spot,
-				intensity: 2,
+				intensity: 1.25,
 				range: 10,
 				cutoff: math.deg2rad(35)
 			}

@@ -103,7 +103,7 @@ class PlayerView {
 
 		if (vec3.length(this.velocity_) >= 0.001) {
 			const targetPos = vec3.add([], this.pos_, this.velocity_);
-			const clippedPos = this.clipMovement(this.pos, targetPos);
+			const clippedPos = vec3.clone(targetPos); // this.clipMovement(this.pos, targetPos);
 			vec3.sub(this.velocity_, clippedPos, this.pos_);
 			vec3.copy(this.pos_, clippedPos);
 
