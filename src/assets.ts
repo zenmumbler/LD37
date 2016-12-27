@@ -92,6 +92,7 @@ function loadAllAssets(rc: render.RenderContext, ac: audio.AudioContext, meshMgr
 		loadLocalMTL("data/mat/bronzepatina/bronzepatina.mtl", ["bronzepatina"]),
 		loadLocalMTL("data/mat/zodiac/zodiac.mtl", ["zodiac"]),
 		loadLocalMTL("data/mat/signs/signs.mtl", ["signs"]),
+		// loadEnvCubeTex("data/mat/miramar/miramar_", "envCubeSpace")
 		loadEnvCubeTex("data/mat/galaxy/galaxy-", "envCubeSpace")
 	];
 	totalAssets = stuff.length;
