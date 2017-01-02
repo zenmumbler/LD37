@@ -2,7 +2,6 @@
 // (c) 2016 by Arthur Langereis (@zenmumbler)
 
 /// <reference path="../../stardazed-tx/dist/stardazed-tx.d.ts" />
-/// <reference path="flycam.ts" />
 /// <reference path="assets.ts" />
 /// <reference path="levelgen.ts" />
 /// <reference path="sfx.ts" />
@@ -267,7 +266,7 @@ class MainScene implements sd.SceneController {
 					viewMatrix: this.player_.view.viewMatrix
 				};
 
-				this.scene_.lightMgr.prepareLightsForRender(this.scene_.lightMgr.allEnabled(), camera, renderPass.viewport()!);
+				this.scene_.lightMgr.prepareLightsForRender(this.scene_.lightMgr.all(), camera, renderPass.viewport()!);
 
 				renderPass.setDepthTest(render.DepthTest.Less);
 				renderPass.setFaceCulling(render.FaceCulling.Back);
