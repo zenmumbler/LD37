@@ -349,9 +349,9 @@ class PlayerController {
 		const maxAccel = 0.66;
 		var accel = 0, sideAccel = 0;
 
-		if (!this.endGame && io.keyboard.pressed(io.Key.P)) {
-			this.startEndGame();
-		}
+		// if (!this.endGame && io.keyboard.pressed(io.Key.P)) {
+		// 	this.startEndGame();
+		// }
 
 		if (io.keyboard.down(io.Key.UP) || io.keyboard.down(this.keyForKeyCommand(KeyCommand.Forward))) {
 			accel = maxAccel;
