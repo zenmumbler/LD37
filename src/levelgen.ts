@@ -358,7 +358,7 @@ class Level {
 			const orbInfo = scene.makeEntity({
 				parent: baseEnt.transform,
 				transform: { position: [p * spacing, 1.4, 0] },
-				mesh: { name: `pillar-sphere-${p}`, meshData: meshdata.gen.generate(new meshdata.gen.Sphere({ radius: pw * .9, rows: 12, segs: 18 })) },
+				mesh: { name: `pillar-sphere-${p}`, meshData: meshdata.gen.generate(new meshdata.gen.Sphere({ radius: pw * .9, rows: 18, segs: 18 })) },
 				pbrModel: { materials: [this.theColorMatsBack[p]] }
 			});
 			const orb = {
