@@ -352,7 +352,7 @@ class Level {
 		for (let p = 0; p < 4; ++p) {
 			pgen.push({
 				translation: [p * spacing, 0, 0],
-				generator: new meshdata.gen.Box({ width: pw, depth: pw, height: 1.3, inward: false, uvRange: [pw, 1.3] })
+				generator: new meshdata.gen.Box({ width: pw * .9, depth: pw * .9, height: 1.3, inward: false, uvRange: [pw, 1.3] })
 			});
 
 			const orbInfo = scene.makeEntity({

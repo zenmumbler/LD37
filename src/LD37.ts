@@ -333,6 +333,7 @@ class MainScene implements sd.SceneController {
 
 			if (this.skyBox_) {
 				this.skyBox_.setCenter(this.player_.view.pos);
+				this.scene_.transformMgr.rotateByAngles(this.skyBox_.transform, [0, Math.PI * .002 * timeStep, Math.PI * -.001 * timeStep]);
 			}
 		}
 	}

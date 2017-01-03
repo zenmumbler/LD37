@@ -334,7 +334,7 @@ class PlayerController {
 		}
 		if (orbsOn) {
 			for (const o of orbsOn) {
-				this.scene.pbrModelMgr.materialManager.setEmissiveIntensity(o.pbrMat, 0.20);
+				this.scene.pbrModelMgr.materialManager.setEmissiveIntensity(o.pbrMat, 0.15);
 			}
 		}
 	}
@@ -432,7 +432,7 @@ class PlayerController {
 					anyHover = true;
 					if (this.hoverOrb != orb) {
 						if (this.hoverOrb) {
-							this.scene.pbrModelMgr.materialManager.setEmissiveIntensity(this.hoverOrb.pbrMat, 0.20);
+							this.scene.pbrModelMgr.materialManager.setEmissiveIntensity(this.hoverOrb.pbrMat, 0.15);
 						}
 						this.hoverOrb = orb;
 						this.scene.pbrModelMgr.materialManager.setEmissiveIntensity(orb.pbrMat, 0.5);
@@ -449,7 +449,7 @@ class PlayerController {
 		}
 
 		if (!anyHover && this.hoverOrb) {
-			this.scene.pbrModelMgr.materialManager.setEmissiveIntensity(this.hoverOrb.pbrMat, 0.20);
+			this.scene.pbrModelMgr.materialManager.setEmissiveIntensity(this.hoverOrb.pbrMat, 0.15);
 			this.hoverOrb = null;
 		}
 
