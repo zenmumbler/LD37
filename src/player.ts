@@ -183,8 +183,8 @@ class PlayerController {
 			if (!this.tracking_) {
 				return;
 			}
-			var newPos = [evt.clientX, evt.clientY];
-			var delta = vec2.sub([], newPos, this.lastPos_);
+			const newPos = [evt.clientX, evt.clientY];
+			const delta = vec2.sub([], newPos, this.lastPos_);
 			vec2.divide(delta, delta, [-this.vpWidth_, -this.vpHeight_]);
 			this.lastPos_ = newPos;
 

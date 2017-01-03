@@ -447,7 +447,7 @@ class Level {
 		this.clipLines.push([ 9.5, 9.5,  1.5, 9.5]);
 		this.clipLines.push([ 1.5, 9.5,  1.5, 13]);
 		this.clipLines.push([ 1.5, 13, -2.0, 13]);
-		this.clipLines.push([-2.0, 13, -2.0, 9.0]);
+		this.clipLines.push([-2.0, 13, -2.0, 9.5]);
 		this.clipLines.push([-2.0, 9.5, -10.5, 9.5]);
 
 		// left
@@ -458,7 +458,7 @@ class Level {
 		this.clipLines.push([-10,  -5, -10, -10]);
 
 		// door blocker
-		this.clipLines.push([ 1.7, 9.5, -2.0, 9.5]);
+		this.clipLines.push([ 1.7, 9.5, -2.2, 9.5]);
 	}
 
 
