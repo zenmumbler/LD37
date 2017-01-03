@@ -308,24 +308,24 @@ class MainScene implements sd.SceneController {
 		if (this.mode_ >= GameMode.Main) {
 			this.player_.step(timeStep);
 
-			if (io.keyboard.pressed(io.Key.U)) {
-				this.SHADOW = !this.SHADOW;
-			}
-			if (io.keyboard.pressed(io.Key.O)) {
-				this.SHADQUAD = !this.SHADQUAD;
-			}
-			if (io.keyboard.down(io.Key.I)) {
-				this.scene_.transformMgr.translate(this.level_.spotExit.transform, [0, 0, -.1]);
-			}
-			else if (io.keyboard.down(io.Key.K)) {
-				this.scene_.transformMgr.translate(this.level_.spotExit.transform, [0, 0, .1]);
-			}
-			if (io.keyboard.down(io.Key.J)) {
-				this.scene_.transformMgr.translate(this.level_.spotExit.transform, [-.1, 0, 0]);
-			}
-			else if (io.keyboard.down(io.Key.L)) {
-				this.scene_.transformMgr.translate(this.level_.spotExit.transform, [.1, 0, 0]);
-			}
+			// if (io.keyboard.pressed(io.Key.U)) {
+			// 	this.SHADOW = !this.SHADOW;
+			// }
+			// if (io.keyboard.pressed(io.Key.O)) {
+			// 	this.SHADQUAD = !this.SHADQUAD;
+			// }
+			// if (io.keyboard.down(io.Key.I)) {
+			// 	this.scene_.transformMgr.translate(this.level_.spotExit.transform, [0, 0, -.1]);
+			// }
+			// else if (io.keyboard.down(io.Key.K)) {
+			// 	this.scene_.transformMgr.translate(this.level_.spotExit.transform, [0, 0, .1]);
+			// }
+			// if (io.keyboard.down(io.Key.J)) {
+			// 	this.scene_.transformMgr.translate(this.level_.spotExit.transform, [-.1, 0, 0]);
+			// }
+			// else if (io.keyboard.down(io.Key.L)) {
+			// 	this.scene_.transformMgr.translate(this.level_.spotExit.transform, [.1, 0, 0]);
+			// }
 
 			if (io.keyboard.pressed(io.Key.F)) {
 				this.antialias = !this.antialias;
