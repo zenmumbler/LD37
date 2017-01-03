@@ -109,7 +109,7 @@ class Level {
 		});
 		this.glowers.push({
 			light: g.light!,
-			mat: this.scene.pbrModelMgr.materialRange(g.pbrModel!).first
+			mat: this.scene.pbrModelMgr.materialRange(g.pbrModel!).front
 		});
 	}
 
@@ -367,7 +367,7 @@ class Level {
 				transform: orbInfo.transform,
 				worldPos: scene.transformMgr.worldPosition(orbInfo.transform),
 				pbrModel: orbInfo.pbrModel!,
-				pbrMat: scene.pbrModelMgr.materialRange(orbInfo.pbrModel!).first
+				pbrMat: scene.pbrModelMgr.materialRange(orbInfo.pbrModel!).front
 			};
 			this.orbs[quadrant].push(orb);
 			scene.pbrModelMgr.materialManager.setEmissiveIntensity(orb.pbrMat, 0);
