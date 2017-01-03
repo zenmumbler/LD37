@@ -137,9 +137,9 @@ class MainScene implements sd.SceneController {
 				const sun = this.scene_.makeEntity({
 					light: {
 						name: "sun",
-						colour: [.5, .9, .5],
+						colour: [.5, .5, .9],
 						type: asset.LightType.Directional,
-						intensity: .03,
+						intensity: .16,
 					}
 				});
 				this.scene_.lightMgr.setDirection(sun.light!, [0, 1, .1]);

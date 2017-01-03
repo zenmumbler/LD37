@@ -420,7 +420,7 @@ class Level {
 					name: `corner_color_${corneria}`,
 					colour: TheColors[corneria],
 					type: asset.LightType.Point,
-					intensity: 3.0,
+					intensity: 5.0,
 					range: 2.6
 				}
 			});
