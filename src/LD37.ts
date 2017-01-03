@@ -232,9 +232,11 @@ class MainScene implements sd.SceneController {
 			if (! this.mainFBO) {
 				this.mainFBO = render.makeScreenFrameBuffer(this.rc, {
 					colourCount: 1,
+					useDepth: true,
 					pixelComponent: render.FBOPixelComponent.Integer
 				});
 			}
+			mainPassFBO = this.mainFBO;
 		}
 
 		// -- shadow pass
@@ -270,19 +272,21 @@ class MainScene implements sd.SceneController {
 				}
 			}
 		}
+
 		if (! this.SHADQUAD) {
 			// -- main forward pass
 			let rpdMain = render.makeRenderPassDescriptor();
 			vec4.set(rpdMain.clearColour, 0, 0, 0, 1);
 			rpdMain.clearMask = render.ClearMask.ColourDepth;
 
-			render.runRenderPass(this.rc, this.scene_.meshMgr, rpdMain, null, (renderPass) => {
+			render.runRenderPass(this.rc, this.scene_.meshMgr, rpdMain, mainPassFBO, (renderPass) => {
+				const viewport = renderPass.viewport()!;
 				let camera: world.ProjectionSetup = {
-					projectionMatrix: mat4.perspective([], math.deg2rad(50), this.rc.gl.drawingBufferWidth / this.rc.gl.drawingBufferHeight, 0.1, 100),
+					projectionMatrix: mat4.perspective([], math.deg2rad(50), viewport.width / viewport.height, 0.1, 100),
 					viewMatrix: this.player_.view.viewMatrix
 				};
 
-				this.scene_.lightMgr.prepareLightsForRender(this.scene_.lightMgr.all(), camera, renderPass.viewport()!);
+				this.scene_.lightMgr.prepareLightsForRender(this.scene_.lightMgr.all(), camera, viewport);
 
 				renderPass.setDepthTest(render.DepthTest.Less);
 				renderPass.setFaceCulling(render.FaceCulling.Back);
@@ -291,6 +295,10 @@ class MainScene implements sd.SceneController {
 
 				this.skyBox_.draw(renderPass, camera);
 			});
+
+			if (this.antialias) {
+				this.fxaaPass.apply(this.rc, this.scene_.meshMgr, mainPassFBO!.colourAttachmentTexture(0)!);
+			}
 		}
 	}
 
