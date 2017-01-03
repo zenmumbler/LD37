@@ -209,6 +209,9 @@ class MainScene implements sd.SceneController {
 	downsample128: render.FilterPass;
 	downsample64: render.FilterPass;
 	boxFilter: render.FilterPass;
+	fxaaPass: render.FXAAPass;
+	mainFBO: render.FrameBuffer | undefined;
+	antialias = false;
 
 	renderFrame(timeStep: number) {
 		if (this.mode_ < GameMode.Title) {
@@ -219,6 +222,19 @@ class MainScene implements sd.SceneController {
 			this.downsample128 = render.resamplePass(this.rc, this.scene_.meshMgr, 512);
 			this.downsample64 = render.resamplePass(this.rc, this.scene_.meshMgr, 256);
 			this.boxFilter = render.boxFilterPass(this.rc, this.scene_.meshMgr, 256);
+		}
+
+		let mainPassFBO: render.FrameBuffer | null = null;
+		if (this.antialias) {
+			if (! this.fxaaPass) {
+				this.fxaaPass = new render.FXAAPass(this.rc, this.scene_.meshMgr);
+			}
+			if (! this.mainFBO) {
+				this.mainFBO = render.makeScreenFrameBuffer(this.rc, {
+					colourCount: 1,
+					pixelComponent: render.FBOPixelComponent.Integer
+				});
+			}
 		}
 
 		// -- shadow pass
@@ -301,6 +317,10 @@ class MainScene implements sd.SceneController {
 			}
 			else if (io.keyboard.down(io.Key.L)) {
 				this.scene_.transformMgr.translate(this.level_.spotExit.transform, [.1, 0, 0]);
+			}
+
+			if (io.keyboard.pressed(io.Key.F)) {
+				this.antialias = !this.antialias;
 			}
 
 			if (this.skyBox_) {
