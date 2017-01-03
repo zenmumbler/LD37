@@ -286,7 +286,7 @@ class MainScene implements sd.SceneController {
 					viewMatrix: this.player_.view.viewMatrix
 				};
 
-				this.scene_.lightMgr.prepareLightsForRender(this.scene_.lightMgr.all(), camera, viewport);
+				this.scene_.lightMgr.prepareLightsForRender(this.scene_.lightMgr.allEnabled(), camera, viewport);
 
 				renderPass.setDepthTest(render.DepthTest.Less);
 				renderPass.setFaceCulling(render.FaceCulling.Back);
