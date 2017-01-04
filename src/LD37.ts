@@ -10,6 +10,10 @@ interface Element {
 	mozRequestFullScreen(): void;
 }
 
+interface Document {
+	mozFullScreenElement: HTMLElement;
+}
+
 import io = sd.io;
 import math = sd.math;
 import world = sd.world;
@@ -148,11 +152,30 @@ class MainScene implements sd.SceneController {
 
 				dom.on("#fullscreen", "click", () => {
 					if (this.mode_ == GameMode.Main) {
-						const canvas = rc.gl.canvas;
+						const canvas = dom.$1(".stageholder");
 						(canvas.requestFullscreen || canvas.webkitRequestFullscreen || canvas.mozRequestFullScreen).call(canvas);
 					}
 				});
 
+				const fsch = () => {
+					const canvas = dom.$1(".stageholder");
+					if (document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement) {
+						if (document.mozFullScreenElement) {
+							canvas.classList.add("moz-fullscreen");
+						}
+						else {
+							canvas.style.transform = "scale(2.0) translate(0, -20px)";
+						}
+					}
+					else {
+						canvas.classList.remove("moz-fullscreen");
+						canvas.style.transform = "";
+					}
+				};
+
+				dom.on(document, "fullscreenchange", fsch);
+				dom.on(document, "webkitfullscreenchange", fsch);
+				dom.on(document, "mozfullscreenchange", fsch);
 			});
 		});
 
