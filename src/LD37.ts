@@ -153,6 +153,7 @@ class MainScene implements sd.SceneController {
 				dom.on("#fullscreen", "click", () => {
 					if (this.mode_ == GameMode.Main) {
 						const canvas = dom.$1(".stageholder");
+						canvas.requestPointerLock();
 						(canvas.requestFullscreen || canvas.webkitRequestFullscreen || canvas.mozRequestFullScreen).call(canvas);
 					}
 				});
@@ -162,6 +163,7 @@ class MainScene implements sd.SceneController {
 					if (document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement) {
 						if (document.mozFullScreenElement) {
 							canvas.classList.add("moz-fullscreen");
+							canvas.requestPointerLock();
 						}
 						else {
 							canvas.style.transform = "scale(2.0) translate(0, -20px)";

@@ -180,12 +180,13 @@ class PlayerController {
 			if (this.restrictMovement) {
 				return;
 			}
-			if (!this.tracking_) {
+			if ((document.pointerLockElement == null) && (!this.tracking_)) {
 				return;
 			}
 			const newPos = [evt.clientX, evt.clientY];
-			const delta = vec2.sub([], newPos, this.lastPos_);
+			const delta = document.pointerLockElement ? [evt.movementX, evt.movementY] : vec2.sub([], newPos, this.lastPos_);
 			vec2.divide(delta, delta, [-this.vpWidth_, -this.vpHeight_]);
+			vec2.scale(delta, delta, document.pointerLockElement ? .5 : 1);
 			this.lastPos_ = newPos;
 
 			this.view.rotate(delta);
