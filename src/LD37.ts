@@ -282,7 +282,7 @@ class MainScene implements sd.SceneController {
 			render.runRenderPass(this.rc, this.scene_.meshMgr, rpdMain, mainPassFBO, (renderPass) => {
 				const viewport = renderPass.viewport()!;
 				let camera: world.ProjectionSetup = {
-					projectionMatrix: mat4.perspective([], math.deg2rad(50), viewport.width / viewport.height, 0.1, 100),
+					projectionMatrix: mat4.perspective([], math.deg2rad(60), viewport.width / viewport.height, 0.1, 100),
 					viewMatrix: this.player_.view.viewMatrix
 				};
 
