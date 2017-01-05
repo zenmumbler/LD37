@@ -175,7 +175,7 @@ class MainScene implements sd.SceneController {
 						}
 						else {
 							// Safari and Chrome, the vOffset is for macOS to adjust for the menubar
-							const vOffset = Math.round((screen.availHeight - screen.height) / 2) + "px";
+							const vOffset = "-13px"; // on macOS this == Math.round((screen.availHeight - screen.height) / 2) + "px", Chrome Windows keeps this for compat reasons?
 							canvas.style.transform = `scale(${scaleFactor}) translate(0, ${vOffset})`;
 						}
 					}
