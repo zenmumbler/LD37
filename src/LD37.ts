@@ -161,17 +161,29 @@ class MainScene implements sd.SceneController {
 				const fsch = () => {
 					const canvas = dom.$1(".stageholder");
 					if (document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement) {
+						const scaleFactor = Math.min(screen.width / rc.gl.drawingBufferWidth, screen.height / rc.gl.drawingBufferHeight);
+
 						if (document.mozFullScreenElement) {
-							canvas.classList.add("moz-fullscreen");
+							// Firefox needs the pointerlock request after fullscreen was activated
 							canvas.requestPointerLock();
+							const hOffset = Math.round((screen.width - rc.gl.drawingBufferWidth) / 4) + "px";
+							const vOffset = Math.round((screen.height - rc.gl.drawingBufferHeight) / 4) + "px";
+
+							dom.$(".stageholder > *").forEach((e: HTMLElement) => {
+								e.style.transform = `scale(${scaleFactor}) translate(${hOffset}, ${vOffset})`;
+							});
 						}
 						else {
-							canvas.style.transform = "scale(2.0) translate(0, -20px)";
+							// Safari and Chrome, the vOffset is for macOS to adjust for the menubar
+							const vOffset = Math.round((screen.availHeight - screen.height) / 2) + "px";
+							canvas.style.transform = `scale(${scaleFactor}) translate(0, ${vOffset})`;
 						}
 					}
 					else {
-						canvas.classList.remove("moz-fullscreen");
 						canvas.style.transform = "";
+						dom.$(".stageholder > *").forEach((e: HTMLElement) => {
+							e.style.transform = "";
+						});
 					}
 				};
 
