@@ -383,6 +383,14 @@ dom.on(window, "load", () => {
 	const rctx = render.makeRenderContext(canvas)!;
 	const actx = audio.makeAudioContext()!;
 
+	if (! (rctx.extDerivatives && rctx.extFragmentLOD)) {
+		alert("Sorry, this game is not compatible with this browser.\n\nTry one of the following:\n- Firefox 50 or newer\n- Safari 9 or newer\n- Chrome 40 or newer\n\nApologies for the trouble.");
+		return;
+	}
+	if (! document.body.requestPointerLock) {
+		dom.hide("#fullscreen");
+	}
+
 	const mainCtl = new MainScene(rctx, actx);
 	sd.defaultRunLoop.sceneController = mainCtl;
 	sd.defaultRunLoop.start();
