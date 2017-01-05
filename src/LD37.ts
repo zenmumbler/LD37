@@ -164,10 +164,10 @@ class MainScene implements sd.SceneController {
 						const scaleFactor = Math.min(screen.width / rc.gl.drawingBufferWidth, screen.height / rc.gl.drawingBufferHeight);
 
 						if (document.mozFullScreenElement) {
-							// Firefox needs the pointerlock request after fullscreen was activated
+							// Firefox needs the pointerlock request after fullscreen activates
 							canvas.requestPointerLock();
-							const hOffset = Math.round((screen.width - rc.gl.drawingBufferWidth) / 4) + "px";
-							const vOffset = Math.round((screen.height - rc.gl.drawingBufferHeight) / 4) + "px";
+							const hOffset = Math.round((screen.width - rc.gl.drawingBufferWidth) / (2 * scaleFactor)) + "px";
+							const vOffset = Math.round((screen.height - rc.gl.drawingBufferHeight) / (2 * scaleFactor)) + "px";
 
 							dom.$(".stageholder > *").forEach((e: HTMLElement) => {
 								e.style.transform = `scale(${scaleFactor}) translate(${hOffset}, ${vOffset})`;
