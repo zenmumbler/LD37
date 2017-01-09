@@ -15,19 +15,21 @@
 			font-family: Tahoma, sans-serif;
 		}
 		.stageholder {
-			width: 1280px;
-			height: 720px;
 			margin: 50px auto 0 auto;
 			position: relative;
 			overflow: hidden;
 		}
+		.stageholder.small {
+			width: 960px;
+			height: 540px;
+		}
+		.stageholder.hdready {
+			width: 1280px;
+			height: 720px;
+		}
 		.stageholder.fullhd {
 			width: 1920px;
 			height: 1080px;
-		}
-		.stageholder.tiny {
-			width: 960px;
-			height: 540px;
 		}
 
 		#stage {
@@ -129,6 +131,8 @@
 		.controls {
 			text-align: center;
 			padding-top: 20px;
+			color: #aaa;
+			font-size: 12px;
 		}
 
 		.controls button {
@@ -136,6 +140,9 @@
 			color: #aaa;
 			background: black;
 			border-radius: 4px;
+		}
+		.controls label, .controls input, .controls button {
+			cursor: pointer;
 		}
 		.controls button:hover {
 			color: white;
@@ -171,6 +178,11 @@
 	</div>
 </div>
 <div class="controls">
+	Resolution:
+	<input type="radio" name="vpsize" data-vps="small" id="vps-small"><label for="vps-small"> 540p</label>
+	<input type="radio" name="vpsize" data-vps="hdready" id="vps-hdready" checked><label for="vps-hdready"> 720p</label>
+	<input type="radio" name="vpsize" data-vps="fullhd" id="vps-fullhd"><label for="vps-fullhd"> 1080p</label>
+	&mdash;
 	<button id="fullscreen">Play Fullscreen</button>
 </div>
 

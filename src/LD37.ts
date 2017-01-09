@@ -149,6 +149,18 @@ class MainScene implements sd.SceneController {
 
 				this.setMode(GameMode.Main);
 
+				dom.on(dom.$(`input[type="radio"]`), "click", evt => {
+					const radio = evt.target as HTMLInputElement;
+					if (radio.checked) {
+						const vpsSize = radio.dataset["vps"];
+						const holder = dom.$1(".stageholder");
+						holder.className = `stageholder ${vpsSize}`;
+						const canvas = rc.gl.canvas;
+						canvas.width = ({ small: 960, hdready: 1280, fullhd: 1920 } as any)[vpsSize];
+						canvas.height = ({ small: 540, hdready: 720, fullhd: 1080 } as any)[vpsSize];
+					}
+				});
+
 				dom.on("#fullscreen", "click", () => {
 					if (this.mode_ == GameMode.Main) {
 						const canvas = dom.$1(".stageholder");
