@@ -72,7 +72,6 @@ function makeFSQPipeline(rc: render.RenderContext) {
 
 	// -- pipeline
 	const pld = render.makePipelineDescriptor();
-	pld.colourPixelFormats[0] = render.PixelFormat.RGBA32F;
 	pld.vertexShader = render.makeShader(rc, rc.gl.VERTEX_SHADER, vertexSource);
 	pld.fragmentShader = render.makeShader(rc, rc.gl.FRAGMENT_SHADER, fragmentSource);
 	pld.attributeNames.set(meshdata.VertexAttributeRole.Position, "vertexPos_model");
