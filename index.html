@@ -131,18 +131,29 @@
 		.controls {
 			text-align: center;
 			padding-top: 20px;
-			color: #aaa;
+			color: #555;
 			font-size: 12px;
 		}
-
 		.controls button {
-			border: 1px solid #aaa;
-			color: #aaa;
+			border: 1px solid #555;
+			color: #555;
 			background: black;
 			border-radius: 4px;
 		}
+		.controls:hover {
+			color: #aaa;
+		}
+		.controls:hover button {
+			border: 1px solid #aaa;
+			color: #aaa;
+
+		}
 		.controls label, .controls input, .controls button {
 			cursor: pointer;
+		}
+		.controls input[disabled], .controls input[disabled] + label {
+			color: #555;
+			cursor: default;
 		}
 		.controls button:hover {
 			color: white;
@@ -179,11 +190,13 @@
 </div>
 <div class="controls">
 	Resolution:
-	<input type="radio" name="vpsize" data-vps="small" id="vps-small"><label for="vps-small"> 540p</label>
-	<input type="radio" name="vpsize" data-vps="hdready" id="vps-hdready" checked><label for="vps-hdready"> 720p</label>
-	<input type="radio" name="vpsize" data-vps="fullhd" id="vps-fullhd"><label for="vps-fullhd"> 1080p</label>
+	<input type="radio" name="vpsize" data-vps="small" id="vps-small"><label for="vps-small">540p</label>
+	<input type="radio" name="vpsize" data-vps="hdready" id="vps-hdready" checked><label for="vps-hdready">720p</label>
+	<input type="radio" name="vpsize" data-vps="fullhd" id="vps-fullhd"><label for="vps-fullhd">1080p</label>
 	&mdash;
 	<button id="fullscreen">Play Fullscreen</button>
+	&mdash;
+	Press <b>X</b> for FXAA Antialiasing
 </div>
 
 <script src="../stardazed-tx/ext/veclib.js"></script>

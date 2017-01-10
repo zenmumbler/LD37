@@ -375,7 +375,7 @@ class MainScene implements sd.SceneController {
 			// 	this.scene_.transformMgr.translate(this.level_.spotExit.transform, [.1, 0, 0]);
 			// }
 
-			if (io.keyboard.pressed(io.Key.F)) {
+			if (io.keyboard.pressed(io.Key.X)) {
 				this.antialias = !this.antialias;
 			}
 
@@ -400,6 +400,11 @@ dom.on(window, "load", () => {
 	}
 	if (! document.body.requestPointerLock) {
 		dom.hide("#fullscreen");
+	}
+	if (screen.width < 1920 || screen.height < 1080) {
+		dom.disable("#vps-fullhd");
+		dom.$1("#vps-fullhd").title = "Your display does not support this resolution.";
+		dom.$1("#vps-fullhd+label").title = "Your display does not support this resolution.";
 	}
 
 	const mainCtl = new MainScene(rctx, actx);
