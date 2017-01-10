@@ -158,6 +158,11 @@ class MainScene implements sd.SceneController {
 						const canvas = rc.gl.canvas;
 						canvas.width = ({ small: 960, hdready: 1280, fullhd: 1920 } as any)[vpsSize];
 						canvas.height = ({ small: 540, hdready: 720, fullhd: 1080 } as any)[vpsSize];
+
+						if (this.mainFBO) {
+							rc.gl.deleteFramebuffer(this.mainFBO.resource);
+							this.mainFBO = undefined;
+						}
 					}
 				});
 
