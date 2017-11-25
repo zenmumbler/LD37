@@ -22,7 +22,6 @@ const enum Music {
 
 
 class Sound {
-	private assets_: SoundAssets;
 	private ctx: AudioContext;
 
 	private endMusic_ = false;
@@ -39,7 +38,7 @@ class Sound {
 
 	private stepToggle = 0;
 
-	constructor(private ac: audio.AudioDevice) {
+	constructor(private ac: audio.AudioDevice, private assets_: SoundAssets) {
 		const ctx = this.ctx = ac.ctx;
 
 		this.stepGain = ctx.createGain();
@@ -52,12 +51,6 @@ class Sound {
 		this.effectGain.connect(ac.ctx.destination);
 		this.toneGain.connect(ac.ctx.destination);
 	}
-
-
-	setAssets(assets: SoundAssets) {
-		this.assets_ = assets;
-	}
-
 
 	startMusic() {
 		if (! this.musicSource) {

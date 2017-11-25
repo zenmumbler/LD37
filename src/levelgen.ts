@@ -85,7 +85,7 @@ function makeEntity(scene: sd.Scene, options: EntityCreateOptions): EntityInfo {
 
 
 class Level {
-	private assets: asset.CacheAccess;
+	private assets: Assets;
 
 	theColorMatsBack: render.EffectData[] = [];
 	theColorMatsLeft: render.EffectData[] = [];
@@ -109,8 +109,8 @@ class Level {
 	checkOrderLeft: number[];
 	checkOrderRight: number[];
 
-	constructor(private scene: sd.Scene) {
-		this.assets = scene.assets;
+	constructor(private scene: sd.Scene, assets: Assets) {
+		this.assets = assets;
 
 		// gen random permutations
 		const ZL = this.orderLeft = this.genRandomPuzzleOrder();

@@ -34,17 +34,7 @@ import mat2 = veclib.mat2;
 import mat3 = veclib.mat3;
 import mat4 = veclib.mat4;
 
-
-const enum GameMode {
-	None,
-	Loading,
-	Title,
-	Start,
-	Main,
-	End
-}
-
-
+/*
 interface FSQPipeline {
 	pipeline: render.Pipeline;
 	texUniform: WebGLUniformLocation;
@@ -104,7 +94,7 @@ function drawFSQ(rc: render.RenderContext, meshes: world.MeshManager, tex: rende
 		rp.drawIndexedPrimitives(primGroup0.type, meshes.indexBufferElementType(m), 0, primGroup0.elementCount);
 	});
 }
-
+*/
 
 
 class MainScene implements sd.SceneDelegate {
@@ -113,10 +103,8 @@ class MainScene implements sd.SceneDelegate {
 	private level_: Level;
 
 	// private skyBox_: world.Skybox;
-	// private glowLight_: world.EntityInfo;
 
 	private player_: PlayerController;
-	private mode_ = GameMode.None;
 
 	willLoadAssets() {
 		dom.show(".overlay.loading");
@@ -131,16 +119,52 @@ class MainScene implements sd.SceneDelegate {
 	}
 
 	setup() {
-		const assets = this.scene.assets;
-		this.sfx_ = new Sound(this.scene.ad);
+		const cache = this.scene.assets;
+		const standard = this.scene.rw.effectByName("standard")!;
 
-		this.setMode(GameMode.Loading);
+		const makePBRMat = (mat: asset.Material) => {
+			const data = standard.makeEffectData();
+			const pbr = mat as asset.StandardMaterial;
+			return data;
+		};
 
-		this.sfx_.setAssets(assets.sound);
+		const assets: Assets = {
+			sound: {
+				steps: [cache("audio", "step0"), cache("audio", "step1")],
+				lightOn: cache("audio", "lightOn"),
+				lightOff: cache("audio", "lightOff"),
+				ping: cache("audio", "ping"),
+				doorOpen: cache("audio", "doorOpen"),
+				swoosh: cache("audio", "swoosh"),
+				mainMusic: cache("audio", "mainMusic"),
+				endMusic: cache("audio", "endMusic")
+			},
+			mat: {
+				chipmetal: makePBRMat(cache("material", "chipmetal")),
+				medmetal: makePBRMat(cache("material", "medmetal")),
+				bronzepatina: makePBRMat(cache("material", "bronzepatina")),
+				zodiac: makePBRMat(cache("material", "zodiac")),
+				signs: makePBRMat(cache("material", "signs")),
+				whiteness: makePBRMat(cache("material", "whiteness")),
+				blackness: makePBRMat(cache("material", "blackness")),
+				orbs: [
+					makePBRMat(cache("material", "orb0")),
+					makePBRMat(cache("material", "orb1")),
+					makePBRMat(cache("material", "orb2")),
+					makePBRMat(cache("material", "orb3"))
+				]
+			},
+			tex: {
+				envCubeSpace: cache("texture", "envCubeSpace").texture,
+				reflectCubeSpace: cache("texture", "reflectCubeSpace").texture
+			}
+		};
 
-		// this.makeSkybox();
+		this.sfx_ = new Sound(this.scene.ad, assets.sound);
 
-		this.level_ = new Level(this.scene);
+		this.makeSkybox();
+
+		this.level_ = new Level(this.scene, assets);
 		this.level_.generate().then(() => {
 			const sun = makeEntity(this.scene, {
 				light: {
@@ -151,7 +175,8 @@ class MainScene implements sd.SceneDelegate {
 			});
 			this.scene.lights.setDirection(sun.light!, [0, 1, .1]);
 
-			this.setMode(GameMode.Main);
+			this.sfx_.startMusic();
+			this.player_ = new PlayerController(this.scene.rw.rd.gl.canvas, [0, 1.5, 5], this.scene, this.level_, this.sfx_);
 
 			/*
 			dom.on(dom.$(`input[type="radio"]`), "click", evt => {
@@ -182,38 +207,14 @@ class MainScene implements sd.SceneDelegate {
 
 
 	resume() {
-		if (this.mode_ >= GameMode.Title) {
-			if (! this.player_.endGame) {
-				this.sfx_.startMusic();
-			}
+		if (! this.player_.endGame) {
+			this.sfx_.startMusic();
 		}
 	}
 
 
 	suspend() {
-		if (this.mode_ >= GameMode.Title) {
-			this.sfx_.stopMusic();
-		}
-	}
-
-
-	setMode(newMode: GameMode) {
-		dom.hide(".loading");
-		dom.hide(".titles");
-		if (newMode == GameMode.Loading) {
-			dom.show(".loading");
-		}
-		else if (newMode == GameMode.Title) {
-			dom.show(".titles");
-		}
-
-		if (newMode !== GameMode.Loading) {
-			dom.show("#stage");
-			this.sfx_.startMusic();
-			this.player_ = new PlayerController(this.rc.gl.canvas, [0, 1.5, 5], this.scene, this.level_, this.sfx_);
-		}
-
-		this.mode_ = newMode;
+		this.sfx_.stopMusic();
 	}
 
 	fullQuad: entity.MeshInstance = 0;
@@ -309,7 +310,7 @@ class MainScene implements sd.SceneDelegate {
 
 				this.scene.pbrModelMgr.draw(this.scene.pbrModelMgr.all(), renderPass, camera, spotShadow, world.PBRLightingQuality.CookTorrance, this.assets_.tex.reflectCubeSpace);
 
-				this.skyBox_.draw(renderPass, camera);
+				// this.skyBox_.draw(renderPass, camera);
 			});
 
 			if (this.antialias) {
@@ -318,40 +319,37 @@ class MainScene implements sd.SceneDelegate {
 		}
 	}
 
-
-	simulationStep(timeStep: number) {
+	update(timeStep: number) {
 		const txm = this.scene.transforms;
-		if (this.mode_ >= GameMode.Main) {
-			this.player_.step(timeStep);
+		this.player_.step(timeStep);
 
-			// if (io.keyboard.pressed(io.Key.U)) {
-			// 	this.SHADOW = !this.SHADOW;
-			// }
-			// if (io.keyboard.pressed(io.Key.O)) {
-			// 	this.SHADQUAD = !this.SHADQUAD;
-			// }
-			// if (io.keyboard.down(io.Key.I)) {
-			// 	this.scene_.transformMgr.translate(this.level_.spotExit.transform, [0, 0, -.1]);
-			// }
-			// else if (io.keyboard.down(io.Key.K)) {
-			// 	this.scene_.transformMgr.translate(this.level_.spotExit.transform, [0, 0, .1]);
-			// }
-			// if (io.keyboard.down(io.Key.J)) {
-			// 	this.scene_.transformMgr.translate(this.level_.spotExit.transform, [-.1, 0, 0]);
-			// }
-			// else if (io.keyboard.down(io.Key.L)) {
-			// 	this.scene_.transformMgr.translate(this.level_.spotExit.transform, [.1, 0, 0]);
-			// }
+		// if (io.keyboard.pressed(io.Key.U)) {
+		// 	this.SHADOW = !this.SHADOW;
+		// }
+		// if (io.keyboard.pressed(io.Key.O)) {
+		// 	this.SHADQUAD = !this.SHADQUAD;
+		// }
+		// if (io.keyboard.down(io.Key.I)) {
+		// 	this.scene_.transformMgr.translate(this.level_.spotExit.transform, [0, 0, -.1]);
+		// }
+		// else if (io.keyboard.down(io.Key.K)) {
+		// 	this.scene_.transformMgr.translate(this.level_.spotExit.transform, [0, 0, .1]);
+		// }
+		// if (io.keyboard.down(io.Key.J)) {
+		// 	this.scene_.transformMgr.translate(this.level_.spotExit.transform, [-.1, 0, 0]);
+		// }
+		// else if (io.keyboard.down(io.Key.L)) {
+		// 	this.scene_.transformMgr.translate(this.level_.spotExit.transform, [.1, 0, 0]);
+		// }
 
-			if (control.keyboard.pressed(control.Key.X)) {
-				this.antialias = !this.antialias;
-			}
-
-			// if (this.skyBox_) {
-			// 	this.skyBox_.setCenter(this.player_.view.pos);
-			// 	this.scene.transformMgr.rotateByAngles(this.skyBox_.transform, [0, Math.PI * .002 * timeStep, Math.PI * -.001 * timeStep]);
-			// }
+		if (control.keyboard.pressed(control.Key.X)) {
+			this.antialias = !this.antialias;
 		}
+
+		// if (this.skyBox_) {
+		// 	this.skyBox_.setCenter(this.player_.view.pos);
+		// 	this.scene.transformMgr.rotateByAngles(this.skyBox_.transform, [0, Math.PI * .002 * timeStep, Math.PI * -.001 * timeStep]);
+		// }
 	}
 }
 
@@ -361,7 +359,8 @@ sd.App.messages.listenOnce("AppStart", undefined, () => {
 	const rw = new render.RenderWorld(stageHolder, 1280, 720);
 	const adev = audio.makeAudioDevice()!;
 
-	if (! (rw.rd.extDerivatives && rw.rd.extFragmentLOD)) {
+	const rdgl1 = rw.rd as render.gl1.GL1RenderDevice;
+	if (!(rdgl1.extDerivatives && rdgl1.extFragmentLOD)) {
 		alert("Sorry, this game is not compatible with this browser.\n\nTry one of the following:\n- Firefox 50 or newer\n- Safari 9 or newer\n- Chrome 40 or newer\n\nApologies for the trouble.");
 		return;
 	}
@@ -374,11 +373,11 @@ sd.App.messages.listenOnce("AppStart", undefined, () => {
 		dom.$1("#vps-fullhd+label").title = "Your display does not support this resolution.";
 	}
 
-	io.loadFile("base-scene.json", { tryBreakCache: true, responseType: io.FileLoadType.JSON })
-		.then((sceneJSON: any) => {
+	io.loadFile("data/assets-ld37.json", { tryBreakCache: true, responseType: io.FileLoadType.JSON })
+		.then((assetsJSON: any) => {
 			const scene = new sd.Scene(rw, adev, {
 				physicsConfig: physics.makeDefaultPhysicsConfig(),
-				assets: sceneJSON.assets,
+				assets: assetsJSON.assets,
 				delegate: new MainScene()
 			});
 			sd.App.scene = scene;
