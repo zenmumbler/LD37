@@ -13,13 +13,13 @@ interface SoundAssets {
 }
 
 interface MaterialAssets {
-	chipmetal: asset.Material;
-	medmetal: asset.Material;
-	bronzepatina: asset.Material;
-	zodiac: asset.Material;
-	signs: asset.Material;
-	whiteness: asset.Material;
-	blackness: asset.Material;
+	chipmetal: render.EffectData;
+	medmetal: render.EffectData;
+	bronzepatina: render.EffectData;
+	zodiac: render.EffectData;
+	signs: render.EffectData;
+	whiteness: render.EffectData;
+	blackness: render.EffectData;
 }
 
 interface TextureAssets {
@@ -33,7 +33,7 @@ interface Assets {
 	tex: TextureAssets;
 }
 
-function loadAllAssets(rc: render.RenderContext, ac: audio.AudioContext, meshMgr: world.MeshManager, progress: (ratio: number) => void) {
+function loadAllAssets(rc: render.RenderContext, ac: audio.AudioContext, meshMgr: scene.MeshManager, progress: (ratio: number) => void) {
 	const a = { mat: {}, sound: {}, tex: {} } as Assets;
 
 	var totalAssets = 1, assetsLoaded = 0;

@@ -23,7 +23,7 @@ const enum Music {
 
 class Sound {
 	private assets_: SoundAssets;
-	private ctx: NativeAudioContext;
+	private ctx: AudioContext;
 
 	private endMusic_ = false;
 
@@ -39,7 +39,7 @@ class Sound {
 
 	private stepToggle = 0;
 
-	constructor(private ac: audio.AudioContext) {
+	constructor(private ac: audio.AudioDevice) {
 		const ctx = this.ctx = ac.ctx;
 
 		this.stepGain = ctx.createGain();

@@ -164,7 +164,7 @@ class PlayerController {
 	private curQuad = Quadrant.Bottom;
 	private keyboardType_ = KeyboardType.QWERTY;
 
-	constructor(sensingElem: HTMLElement, initialPos: sd.Float3, private scene: world.Scene, private level: Level, private sfx: Sound) {
+	constructor(sensingElem: HTMLElement, initialPos: sd.Float3, private scene: sd.Scene, private level: Level, private sfx: Sound) {
 		this.view = new PlayerView(initialPos, level.clipLines);
 
 		this.vpWidth_ = sensingElem.offsetWidth;
@@ -198,23 +198,23 @@ class PlayerController {
 	}
 
 
-	private keyForKeyCommand(cmd: KeyCommand): io.Key {
-		let keys: io.Key[] | undefined;
+	private keyForKeyCommand(cmd: KeyCommand): control.Key {
+		let keys: control.Key[] | undefined;
 		switch (cmd) {
 			case KeyCommand.Forward:
-				keys = [io.Key.W, io.Key.W, io.Key.Z];
+				keys = [control.Key.W, control.Key.W, control.Key.Z];
 				break;
 			case KeyCommand.Backward:
-				keys = [io.Key.S, io.Key.S, io.Key.S];
+				keys = [control.Key.S, control.Key.S, control.Key.S];
 				break;
 			case KeyCommand.Left:
-				keys = [io.Key.A, io.Key.A, io.Key.Q];
+				keys = [control.Key.A, control.Key.A, control.Key.Q];
 				break;
 			case KeyCommand.Right:
-				keys = [io.Key.D, io.Key.D, io.Key.D];
+				keys = [control.Key.D, control.Key.D, control.Key.D];
 				break;
 			case KeyCommand.Interact:
-				keys = [io.Key.E, io.Key.E, io.Key.E];
+				keys = [control.Key.E, control.Key.E, control.Key.E];
 				break;
 		}
 
@@ -240,8 +240,8 @@ class PlayerController {
 
 
 	openExit() {
-		this.scene.lightMgr.setEnabled(this.level.spotExit.light!, true);
-		this.scene.pbrModelMgr.setShadowCaster(this.level.spotExit.light!);
+		this.scene.lights.setEnabled(this.level.spotExit.light!, true);
+		this.scene.renderers.setShadowCaster(this.level.spotExit.light!);
 		this.sfx.play(SFX.DoorOpen);
 		this.doorOpenStart = Date.now();
 	}
@@ -251,8 +251,8 @@ class PlayerController {
 		this.endGame = true;
 		this.sfx.stopMusic();
 		for (const g of this.level.glowers) {
-			this.scene.lightMgr.setEnabled(g.light, false);
-			this.scene.pbrModelMgr.materialManager.setEmissiveIntensity(g.mat, 0);
+			this.scene.lights.setEnabled(g.light, false);
+			this.scene.renderers.materialManager.setEmissiveIntensity(g.mat, 0);
 		}
 
 		setTimeout(() => { this.openExit(); }, 2500);
@@ -271,8 +271,8 @@ class PlayerController {
 
 		let orbsOff: Orb[] | undefined = this.level.orbs[this.curQuad];
 		let orbsOn: Orb[] | undefined = this.level.orbs[q];
-		let spotOff: world.LightInstance | undefined;
-		let spotOn: world.LightInstance | undefined;
+		let spotOff: entity.LightInstance | undefined;
+		let spotOn: entity.LightInstance | undefined;
 		switch (this.curQuad) {
 			case Quadrant.Bottom: break;
 			case Quadrant.Left:
@@ -310,8 +310,8 @@ class PlayerController {
 		}
 
 		if (spotOff) {
-			if (this.scene.lightMgr.enabled(spotOff)) {
-				this.scene.lightMgr.setEnabled(spotOff, false);
+			if (this.scene.lights.enabled(spotOff)) {
+				this.scene.lights.setEnabled(spotOff, false);
 			}
 			else {
 				spotOff = undefined;
@@ -319,23 +319,23 @@ class PlayerController {
 		}
 		if (orbsOff) {
 			for (const o of orbsOff) {
-				this.scene.pbrModelMgr.materialManager.setEmissiveIntensity(o.pbrMat, 0);
+				this.scene.renderers.materialManager.setEmissiveIntensity(o.material, 0);
 			}
 		}
 		if (spotOn) {
-			this.scene.lightMgr.setEnabled(spotOn, true);
-			this.scene.pbrModelMgr.setShadowCaster(spotOn);
+			this.scene.lights.setEnabled(spotOn, true);
+			this.scene.renderers.setShadowCaster(spotOn);
 			this.sfx.play(SFX.LightOn);
 		}
 		else {
-			this.scene.pbrModelMgr.setShadowCaster(0);
+			this.scene.renderers.setShadowCaster(0);
 			if (spotOff) {
 				this.sfx.play(SFX.LightOff);
 			}
 		}
 		if (orbsOn) {
 			for (const o of orbsOn) {
-				this.scene.pbrModelMgr.materialManager.setEmissiveIntensity(o.pbrMat, 0.15);
+				this.scene.renderers.materialManager.setEmissiveIntensity(o.material, 0.15);
 			}
 		}
 	}
@@ -350,20 +350,20 @@ class PlayerController {
 		const maxAccel = 0.66;
 		var accel = 0, sideAccel = 0;
 
-		// if (!this.endGame && io.keyboard.pressed(io.Key.P)) {
+		// if (!this.endGame && control.keyboard.pressed(control.Key.P)) {
 		// 	this.startEndGame();
 		// }
 
-		if (io.keyboard.down(io.Key.UP) || io.keyboard.down(this.keyForKeyCommand(KeyCommand.Forward))) {
+		if (control.keyboard.down(control.Key.UP) || control.keyboard.down(this.keyForKeyCommand(KeyCommand.Forward))) {
 			accel = maxAccel;
 		}
-		else if (io.keyboard.down(io.Key.DOWN) || io.keyboard.down(this.keyForKeyCommand(KeyCommand.Backward))) {
+		else if (control.keyboard.down(control.Key.DOWN) || control.keyboard.down(this.keyForKeyCommand(KeyCommand.Backward))) {
 			accel = -maxAccel;
 		}
-		if (io.keyboard.down(io.Key.LEFT) || io.keyboard.down(this.keyForKeyCommand(KeyCommand.Left))) {
+		if (control.keyboard.down(control.Key.LEFT) || control.keyboard.down(this.keyForKeyCommand(KeyCommand.Left))) {
 			sideAccel = -maxAccel;
 		}
-		else if (io.keyboard.down(io.Key.RIGHT) || io.keyboard.down(this.keyForKeyCommand(KeyCommand.Right))) {
+		else if (control.keyboard.down(control.Key.RIGHT) || control.keyboard.down(this.keyForKeyCommand(KeyCommand.Right))) {
 			sideAccel = maxAccel;
 		}
 
@@ -383,7 +383,7 @@ class PlayerController {
 			if (this.doorOpenStart > 0) {
 				const lapsed = math.clamp(Date.now() - this.doorOpenStart, 0, 10000);
 				const doorY = 1.5 - (3 * (lapsed / 10000));
-				this.scene.transformMgr.setPosition(this.level.finalDoor.transform, [-0.25, doorY, 10.001]);
+				this.scene.transforms.setPosition(this.level.finalDoor.transform, [-0.25, doorY, 10.001]);
 
 				if (lapsed == 10000) {
 					this.doorOpenStart = 0;
@@ -422,27 +422,27 @@ class PlayerController {
 		let anyHover = false;
 		for (const orbQ of this.level.orbs) {
 			for (const orb of orbQ) {
-				const owp = this.scene.transformMgr.worldPosition(orb.transform);
+				const owp = this.scene.transforms.worldPosition(orb.transform);
 				const cp = intersectCircleLineSeg([owp[0], owp[2]], .3, arm);
 				if (cp) {
 					if ((orb.quadrant == Quadrant.Left && this.solvedLeft) || (orb.quadrant == Quadrant.Right && this.solvedRight)) {
-						this.scene.pbrModelMgr.materialManager.setEmissiveIntensity(orb.pbrMat, 0);
+						this.scene.renderers.materialManager.setEmissiveIntensity(orb.material, 0);
 						continue;
 					}
 
 					anyHover = true;
 					if (this.hoverOrb != orb) {
 						if (this.hoverOrb) {
-							this.scene.pbrModelMgr.materialManager.setEmissiveIntensity(this.hoverOrb.pbrMat, 0.15);
+							this.scene.renderers.materialManager.setEmissiveIntensity(this.hoverOrb.material, 0.15);
 						}
 						this.hoverOrb = orb;
-						this.scene.pbrModelMgr.materialManager.setEmissiveIntensity(orb.pbrMat, 0.5);
+						this.scene.renderers.materialManager.setEmissiveIntensity(orb.material, 0.5);
 					}
 					else {
 							const timeSinceTap = Date.now() - this.lastInteract;
 							if (timeSinceTap < 1000) {
 								const shine = 1 - (timeSinceTap / 1000) * .5;
-								this.scene.pbrModelMgr.materialManager.setEmissiveIntensity(orb.pbrMat, shine);
+								this.scene.renderers.materialManager.setEmissiveIntensity(orb.material, shine);
 							}
 					}
 				}
@@ -450,11 +450,11 @@ class PlayerController {
 		}
 
 		if (!anyHover && this.hoverOrb) {
-			this.scene.pbrModelMgr.materialManager.setEmissiveIntensity(this.hoverOrb.pbrMat, 0.15);
+			this.scene.renderers.materialManager.setEmissiveIntensity(this.hoverOrb.material, 0.15);
 			this.hoverOrb = null;
 		}
 
-		if (io.keyboard.pressed(this.keyForKeyCommand(KeyCommand.Interact)) && this.hoverOrb) {
+		if (control.keyboard.pressed(this.keyForKeyCommand(KeyCommand.Interact)) && this.hoverOrb) {
 			this.lastInteract = Date.now();
 			this.sfx.play(SFX.ToneA + this.hoverOrb.index);
 
