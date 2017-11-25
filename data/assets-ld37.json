@@ -1,63 +1,78 @@
 {
+	"$schema": "file:///Users/arthur/Sites/sdtx/stardazed/schemas/assets-01.json#",
 	"schema-version": 1,
 	"author": "Arthur Langereis (@zenmumbler)",
 	"project": "Callisto (LD37)",
 
-	"assets": {
-		"sound": {
-			"steps": [
-				"data/sound/34253__ddohler__hard-walking_0.mp3",
-				"data/sound/34253__ddohler__hard-walking_1.mp3"
-			],
-
-			"lightOn": "data/sound/131599__alvinwhatup2__kill-switch-large-breaker-switch.mp3",
-			"lightOff": "data/sound/132998__cosmicd__light-switch-of-doom.mp3",
-
-			"ping": "data/sound/215415__unfa__ping.mp3",
-
-			"doorOpen": "data/sound/232102__thalamus-lab__stone-grind_83631__arithni__heavy-thud.mp3",
-			"swoosh": "data/sound/264777__shinplaster__swoosh.mp3",
-
-			"mainMusic": "data/sound/274222__limetoe__space-atmosphere.mp3",
-			"endMusic": {
-				"from": "data/sound/Incompetech-Comfortable-Mystery-4.mp3",
-				"lazy": true
-			}
+	"assets": [
+		{
+			"name": "step0",
+			"uri": "data/sound/34253__ddohler__hard-walking_0.mp3"
+		},
+		{
+			"name": "step1",
+			"uri": "data/sound/34253__ddohler__hard-walking_1.mp3"
+		},
+		{
+			"name": "lightOn",
+			"uri": "data/sound/131599__alvinwhatup2__kill-switch-large-breaker-switch.mp3"
+		},
+		{
+			"name": "lightOff",
+			"uri": "data/sound/132998__cosmicd__light-switch-of-doom.mp3"
+		},
+		{
+			"name": "ping",
+			"uri": "data/sound/215415__unfa__ping.mp3"
+		},
+		{
+			"name": "doorOpen",
+			"uri": "data/sound/232102__thalamus-lab__stone-grind_83631__arithni__heavy-thud.mp3"
+		},
+		{
+			"name": "swoosh",
+			"uri": "data/sound/264777__shinplaster__swoosh.mp3"
+		},
+		{
+			"name": "mainMusic",
+			"uri": "data/sound/274222__limetoe__space-atmosphere.mp3"
+		},
+		{
+			"name": "endMusic",
+			"uri": "data/sound/Incompetech-Comfortable-Mystery-4.mp3"
 		},
 
-		"mat": {
-			"chipmetal": {
-				"from": "data/mat/chipmetal/chipmetal.mtl",
-				"use": "chipmetal"
-			},
-			"medmetal": {
-				"from": "data/mat/medmetal/medmetal.mtl",
-				"use": "medmetal"
-			},
-			"bronzepatina": {
-				"from": "data/mat/bronzepatina/bronzepatina.mtl",
-				"use": "bronzepatina"
-			},
-			"zodiac": {
-				"from": "data/mat/zodiac/zodiac.mtl",
-				"use": "zodiac"
-			},
-			"signs": {
-				"from": "data/mat/signs/signs.mtl",
-				"use": "signs"
-			},
-			"whiteness": {
-				"from": "data/mat/basic.mtl",
-				"use": "whiteness"
-			},
-			"blackness": {
-				"from": "data/mat/basic.mtl",
-				"use": "blackness"
+		{ "uri": "data/mat/chipmetal/chipmetal.mtl" },
+		{ "uri": "data/mat/medmetal/medmetal.mtl" },
+		{ "uri": "data/mat/bronzepatina/bronzepatina.mtl" },
+		{ "uri": "data/mat/zodiac/zodiac.mtl" },
+		{ "uri": "data/mat/signs/signs.mtl" },
+		{ "uri": "data/mat/basic.mtl" },
+
+		{
+			"name": "envCubeSpace",
+			"kind": "textureCube",
+			"dependencies": {
+				"negx": { "uri": "data/mat/galaxy/galaxy-negx.jpg" },
+				"negy": { "uri": "data/mat/galaxy/galaxy-negy.jpg" },
+				"negz": { "uri": "data/mat/galaxy/galaxy-negz.jpg" },
+				"posx": { "uri": "data/mat/galaxy/galaxy-posx.jpg" },
+				"posy": { "uri": "data/mat/galaxy/galaxy-posy.jpg" },
+				"posz": { "uri": "data/mat/galaxy/galaxy-posz.jpg" }
 			}
 		},
-
-		"tex": {
-			"envCubeSpace": "data/mat/galaxy/galaxy.sdtex.json"
+		{
+			"name": "reflectCubeSpace",
+			"generator": "pbrPrefilteredEnvMap",
+			"metadata": {
+				"baseDim": 256,
+				"levels": 5
+			},
+			"dependencies": {
+				"textureCube": {
+					"ref": "envCubeSpace"
+				}
+			}
 		}
-	}
+	]
 }
