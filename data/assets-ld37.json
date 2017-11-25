@@ -45,6 +45,14 @@
 			"signs": {
 				"from": "data/mat/signs/signs.mtl",
 				"use": "signs"
+			},
+			"whiteness": {
+				"from": "data/mat/basic.mtl",
+				"use": "whiteness"
+			},
+			"blackness": {
+				"from": "data/mat/basic.mtl",
+				"use": "blackness"
 			}
 		},
 

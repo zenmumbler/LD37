@@ -1,0 +1,10 @@
+newmtl whiteness
+	Kd 1 1 1
+	Ke 1 1 1
+	Pr 0.8
+	Pm 0
+
+newmtl blackness
+	Kd 1 1 1
+	Pm 0.8
+	map_Pr medmetal/TexturesCom_Medieval_Metal_roughness_S.png
