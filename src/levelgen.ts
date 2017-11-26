@@ -29,7 +29,7 @@ interface Orb {
 	transform: entity.TransformInstance;
 	worldPos: sd.Float3;
 	renderer: entity.MeshRendererInstance;
-	material: render.EffectData;
+	material: render.effect.StandardEffectData;
 }
 
 interface EntityCreateOptions {
@@ -42,6 +42,8 @@ interface EntityCreateOptions {
 	renderer?: entity.MeshRendererDescriptor;
 	light?: entity.Light;
 }
+
+const geomsToAllocate: geometry.Geometry[] = [];
 
 interface EntityInfo {
 	entity: entity.Entity;
@@ -67,6 +69,7 @@ function makeEntity(scene: sd.Scene, options: EntityCreateOptions): EntityInfo {
 		const mesh = scene.meshes.create(options.geom.geometry);
 		scene.meshes.linkToEntity(mesh, entity);
 		info.mesh = mesh;
+		geomsToAllocate.push(options.geom.geometry);
 	}
 	if (options.renderer) {
 		info.renderer = scene.renderers.create(entity, options.renderer);
@@ -87,9 +90,9 @@ function makeEntity(scene: sd.Scene, options: EntityCreateOptions): EntityInfo {
 class Level {
 	private assets: Assets;
 
-	theColorMatsBack: render.EffectData[] = [];
-	theColorMatsLeft: render.EffectData[] = [];
-	theColorMatsRight: render.EffectData[] = [];
+	theColorMatsBack: render.effect.StandardEffectData[] = [];
+	theColorMatsLeft: render.effect.StandardEffectData[] = [];
+	theColorMatsRight: render.effect.StandardEffectData[] = [];
 
 	clipLines: LineSeg[] = [];
 
@@ -99,7 +102,7 @@ class Level {
 	spotExit: EntityInfo;
 
 	orbs: Orb[][];
-	glowers: { light: entity.LightInstance; mat: entity.MeshRendererInstance }[] = [];
+	glowers: { light: entity.LightInstance; }[] = [];
 
 	finalDoor: EntityInfo;
 
@@ -121,17 +124,9 @@ class Level {
 		this.checkOrderRight = [ZR[4], ZR[0], ZR[1], ZR[5], ZR[6], ZR[2], ZR[3], ZR[7]];
 
 		for (let c = 0; c < TheColors.length; ++c) {
-			const color = TheColors[c];
-			const m = asset.makeMaterial(`core_color_${c}`);
-			m.emissiveColour = color;
-			m.emissiveIntensity = 1;
-			m.flags |= asset.MaterialFlags.usesEmissive;
-			m.metallic = 0;
-			m.roughness = 0.2;
-
-			this.theColorMatsBack[c] = m;
-			this.theColorMatsLeft[c] = { ...m };
-			this.theColorMatsRight[c] = { ...m };
+			this.theColorMatsBack[c] = assets.mat.orbs[c];
+			this.theColorMatsLeft[c] = assets.mat.orbsLeft[c];
+			this.theColorMatsRight[c] = assets.mat.orbsRight[c];
 		}
 
 		this.orbs = [];
@@ -161,8 +156,7 @@ class Level {
 			}
 		});
 		this.glowers.push({
-			light: g.light!,
-			mat: this.scene.renderers.materialRange(g.renderer!).front
+			light: g.light!
 		});
 	}
 
@@ -414,10 +408,10 @@ class Level {
 				transform: orbInfo.transform,
 				worldPos: scene.transforms.worldPosition(orbInfo.transform),
 				renderer: orbInfo.renderer!,
-				material: scene.renderers.materialRange(orbInfo.renderer!).front
+				material: this.theColorMatsBack[p]
 			};
 			this.orbs[quadrant].push(orb);
-			scene.renderers.materialManager.setEmissiveIntensity(orb.material, 0);
+			// this.theColorMatsBack[p].emissiveFactor[3] = 0;
 		}
 		makeEntity(scene, {
 			parent: baseEnt.transform,
@@ -636,6 +630,13 @@ class Level {
 		for (let qq = 0; qq < 7; ++qq) {
 			this.makeGlower([((qq * 16) % 20) - 10, 6.5, ((qq * 34) % 20) - 10], .4, 1.8);
 		}
+
+		// sigh
+		const rcb = new render.RenderCommandBuffer();
+		for (const geom of geomsToAllocate) {
+			rcb.allocate(geom);
+		}
+		scene.rw.rd.dispatch(rcb);
 
 		return Promise.resolve();
 	}

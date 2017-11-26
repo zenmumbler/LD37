@@ -125,7 +125,7 @@ class MainScene implements sd.SceneDelegate {
 		const makePBRMat = (mat: asset.Material) => {
 			const data = standard.makeEffectData();
 			const pbr = mat as asset.StandardMaterial;
-			return data;
+			return data as render.effect.StandardEffectData;
 		};
 
 		const assets: Assets = {
@@ -152,17 +152,31 @@ class MainScene implements sd.SceneDelegate {
 					makePBRMat(cache("material", "orb1")),
 					makePBRMat(cache("material", "orb2")),
 					makePBRMat(cache("material", "orb3"))
+				],
+				orbsLeft: [
+					makePBRMat(cache("material", "orb0")),
+					makePBRMat(cache("material", "orb1")),
+					makePBRMat(cache("material", "orb2")),
+					makePBRMat(cache("material", "orb3"))
+				],
+				orbsRight: [
+					makePBRMat(cache("material", "orb0")),
+					makePBRMat(cache("material", "orb1")),
+					makePBRMat(cache("material", "orb2")),
+					makePBRMat(cache("material", "orb3"))
 				]
 			},
 			tex: {
-				envCubeSpace: cache("texture", "envCubeSpace").texture,
-				reflectCubeSpace: cache("texture", "reflectCubeSpace").texture
+				envCubeSpace: undefined, // cache("texture", "envCubeSpace").texture,
+				reflectCubeSpace: undefined // cache("texture", "reflectCubeSpace").texture
 			}
 		};
 
 		this.sfx_ = new Sound(this.scene.ad, assets.sound);
 
 		this.makeSkybox();
+
+		this.scene.camera.perspective(60, .1, 100);
 
 		this.level_ = new Level(this.scene, assets);
 		this.level_.generate().then(() => {
@@ -176,7 +190,8 @@ class MainScene implements sd.SceneDelegate {
 			this.scene.lights.setDirection(sun.light!, [0, 1, .1]);
 
 			this.sfx_.startMusic();
-			this.player_ = new PlayerController(this.scene.rw.rd.gl.canvas, [0, 1.5, 5], this.scene, this.level_, this.sfx_);
+			const gl = (this.scene.rw.rd as render.gl1.GL1RenderDevice).gl;
+			this.player_ = new PlayerController(gl.canvas, [0, 1.5, 5], this.scene, assets, this.level_, this.sfx_);
 
 			/*
 			dom.on(dom.$(`input[type="radio"]`), "click", evt => {
@@ -217,19 +232,20 @@ class MainScene implements sd.SceneDelegate {
 		this.sfx_.stopMusic();
 	}
 
-	fullQuad: entity.MeshInstance = 0;
-	quadPipeline?: FSQPipeline;
+	// fullQuad: entity.MeshInstance = 0;
+	// quadPipeline?: FSQPipeline;
 
 	SHADOW = true;
 	SHADQUAD = false;
 
-	downsample128: render.FilterPass;
-	downsample64: render.FilterPass;
-	boxFilter: render.FilterPass;
-	fxaaPass: render.FXAAPass;
+	// downsample128: render.FilterPass;
+	// downsample64: render.FilterPass;
+	// boxFilter: render.FilterPass;
+	// fxaaPass: render.FXAAPass;
 	mainFBO: render.FrameBuffer | undefined;
 	antialias = false;
 
+	/*
 	renderFrame(timeStep: number) {
 		if (this.mode_ < GameMode.Title) {
 			return;
@@ -318,10 +334,15 @@ class MainScene implements sd.SceneDelegate {
 			}
 		}
 	}
+	*/
 
 	update(timeStep: number) {
 		const txm = this.scene.transforms;
 		this.player_.step(timeStep);
+
+		// camera positioning, incl. earthquake effect
+		const finalEye = this.player_.view.pos;
+		this.scene.camera.lookAt(finalEye, this.player_.view.focusPos, this.player_.view.up);
 
 		// if (io.keyboard.pressed(io.Key.U)) {
 		// 	this.SHADOW = !this.SHADOW;

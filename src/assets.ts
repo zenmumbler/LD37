@@ -13,19 +13,21 @@ interface SoundAssets {
 }
 
 interface MaterialAssets {
-	chipmetal: render.EffectData;
-	medmetal: render.EffectData;
-	bronzepatina: render.EffectData;
-	zodiac: render.EffectData;
-	signs: render.EffectData;
-	whiteness: render.EffectData;
-	blackness: render.EffectData;
-	orbs: render.EffectData[];
+	chipmetal: render.effect.StandardEffectData;
+	medmetal: render.effect.StandardEffectData;
+	bronzepatina: render.effect.StandardEffectData;
+	zodiac: render.effect.StandardEffectData;
+	signs: render.effect.StandardEffectData;
+	whiteness: render.effect.StandardEffectData;
+	blackness: render.effect.StandardEffectData;
+	orbs: render.effect.StandardEffectData[];
+	orbsLeft: render.effect.StandardEffectData[];
+	orbsRight: render.effect.StandardEffectData[];
 }
 
 interface TextureAssets {
-	envCubeSpace: render.Texture;
-	reflectCubeSpace: render.Texture;
+	envCubeSpace?: render.Texture;
+	reflectCubeSpace?: render.Texture;
 }
 
 interface Assets {

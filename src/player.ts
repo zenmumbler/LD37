@@ -135,6 +135,7 @@ class PlayerView {
 	get rotation() { return this.rot_; }
 	get effectiveSpeed() { return this.effectiveSpeed_; }
 	get focusPos() { return vec3.add([], this.pos_, this.dir_); }
+	get up() { return this.up_; }
 	get viewMatrix() { return mat4.lookAt([], this.pos_, this.focusPos, this.up_); }
 }
 
@@ -164,7 +165,7 @@ class PlayerController {
 	private curQuad = Quadrant.Bottom;
 	private keyboardType_ = KeyboardType.QWERTY;
 
-	constructor(sensingElem: HTMLElement, initialPos: sd.Float3, private scene: sd.Scene, private level: Level, private sfx: Sound) {
+	constructor(sensingElem: HTMLElement, initialPos: sd.Float3, private scene: sd.Scene, private assets: Assets, private level: Level, private sfx: Sound) {
 		this.view = new PlayerView(initialPos, level.clipLines);
 
 		this.vpWidth_ = sensingElem.offsetWidth;
@@ -241,7 +242,7 @@ class PlayerController {
 
 	openExit() {
 		this.scene.lights.setEnabled(this.level.spotExit.light!, true);
-		this.scene.renderers.setShadowCaster(this.level.spotExit.light!);
+		// this.scene.renderers.setShadowCaster(this.level.spotExit.light!);
 		this.sfx.play(SFX.DoorOpen);
 		this.doorOpenStart = Date.now();
 	}
@@ -252,8 +253,8 @@ class PlayerController {
 		this.sfx.stopMusic();
 		for (const g of this.level.glowers) {
 			this.scene.lights.setEnabled(g.light, false);
-			this.scene.renderers.materialManager.setEmissiveIntensity(g.mat, 0);
 		}
+		// this.assets.mat.whiteness.emissiveFactor[3] = 0;
 
 		setTimeout(() => { this.openExit(); }, 2500);
 	}
@@ -319,23 +320,23 @@ class PlayerController {
 		}
 		if (orbsOff) {
 			for (const o of orbsOff) {
-				this.scene.renderers.materialManager.setEmissiveIntensity(o.material, 0);
+				// o.material.emissiveFactor[3] = 0;
 			}
 		}
 		if (spotOn) {
 			this.scene.lights.setEnabled(spotOn, true);
-			this.scene.renderers.setShadowCaster(spotOn);
+			// this.scene.renderers.setShadowCaster(spotOn);
 			this.sfx.play(SFX.LightOn);
 		}
 		else {
-			this.scene.renderers.setShadowCaster(0);
+			// this.scene.renderers.setShadowCaster(0);
 			if (spotOff) {
 				this.sfx.play(SFX.LightOff);
 			}
 		}
 		if (orbsOn) {
 			for (const o of orbsOn) {
-				this.scene.renderers.materialManager.setEmissiveIntensity(o.material, 0.15);
+				// o.material.emissiveFactor[3] = 0.15;
 			}
 		}
 	}
@@ -426,23 +427,23 @@ class PlayerController {
 				const cp = intersectCircleLineSeg([owp[0], owp[2]], .3, arm);
 				if (cp) {
 					if ((orb.quadrant == Quadrant.Left && this.solvedLeft) || (orb.quadrant == Quadrant.Right && this.solvedRight)) {
-						this.scene.renderers.materialManager.setEmissiveIntensity(orb.material, 0);
+						// orb.material.emissiveFactor[3] = 0;
 						continue;
 					}
 
 					anyHover = true;
 					if (this.hoverOrb != orb) {
 						if (this.hoverOrb) {
-							this.scene.renderers.materialManager.setEmissiveIntensity(this.hoverOrb.material, 0.15);
+							// orb.material.emissiveFactor[3] = 0.15;
 						}
 						this.hoverOrb = orb;
-						this.scene.renderers.materialManager.setEmissiveIntensity(orb.material, 0.5);
+						// orb.material.emissiveFactor[3] = 0.5;
 					}
 					else {
 							const timeSinceTap = Date.now() - this.lastInteract;
 							if (timeSinceTap < 1000) {
 								const shine = 1 - (timeSinceTap / 1000) * .5;
-								this.scene.renderers.materialManager.setEmissiveIntensity(orb.material, shine);
+								// orb.material.emissiveFactor[3] = shine;
 							}
 					}
 				}
@@ -450,7 +451,7 @@ class PlayerController {
 		}
 
 		if (!anyHover && this.hoverOrb) {
-			this.scene.renderers.materialManager.setEmissiveIntensity(this.hoverOrb.material, 0.15);
+			// this.hoverOrb.material.emissiveFactor[3] = 0.15;
 			this.hoverOrb = null;
 		}
 
