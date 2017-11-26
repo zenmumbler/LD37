@@ -58,7 +58,7 @@ function makeEntity(scene: sd.Scene, options: EntityCreateOptions): EntityInfo {
 	const entity = scene.entities.create();
 	const info: EntityInfo = {
 		entity,
-		transform: scene.transforms.create(entity, options.transform),
+		transform: scene.transforms.create(entity, options.transform, options.parent),
 		collider: 0,
 		mesh: 0,
 		renderer: 0,

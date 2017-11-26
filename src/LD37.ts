@@ -123,9 +123,18 @@ class MainScene implements sd.SceneDelegate {
 		const standard = this.scene.rw.effectByName("standard")!;
 
 		const makePBRMat = (mat: asset.Material) => {
-			const data = standard.makeEffectData();
+			const data = standard.makeEffectData() as render.effect.StandardEffectData;
 			const pbr = mat as asset.StandardMaterial;
-			return data as render.effect.StandardEffectData;
+			
+			vec3.copy(data.tint, pbr.colour.baseColour);
+			if (pbr.colour.colourTexture) {
+				data.diffuse = pbr.colour.colourTexture.texture;
+			}
+			if (pbr.normalTexture) {
+				data.normal = pbr.normalTexture.texture;
+			}
+
+			return data;
 		};
 
 		const assets: Assets = {
