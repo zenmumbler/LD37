@@ -440,11 +440,11 @@ class PlayerController {
 						this.hoverOrb.material.emissiveFactor[3] = 0.5;
 					}
 					else {
-							const timeSinceTap = Date.now() - this.lastInteract;
-							if (timeSinceTap < 1000) {
-								const shine = 1 - (timeSinceTap / 1000) * .5;
-								orb.material.emissiveFactor[3] = shine;
-							}
+						const timeSinceTap = Date.now() - this.lastInteract;
+						if (timeSinceTap < 1000) {
+							const shine = 1 - (timeSinceTap / 1000) * .5;
+							orb.material.emissiveFactor[3] = shine;
+						}
 					}
 				}
 			}
