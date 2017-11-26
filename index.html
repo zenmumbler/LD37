@@ -199,6 +199,18 @@
 
 <script src="../stardazed/ext/veclib.js"></script>
 <script src="../stardazed/ext/inflate.js"></script>
+<script>
+	(function () {
+		var ammoJSFile = "../stardazed/ext/ammojs/";
+		if (typeof window.WebAssemblyX === "object") {
+			ammoJSFile += "ammo.wasm.js";
+		}
+		else {
+			ammoJSFile += "ammo.js";
+		}
+		document.writeln('<scr' + 'ipt src="' + ammoJSFile + '"><\/script>');
+	}());
+</script>
 <script src="../stardazed/dist/stardazed.js"></script>
 <script src="build/ld37.js"></script>
 
