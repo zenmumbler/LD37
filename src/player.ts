@@ -434,10 +434,10 @@ class PlayerController {
 					anyHover = true;
 					if (this.hoverOrb != orb) {
 						if (this.hoverOrb) {
-							orb.material.emissiveFactor[3] = 0.15;
+							this.hoverOrb.material.emissiveFactor[3] = 0.15;
 						}
 						this.hoverOrb = orb;
-						orb.material.emissiveFactor[3] = 0.5;
+						this.hoverOrb.material.emissiveFactor[3] = 0.5;
 					}
 					else {
 							const timeSinceTap = Date.now() - this.lastInteract;
