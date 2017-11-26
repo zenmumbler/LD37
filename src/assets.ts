@@ -33,3 +33,31 @@ interface Assets {
 	mat: MaterialAssets;
 	tex: TextureAssets;
 }
+
+/*
+		{
+			"name": "envCubeSpace",
+			"kind": "textureCube",
+			"dependencies": {
+				"negx": { "uri": "data/mat/galaxy/galaxy-negx.jpg" },
+				"negy": { "uri": "data/mat/galaxy/galaxy-negy.jpg" },
+				"negz": { "uri": "data/mat/galaxy/galaxy-negz.jpg" },
+				"posx": { "uri": "data/mat/galaxy/galaxy-posx.jpg" },
+				"posy": { "uri": "data/mat/galaxy/galaxy-posy.jpg" },
+				"posz": { "uri": "data/mat/galaxy/galaxy-posz.jpg" }
+			}
+		},
+		{
+			"name": "reflectCubeSpace",
+			"generator": "pbrPrefilteredEnvMap",
+			"metadata": {
+				"baseDim": 256,
+				"levels": 5
+			},
+			"dependencies": {
+				"textureCube": {
+					"ref": "envCubeSpace"
+				}
+			}
+		}
+*/
