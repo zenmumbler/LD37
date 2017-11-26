@@ -127,6 +127,10 @@ class MainScene implements sd.SceneDelegate {
 			const pbr = mat as asset.StandardMaterial;
 			
 			vec3.copy(data.tint, pbr.colour.baseColour);
+			vec3.copy(data.emissiveFactor, pbr.emissiveFactor);
+			if (vec3.len(pbr.emissiveFactor) > 0) {
+				data.emissiveFactor[3] = 1.0;
+			}
 			if (pbr.colour.colourTexture) {
 				data.diffuse = pbr.colour.colourTexture.texture;
 			}

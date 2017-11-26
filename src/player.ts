@@ -254,7 +254,7 @@ class PlayerController {
 		for (const g of this.level.glowers) {
 			this.scene.lights.setEnabled(g.light, false);
 		}
-		// this.assets.mat.whiteness.emissiveFactor[3] = 0;
+		this.assets.mat.whiteness.emissiveFactor[3] = 0;
 
 		setTimeout(() => { this.openExit(); }, 2500);
 	}
@@ -320,7 +320,7 @@ class PlayerController {
 		}
 		if (orbsOff) {
 			for (const o of orbsOff) {
-				// o.material.emissiveFactor[3] = 0;
+				o.material.emissiveFactor[3] = 0;
 			}
 		}
 		if (spotOn) {
@@ -336,7 +336,7 @@ class PlayerController {
 		}
 		if (orbsOn) {
 			for (const o of orbsOn) {
-				// o.material.emissiveFactor[3] = 0.15;
+				o.material.emissiveFactor[3] = 0.15;
 			}
 		}
 	}
@@ -427,23 +427,23 @@ class PlayerController {
 				const cp = intersectCircleLineSeg([owp[0], owp[2]], .3, arm);
 				if (cp) {
 					if ((orb.quadrant == Quadrant.Left && this.solvedLeft) || (orb.quadrant == Quadrant.Right && this.solvedRight)) {
-						// orb.material.emissiveFactor[3] = 0;
+						orb.material.emissiveFactor[3] = 0;
 						continue;
 					}
 
 					anyHover = true;
 					if (this.hoverOrb != orb) {
 						if (this.hoverOrb) {
-							// orb.material.emissiveFactor[3] = 0.15;
+							orb.material.emissiveFactor[3] = 0.15;
 						}
 						this.hoverOrb = orb;
-						// orb.material.emissiveFactor[3] = 0.5;
+						orb.material.emissiveFactor[3] = 0.5;
 					}
 					else {
 							const timeSinceTap = Date.now() - this.lastInteract;
 							if (timeSinceTap < 1000) {
 								const shine = 1 - (timeSinceTap / 1000) * .5;
-								// orb.material.emissiveFactor[3] = shine;
+								orb.material.emissiveFactor[3] = shine;
 							}
 					}
 				}
@@ -451,7 +451,7 @@ class PlayerController {
 		}
 
 		if (!anyHover && this.hoverOrb) {
-			// this.hoverOrb.material.emissiveFactor[3] = 0.15;
+			this.hoverOrb.material.emissiveFactor[3] = 0.15;
 			this.hoverOrb = null;
 		}
 

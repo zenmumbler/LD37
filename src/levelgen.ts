@@ -411,7 +411,7 @@ class Level {
 				material: this.theColorMatsBack[p]
 			};
 			this.orbs[quadrant].push(orb);
-			// this.theColorMatsBack[p].emissiveFactor[3] = 0;
+			this.theColorMatsBack[p].emissiveFactor[3] = 0;
 		}
 		makeEntity(scene, {
 			parent: baseEnt.transform,
