@@ -137,6 +137,7 @@ class MainScene implements sd.SceneDelegate {
 			if (pbr.normalTexture) {
 				data.normal = pbr.normalTexture.texture;
 			}
+			vec4.copy(data.texScaleOffset, [pbr.uvScale[0], pbr.uvScale[1], pbr.uvOffset[0], pbr.uvOffset[1]]);
 
 			return data;
 		};
