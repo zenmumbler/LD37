@@ -47,7 +47,19 @@
 		{ "uri": "data/mat/bronzepatina/bronzepatina.mtl" },
 		{ "uri": "data/mat/zodiac/zodiac.mtl" },
 		{ "uri": "data/mat/signs/signs.mtl" },
-		{ "uri": "data/mat/basic.mtl" }
+		{ "uri": "data/mat/basic.mtl" },
 
+		{
+			"name": "envCubeSpace",
+			"kind": "textureCube",
+			"dependencies": {
+				"posx": { "uri": "data/mat/galaxy/galaxy-posx.jpg" },
+				"negx": { "uri": "data/mat/galaxy/galaxy-negx.jpg" },
+				"posy": { "uri": "data/mat/galaxy/galaxy-posy.jpg" },
+				"negy": { "uri": "data/mat/galaxy/galaxy-negy.jpg" },
+				"posz": { "uri": "data/mat/galaxy/galaxy-posz.jpg" },
+				"negz": { "uri": "data/mat/galaxy/galaxy-negz.jpg" }
+			}
+		}				
 	]
 }
