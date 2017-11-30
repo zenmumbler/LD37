@@ -390,6 +390,9 @@ class Level {
 			transform: { position: origin }
 		});
 
+		const orbMats = quadrant === Quadrant.Top ? this.theColorMatsBack :
+			(quadrant === Quadrant.Left ? this.theColorMatsLeft : this.theColorMatsRight);
+
 		const pgen: geometry.gen.TransformedMeshGen[] = [];
 		const pw = .25;
 		for (let p = 0; p < 4; ++p) {
@@ -402,7 +405,7 @@ class Level {
 				parent: baseEnt.transform,
 				transform: { position: [p * spacing, 1.4, 0] },
 				geom: { geometry: geometry.gen.generate(new geometry.gen.Sphere({ radius: pw * .9, rows: 18, segs: 18 })) },
-				renderer: { materials: [this.theColorMatsBack[p]] }
+				renderer: { materials: [orbMats[p]] }
 			});
 			const orb = {
 				index: p,
@@ -410,10 +413,10 @@ class Level {
 				transform: orbInfo.transform,
 				worldPos: scene.transforms.worldPosition(orbInfo.transform),
 				renderer: orbInfo.renderer!,
-				material: this.theColorMatsBack[p]
+				material: orbMats[p]
 			};
 			this.orbs[quadrant].push(orb);
-			this.theColorMatsBack[p].emissiveFactor[3] = 0;
+			orbMats[p].emissiveFactor[3] = 0;
 		}
 		makeEntity(scene, {
 			parent: baseEnt.transform,
