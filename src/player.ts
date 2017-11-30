@@ -81,7 +81,7 @@ class PlayerView {
 		for (const cl of this.clipLines) {
 			const ip = intersectCircleLineSeg(posXZ, .25, cl);
 			if (ip) {
-				if (ip.length == 2) {
+				if (ip.length === 2) {
 					const center = vec2.lerp([], ip[0], ip[1], .5);
 					const pdir = vec2.sub([], posXZ, center);
 					const pen = .25 / vec2.length(pdir);
@@ -227,7 +227,7 @@ class PlayerController {
 
 	handleStepSounds() {
 		if (this.view.effectiveSpeed > 0.01) {
-			if (this.stepSoundTimer_ == -1) {
+			if (this.stepSoundTimer_ === -1) {
 				this.stepSoundTimer_ = setInterval(() => { this.sfx.play(SFX.FootStep); }, 500);
 			}
 		}
@@ -270,7 +270,7 @@ class PlayerController {
 			return;
 		}
 
-		let orbsOff: Orb[] | undefined = this.level.orbs[this.curQuad];
+		const orbsOff: Orb[] | undefined = this.level.orbs[this.curQuad];
 		let orbsOn: Orb[] | undefined = this.level.orbs[q];
 		let spotOff: entity.LightInstance | undefined;
 		let spotOn: entity.LightInstance | undefined;
@@ -300,11 +300,11 @@ class PlayerController {
 			this.startEndGame();
 		}
 		else {
-			if (q == Quadrant.Left && this.solvedLeft) {
+			if (q === Quadrant.Left && this.solvedLeft) {
 				spotOn = undefined;
 				orbsOn = undefined;
 			}
-			if (q == Quadrant.Right && this.solvedRight) {
+			if (q === Quadrant.Right && this.solvedRight) {
 				spotOn = undefined;
 				orbsOn = undefined;
 			}
@@ -349,7 +349,7 @@ class PlayerController {
 
 	step(timeStep: number) {
 		const maxAccel = 0.66;
-		var accel = 0, sideAccel = 0;
+		let accel = 0, sideAccel = 0;
 
 		// if (!this.endGame && control.keyboard.pressed(control.Key.P)) {
 		// 	this.startEndGame();
@@ -386,7 +386,7 @@ class PlayerController {
 				const doorY = 1.5 - (3 * (lapsed / 10000));
 				this.scene.transforms.setPosition(this.level.finalDoor.transform, [-0.25, doorY, 10.001]);
 
-				if (lapsed == 10000) {
+				if (lapsed === 10000) {
 					this.doorOpenStart = 0;
 					this.level.clipLines.pop(); // open door
 				}
@@ -409,7 +409,7 @@ class PlayerController {
 
 		// positional interaction
 		const quadrant = this.level.positionQuadrant(this.view.pos);
-		if (quadrant != this.curQuad) {
+		if (quadrant !== this.curQuad) {
 			this.setPoweredQuadrant(quadrant);
 		}
 
@@ -426,13 +426,13 @@ class PlayerController {
 				const owp = this.scene.transforms.worldPosition(orb.transform);
 				const cp = intersectCircleLineSeg([owp[0], owp[2]], .3, arm);
 				if (cp) {
-					if ((orb.quadrant == Quadrant.Left && this.solvedLeft) || (orb.quadrant == Quadrant.Right && this.solvedRight)) {
+					if ((orb.quadrant === Quadrant.Left && this.solvedLeft) || (orb.quadrant === Quadrant.Right && this.solvedRight)) {
 						orb.material.emissiveFactor[3] = 0;
 						continue;
 					}
 
 					anyHover = true;
-					if (this.hoverOrb != orb) {
+					if (this.hoverOrb !== orb) {
 						if (this.hoverOrb) {
 							this.hoverOrb.material.emissiveFactor[3] = 0.15;
 						}
@@ -459,7 +459,7 @@ class PlayerController {
 			this.lastInteract = Date.now();
 			this.sfx.play(SFX.ToneA + this.hoverOrb.index);
 
-			if (this.hoverOrb.quadrant == Quadrant.Left) {
+			if (this.hoverOrb.quadrant === Quadrant.Left) {
 				this.sequenceLeft.push(this.hoverOrb.index);
 				if (this.sequenceLeft.length > 8) {
 					this.sequenceLeft.shift();
@@ -469,7 +469,7 @@ class PlayerController {
 					this.setPoweredQuadrant(this.hoverOrb.quadrant);
 				}
 			}
-			else if (this.hoverOrb.quadrant == Quadrant.Right) {
+			else if (this.hoverOrb.quadrant === Quadrant.Right) {
 				this.sequenceRight.push(this.hoverOrb.index);
 				if (this.sequenceRight.length > 8) {
 					this.sequenceRight.shift();

@@ -141,10 +141,10 @@ class Level {
 	makeGlower(position: sd.Float3, radius: number, range = 3 * radius) {
 		const g = makeEntity(this.scene, {
 			transform: {
-				position: position
+				position
 			},
 			geom: {
-				geometry: geometry.gen.generate(new geometry.gen.Sphere({ radius: radius, rows: 16, segs: 24 }))
+				geometry: geometry.gen.generate(new geometry.gen.Sphere({ radius, rows: 16, segs: 24 }))
 			},
 			renderer: {
 				materials: [this.assets.mat.whiteness],
@@ -153,7 +153,7 @@ class Level {
 			light: {
 				type: entity.LightType.Point,
 				intensity: 7,
-				range: range,
+				range,
 				colour: [1, 0.96, 0.94]
 			}
 		});
@@ -181,7 +181,7 @@ class Level {
 					generator: new geometry.gen.Box({
 						width: pillarDim, depth: pillarDim, height: pillarHeight,
 						inward: false,
-						uvRange: uvRange, uvOffset: vec2.multiply([], uvRange, [tileX, tileZ])
+						uvRange, uvOffset: vec2.multiply([], uvRange, [tileX, tileZ])
 					})
 				});
 				pX += pillarDim;
@@ -207,7 +207,7 @@ class Level {
 				translation: [vwalls[cwx][0], 7.5, vwalls[cwx][1] + 2.25],
 				generator: new geometry.gen.Box({ width: 0.5, depth: 5, height: 15, inward: false, uvRange: [5, 15] })
 			});
-			if ((cwx & 1) == 0) {
+			if ((cwx & 1) === 0) {
 				walls.push({
 					translation: [cwalls[cwx][0], 9, cwalls[cwx][1]],
 					generator: new geometry.gen.Box({ width: 10, depth: 0.5, height: 12, inward: false, uvRange: [11, 12], uvOffset: [1, 0] })
@@ -359,7 +359,7 @@ class Level {
 		let pY = spacing[1];
 
 		for (let pos = 0; pos < indexes.length; ++pos) {
-			if ((pos % 4) == 0) {
+			if ((pos % 4) === 0) {
 				pX = 0;
 				pY -= spacing[1];
 			}
@@ -409,7 +409,7 @@ class Level {
 			});
 			const orb = {
 				index: p,
-				quadrant: quadrant,
+				quadrant,
 				transform: orbInfo.transform,
 				worldPos: scene.transforms.worldPosition(orbInfo.transform),
 				renderer: orbInfo.renderer!,
@@ -458,7 +458,7 @@ class Level {
 	makeCornerLights(scene: sd.Scene, assets: Assets) {
 		for (let corneria = 0; corneria < 4; ++corneria) {
 			const mulX = ((corneria > 0) && (corneria < 3)) ? 1 : -1;
-			const mulZ = ((corneria & 2) == 0) ? -1 : 1;
+			const mulZ = ((corneria & 2) === 0) ? -1 : 1;
 			makeEntity(scene, {
 				transform: { position: [mulX * 8.5, 2.7, mulZ * 8.5] },
 				light: {
