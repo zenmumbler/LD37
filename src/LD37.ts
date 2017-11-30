@@ -102,7 +102,7 @@ class MainScene implements sd.SceneDelegate {
 	private sfx_: Sound;
 	private level_: Level;
 
-	// private skyBox_: world.Skybox;
+	private skybox_: EntityInfo;
 
 	private player_: PlayerController;
 
@@ -121,6 +121,7 @@ class MainScene implements sd.SceneDelegate {
 	setup() {
 		const cache = this.scene.assets;
 		const standard = this.scene.rw.effectByName("standard")!;
+		const skybox = this.scene.rw.effectByName("simple-skybox")!;
 
 		const makePBRMat = (mat: asset.Material) => {
 			const data = standard.makeEffectData() as render.effect.StandardEffectData;
@@ -181,16 +182,25 @@ class MainScene implements sd.SceneDelegate {
 				]
 			},
 			tex: {
-				envCubeSpace: undefined, // cache("texture", "envCubeSpace").texture,
+				envCubeSpace: cache("texturecube", "envCubeSpace").texture,
 				reflectCubeSpace: undefined // cache("texture", "reflectCubeSpace").texture
 			}
 		};
 
 		this.sfx_ = new Sound(this.scene.ad, assets.sound);
 
-		this.makeSkybox();
-
 		this.scene.camera.perspective(60, .1, 100);
+
+		const sky = skybox.makeEffectData() as render.effect.SimpleSkyboxEffectData;
+		sky.skybox = assets.tex.envCubeSpace;
+		this.skybox_ = makeEntity(this.scene, {
+			geom: {
+				geometry: geometry.gen.generate(new geometry.gen.Sphere({ radius: 400, rows: 10, segs: 15 }))
+			},
+			renderer: {
+				materials: [sky]
+			}
+		});
 
 		this.level_ = new Level(this.scene, assets);
 		this.level_.generate().then(() => {
@@ -226,12 +236,6 @@ class MainScene implements sd.SceneDelegate {
 			});
 			*/
 		});
-	}
-
-	makeSkybox() {
-		const sb = makeEntity(this.scene, {});
-		// this.skyBox_ = new world.Skybox(this.rc, this.scene.transformMgr, this.scene.meshes, this.assets_.tex.envCubeSpace);
-		// this.skyBox_.setEntity(sb.entity);
 	}
 
 
@@ -339,8 +343,6 @@ class MainScene implements sd.SceneDelegate {
 				renderPass.setFaceCulling(render.FaceCulling.Back);
 
 				this.scene.pbrModelMgr.draw(this.scene.pbrModelMgr.all(), renderPass, camera, spotShadow, world.PBRLightingQuality.CookTorrance, this.assets_.tex.reflectCubeSpace);
-
-				// this.skyBox_.draw(renderPass, camera);
 			});
 
 			if (this.antialias) {
@@ -381,10 +383,9 @@ class MainScene implements sd.SceneDelegate {
 			this.antialias = !this.antialias;
 		}
 
-		// if (this.skyBox_) {
-		// 	this.skyBox_.setCenter(this.player_.view.pos);
-		// 	this.scene.transformMgr.rotateByAngles(this.skyBox_.transform, [0, Math.PI * .002 * timeStep, Math.PI * -.001 * timeStep]);
-		// }
+		if (this.skybox_) {
+			this.scene.transforms.rotateByAngles(this.skybox_.transform, [0, Math.PI * .002 * timeStep, Math.PI * -.001 * timeStep]);
+		}
 	}
 }
 

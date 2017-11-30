@@ -69,7 +69,9 @@ function makeEntity(scene: sd.Scene, options: EntityCreateOptions): EntityInfo {
 		const mesh = scene.meshes.create(options.geom.geometry);
 		scene.meshes.linkToEntity(mesh, entity);
 		info.mesh = mesh;
-		geomsToAllocate.push(options.geom.geometry);
+		if (options.geom.geometry.renderResourceHandle === 0) {
+			geomsToAllocate.push(options.geom.geometry);
+		}
 	}
 	if (options.renderer) {
 		info.renderer = scene.renderers.create(entity, options.renderer);
