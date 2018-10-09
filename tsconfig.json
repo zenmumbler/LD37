@@ -4,16 +4,13 @@
         "target": "es5",
         "rootDir": "src",
         "outFile": "build/ld37.js",
-
         "noEmitOnError": true,
-        "alwaysStrict": true,
-        "noImplicitAny": true,
-        "suppressImplicitAnyIndexErrors": false,
+
+        "strict": true,
         "noImplicitReturns": true,
         "forceConsistentCasingInFileNames": true,
         "noFallthroughCasesInSwitch": false,
-        "strictNullChecks": true,
-        "noImplicitThis": true,
+
         "noUnusedLocals": false,
         "noUnusedParameters": false,
  

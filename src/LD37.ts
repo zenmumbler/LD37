@@ -1,11 +1,6 @@
 // Callisto, a Ludum Dare 37 Entry
 // (c) 2016 by Arthur Langereis (@zenmumbler)
 
-/// <reference path="../../stardazed/dist/stardazed.d.ts" />
-/// <reference path="assets.ts" />
-/// <reference path="levelgen.ts" />
-/// <reference path="sfx.ts" />
-
 interface Element {
 	mozRequestFullScreen(): void;
 }
